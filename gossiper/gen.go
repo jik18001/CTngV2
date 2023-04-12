@@ -67,6 +67,7 @@ func (ctx GossiperContext) Generate_NUM_FRAG(n definition.PoM_Counter) definitio
 	// Generate a signature fragment
 	sig, _ := ctx.Gossiper_crypto_config.ThresholdSign(n.ACC_FULL_Counter + n.CON_FULL_Counter + n.Period)
 	return definition.PoM_Counter{
+		Type:             definition.NUM_FRAG,
 		ACC_FULL_Counter: n.ACC_FULL_Counter,
 		CON_FULL_Counter: n.CON_FULL_Counter,
 		Period:           n.Period,
@@ -99,6 +100,7 @@ func (ctx GossiperContext) Generate_NUM_FULL(n_list []definition.PoM_Counter) de
 	}
 	// Generate the full gossip object
 	return definition.PoM_Counter{
+		Type:             definition.NUM_FULL,
 		ACC_FULL_Counter: n_list[0].ACC_FULL_Counter,
 		CON_FULL_Counter: n_list[0].CON_FULL_Counter,
 		Period:           n_list[0].Period,

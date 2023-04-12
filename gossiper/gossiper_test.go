@@ -247,7 +247,7 @@ func testCONhandler(t *testing.T) {
 
 }
 
-func TestFragHandler(t *testing.T) {
+func testFragHandler(t *testing.T) {
 	// Create a channel that will receive a message after 10 seconds
 	done := make(chan bool, 1)
 	go func() {
@@ -288,4 +288,34 @@ func TestFragHandler(t *testing.T) {
 		t.Errorf("test timed out after 10 seconds")
 		return
 	}
+}
+
+func TestNUMHandler(t *testing.T) {
+	ctx_g1 := InitializeGossiperContext("testFiles/gossiper_testconfig/1/Gossiper_public_config.json", "testFiles/gossiper_testconfig/1/Gossiper_private_config.json", "testFiles/gossiper_testconfig/1/Gossiper_crypto_config.json", "1")
+	ctx_g2 := InitializeGossiperContext("testFiles/gossiper_testconfig/2/Gossiper_public_config.json", "testFiles/gossiper_testconfig/2/Gossiper_private_config.json", "testFiles/gossiper_testconfig/2/Gossiper_crypto_config.json", "2")
+	NUM_INIT_1 := definition.PoM_Counter{
+		Type:             definition.NUM_INIT,
+		Signer_Monitor:   "1",
+		ACC_FULL_Counter: "1",
+		CON_FULL_Counter: "1",
+		Period:           "1",
+		Crypto_Scheme:    "RSA",
+		Signature:        "1",
+	}
+	NUM_INIT_2 := definition.PoM_Counter{
+		Type:             definition.NUM_INIT,
+		Signer_Monitor:   "2",
+		ACC_FULL_Counter: "1",
+		CON_FULL_Counter: "1",
+		Period:           "1",
+		Crypto_Scheme:    "RSA",
+		Signature:        "2",
+	}
+	NUM_FRAG_2 := ctx_g2.Generate_NUM_FRAG(NUM_INIT_2)
+	Handle_PoM_Counter(ctx_g1, NUM_INIT_1)
+	Handle_PoM_Counter(ctx_g1, NUM_INIT_2)
+	Handle_PoM_Counter(ctx_g1, NUM_FRAG_2)
+	ctx_g1.Save()
+	fmt.Println(ctx_g1.Gossiper_log)
+
 }

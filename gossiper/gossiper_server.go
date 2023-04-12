@@ -129,12 +129,15 @@ func Handle_PoM_Counter(c *GossiperContext, pom_counter definition.PoM_Counter) 
 	// check duplicate before proceeding
 	dup, err := c.IsDuplicate(pom_counter)
 	if err != nil {
+		//fmt.Println(err)
 		return
 	}
 	if dup {
 		// it is a duplicate, we just ignore it
+		//fmt.Println(util.RED, "Received duplicate PoM_counter "+definition.TypeString(pom_counter.Type)+" signed by "+pom_counter.Signer_Gossiper+".", util.RESET)
 		return
 	}
+	fmt.Println(util.BLUE, "Received PoM_counter "+definition.TypeString(pom_counter.Type)+" signed by "+pom_counter.Signer_Gossiper+".", util.RESET)
 	switch pom_counter.Type {
 	case definition.NUM_INIT:
 		Handle_NUM_INIT(c, pom_counter)
@@ -292,13 +295,17 @@ func Handle_NUM_INIT(c *GossiperContext, pom_counter definition.PoM_Counter) {
 	c.Store(pom_counter)
 	c.Send_to_Gossipers(pom_counter)
 	itemcount, _ := c.GetItemCount(pom_counter.GetID(), pom_counter.Type)
-	if itemcount == c.Gossiper_crypto_config.Threshold {
-		Generate_NUM_FRAG := c.Generate_NUM_FRAG(pom_counter)
-		Handle_PoM_Counter(c, Generate_NUM_FRAG)
+	//fmt.Println("itemcount: ", itemcount)
+	//fmt.Println("threshold: ", c.Gossiper_crypto_config.Threshold)
+	if itemcount >= c.Gossiper_crypto_config.Threshold {
+		NUM_FRAG := c.Generate_NUM_FRAG(pom_counter)
+		fmt.Println("NUM_FRAG: ", NUM_FRAG)
+		Handle_PoM_Counter(c, NUM_FRAG)
 	}
 
 }
 func Handle_NUM_FRAG(c *GossiperContext, pom_counter definition.PoM_Counter) {
+	fmt.Println("Handle_NUM_FRAG")
 	icount, _ := c.GetItemCount(pom_counter.GetID(), definition.NUM_FULL)
 	if icount > 0 {
 		return
@@ -306,10 +313,10 @@ func Handle_NUM_FRAG(c *GossiperContext, pom_counter definition.PoM_Counter) {
 	c.Store(pom_counter)
 	c.Send_to_Gossipers(pom_counter)
 	itemcount, _ := c.GetItemCount(pom_counter.GetID(), pom_counter.Type)
-	if itemcount == c.Gossiper_crypto_config.Threshold {
+	if itemcount >= c.Gossiper_crypto_config.Threshold {
 		num_frag_list := c.GetNUMList(pom_counter.GetID())
-		Generate_NUM_FULL := c.Generate_NUM_FULL(num_frag_list)
-		Handle_PoM_Counter(c, Generate_NUM_FULL)
+		NUM_FULL := c.Generate_NUM_FULL(num_frag_list)
+		Handle_PoM_Counter(c, NUM_FULL)
 	}
 }
 func Handle_NUM_FULL(c *GossiperContext, pom_counter definition.PoM_Counter) {

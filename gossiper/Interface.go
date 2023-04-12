@@ -25,6 +25,14 @@ type GossiperInterfact interface {
 	Save()
 }
 
+func countFragments(fragmentMap map[definition.Gossip_ID][]definition.Gossip_object) int {
+	count := 0
+	for _, fragments := range fragmentMap {
+		count += len(fragments)
+	}
+	return count
+}
+
 func (ctx *GossiperContext) Save() {
 	Period, _ := strconv.Atoi(util.GetCurrentPeriod())
 	g_log_entry := Gossiper_log_entry{
@@ -33,10 +41,10 @@ func (ctx *GossiperContext) Save() {
 		NUM_REV_INIT:       len(ctx.Gossip_object_storage.REV_INIT),
 		NUM_ACC_INIT:       len(ctx.Gossip_object_storage.ACC_INIT),
 		NUM_CON_INIT:       len(ctx.Gossip_object_storage.CON_INIT),
-		NUM_STH_FRAG:       len(ctx.Gossip_object_storage.STH_FRAG),
-		NUM_REV_FRAG:       len(ctx.Gossip_object_storage.REV_FRAG),
-		NUM_ACC_FRAG:       len(ctx.Gossip_object_storage.ACC_FRAG),
-		NUM_CON_FRAG:       len(ctx.Gossip_object_storage.CON_FRAG),
+		NUM_STH_FRAG:       0,
+		NUM_REV_FRAG:       0,
+		NUM_ACC_FRAG:       0,
+		NUM_CON_FRAG:       0,
 		NUM_STH_FULL:       len(ctx.Gossip_object_storage.STH_FULL),
 		NUM_REV_FULL:       len(ctx.Gossip_object_storage.REV_FULL),
 		NUM_ACC_FULL:       len(ctx.Gossip_object_storage.ACC_FULL),
@@ -45,7 +53,13 @@ func (ctx *GossiperContext) Save() {
 		NUM_BLACKLIST_PERM: len(ctx.Gossip_blacklist.BLACKLIST_PERM),
 		NUM_POM_INIT:       len(ctx.Gossip_PoM_Counter.NUM_INIT),
 		NUM_POM_FRAG:       len(ctx.Gossip_PoM_Counter.NUM_FRAG),
+		NUM_POM_FULL:       0,
 	}
+	g_log_entry.NUM_STH_FRAG = countFragments(ctx.Gossip_object_storage.STH_FRAG)
+	g_log_entry.NUM_REV_FRAG = countFragments(ctx.Gossip_object_storage.REV_FRAG)
+	g_log_entry.NUM_ACC_FRAG = countFragments(ctx.Gossip_object_storage.ACC_FRAG)
+	g_log_entry.NUM_CON_FRAG = countFragments(ctx.Gossip_object_storage.CON_FRAG)
+
 	if ctx.Gossip_PoM_Counter.NUM_FULL {
 		g_log_entry.NUM_POM_FULL = 1
 	} else {
