@@ -1,0 +1,10 @@
+{
+  "Crypto_config_location": "gossiper_testconfig/3/crypto_config.json",
+  "Connected_Gossipers": [
+   "localhost:8083"
+  ],
+  "Owner_URL": "localhost:8182",
+  "Port": "8082",
+  "Crypto": null,
+  "Public": null
+ }

@@ -1,0 +1,24 @@
+{
+  "STHs": [],
+  "REVs": [],
+  "ACCs": [],
+  "CONs": [],
+  "NUM": {
+    "type": "http://ctng.uconn.edu/105",
+    "ACC_FULL_Counter": "0",
+    "CON_FULL_Counter": "0",
+    "period": "23",
+    "signer_monitor": "localhost:8182",
+    "crypto_scheme": "rsa",
+    "signature": "{\"sig\":\"129c3b0bb1f060040a9f5824c482cf4f9e38576f3d0b82598d4f21b70df6f4e07eab5016bc4e6bb50bf8691dc2ce4f3590f677e65b08789452c2e64ecf73103e8ce0d79f7c7077ba26576909658e24cd6a43b39284fed3866bf13ac3fc52c3d51abb8b041f8c4ace3beadd2dd682588a632714de36d8fcec6a4869e20985a9ecef7fffee47ecbb62c200769a2863680d4406f652701980c8fe6648e3d891c64a0cb5977b7fd0be2a64f3b6db3f3f42a4ff2e82093a39bae246701b990a0651549b495502f13b5dca4b556cadb476d741ea0d00360f21c973640470f8cddf9c9a1c642ec5677fd1618316205046c9acdce9413b489ab6546221d4b3ddfc0a512d\",\"id\":\"localhost:8182\"}"
+  },
+  "NUM_FULL": {
+    "type": "",
+    "ACC_FULL_Counter": "",
+    "CON_FULL_Counter": "",
+    "period": "",
+    "crypto_scheme": ""
+  },
+  "MonitorID": "localhost:8182",
+  "Period": "23"
+}
