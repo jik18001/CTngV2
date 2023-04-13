@@ -5,7 +5,6 @@ import (
 	"CTngV2/util"
 	"errors"
 	"fmt"
-	"os"
 	"strconv"
 )
 
@@ -561,15 +560,6 @@ func (ctx GossiperContext) IsMalicious(obj definition.Gossip_object) bool {
 		}
 	}
 	return false
-}
-
-func (ctx GossiperContext) WriteToFile() {
-	// check if Directory exists
-	if _, err := os.Stat(ctx.StorageDirectory); os.IsNotExist(err) {
-		os.Mkdir(ctx.StorageDirectory, 0755)
-	}
-	// write gossip log
-	util.WriteData(ctx.StorageDirectory+ctx.StorageFile, ctx.Gossiper_log)
 }
 
 func (ctx GossiperContext) WipeStorage() {

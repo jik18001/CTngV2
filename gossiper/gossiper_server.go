@@ -153,6 +153,11 @@ func Handle_STH_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 		// we already have the full object, we just ignore the init
 		return
 	}
+	icount, _ = c.GetItemCount(gossip_obj.GetID(), definition.STH_FRAG)
+	if icount >= c.Gossiper_crypto_config.Threshold {
+		// we already have enough fragments, we just ignore the init
+		return
+	}
 	//check Malicious
 	if c.IsMalicious(gossip_obj) {
 		// if it is malicious, the list is not empty
@@ -186,6 +191,11 @@ func Handle_REV_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 		// we already have the full object, we just ignore the init
 		return
 	}
+	icount, _ = c.GetItemCount(gossip_obj.GetID(), definition.REV_FRAG)
+	if icount >= c.Gossiper_crypto_config.Threshold {
+		// we already have enough fragments, we just ignore the init
+		return
+	}
 	//check Malicious
 	if c.IsMalicious(gossip_obj) {
 		// if it is malicious, the list is not empty
@@ -217,10 +227,21 @@ func Handle_ACC_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 		// we already have the full object, we just ignore the init
 		return
 	}
+	icount, _ = c.GetItemCount(gossip_obj.GetID(), definition.ACC_FRAG)
+	if icount >= c.Gossiper_crypto_config.Threshold {
+		// we already have enough fragments, we just ignore the init
+		return
+	}
 	// if not malicious, we store the object
 	c.Store(gossip_obj)
-	ACC_FRAG := c.Generate_Gossip_Object_FRAG(gossip_obj)
-	Handle_Gossip_object(c, ACC_FRAG)
+	f := func() {
+		if c.InBlacklist(gossip_obj.Payload[0]) {
+			return
+		}
+		ACC_FRAG := c.Generate_Gossip_Object_FRAG(gossip_obj)
+		Handle_Gossip_object(c, ACC_FRAG)
+	}
+	time.AfterFunc(time.Duration(c.Gossiper_public_config.Gossip_wait_time)*time.Second, f)
 	return
 }
 
@@ -229,17 +250,22 @@ func Handle_CON_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 	if icount > 0 {
 		return
 	}
-	c.Send_to_Gossipers(gossip_obj)
+	icount, _ = c.GetItemCount(gossip_obj.GetID(), definition.CON_FRAG)
+	if icount >= c.Gossiper_crypto_config.Threshold {
+		return
+	}
 	CON2 := c.GetObject(gossip_obj.GetID(), gossip_obj.Type)
 	//fmt.Println("CON2: ", CON2)
 	count, _ := c.GetItemCount(gossip_obj.GetID(), gossip_obj.Type)
 	if count == 0 {
 		c.Store(gossip_obj)
+		c.Send_to_Gossipers(gossip_obj)
 	}
 	// if in the store, we compare the ID
 	if count == 1 && gossip_obj.Get_CON_ID() > CON2.Get_CON_ID() {
 		fmt.Println(util.BLUE, "Received CON_INIT with higher CON ID than the one in the store.", util.RESET)
 		c.Store(gossip_obj)
+		c.Send_to_Gossipers(gossip_obj)
 	}
 	// wait and sign the CON
 	f := func() {
@@ -266,21 +292,29 @@ func Handle_OBJ_FRAG(c *GossiperContext, gossip_obj definition.Gossip_object) {
 	}
 	if icount > 0 {
 		// we already have the full object, we just ignore the init
+		fmt.Println(util.BLUE, "Received a fragment for a full object.", util.RESET)
 		return
 	}
-	c.Store(gossip_obj)
-	c.Send_to_Gossipers(gossip_obj)
+
 	itemcount, _ := c.GetItemCount(gossip_obj.GetID(), gossip_obj.Type)
-	if itemcount == c.Gossiper_crypto_config.Threshold {
+	if itemcount < c.Gossiper_crypto_config.Threshold {
+		c.Store(gossip_obj)
+		c.Send_to_Gossipers(gossip_obj)
+	}
+	if itemcount == c.Gossiper_crypto_config.Threshold-1 {
 		itemlist := c.GetObjectList(gossip_obj.GetID(), gossip_obj.Type)
 		target_type := gossip_obj.GetTargetType()
 		obj := c.Generate_Gossip_Object_FULL(itemlist, target_type)
+		fmt.Println(util.BLUE, "Generated full object: ", obj, util.RESET)
 		Handle_Gossip_object(c, obj)
 	}
 	return
 }
 
 func Handle_OBJ_FULL(c *GossiperContext, gossip_obj definition.Gossip_object) {
+	if c.InBlacklist(gossip_obj.Payload[0]) && (gossip_obj.Type == definition.STH_FULL || gossip_obj.Type == definition.REV_FULL || gossip_obj.Type == definition.ACC_FULL) {
+		return
+	}
 	c.Store(gossip_obj)
 	c.Send_to_Gossipers(gossip_obj)
 	c.Send_to_Monitor(gossip_obj)
@@ -313,7 +347,7 @@ func Handle_NUM_FRAG(c *GossiperContext, pom_counter definition.PoM_Counter) {
 	c.Store(pom_counter)
 	c.Send_to_Gossipers(pom_counter)
 	itemcount, _ := c.GetItemCount(pom_counter.GetID(), pom_counter.Type)
-	if itemcount >= c.Gossiper_crypto_config.Threshold {
+	if itemcount == c.Gossiper_crypto_config.Threshold {
 		num_frag_list := c.GetNUMList(pom_counter.GetID())
 		NUM_FULL := c.Generate_NUM_FULL(num_frag_list)
 		Handle_PoM_Counter(c, NUM_FULL)
@@ -479,8 +513,11 @@ func PeriodicTasks(c *GossiperContext) {
 	}
 	time.AfterFunc(time.Duration(c.Gossiper_public_config.MMD)*time.Second, f)
 	// Run the periodic tasks.
-	c.WriteToFile()
-	//c.WipeStorage()
+	f1 := func() {
+		c.Save()
+		c.WipeStorage()
+	}
+	time.AfterFunc(time.Duration(c.Gossiper_public_config.MMD-10)*time.Second, f1)
 }
 
 func StartGossiperServer(c *GossiperContext) {

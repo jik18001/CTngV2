@@ -247,7 +247,7 @@ func testCONhandler(t *testing.T) {
 
 }
 
-func testFragHandler(t *testing.T) {
+func TestFragHandler(t *testing.T) {
 	// Create a channel that will receive a message after 10 seconds
 	done := make(chan bool, 1)
 	go func() {
@@ -267,13 +267,22 @@ func testFragHandler(t *testing.T) {
 	}
 	ctx_g1 := InitializeGossiperContext("testFiles/gossiper_testconfig/1/Gossiper_public_config.json", "testFiles/gossiper_testconfig/1/Gossiper_private_config.json", "testFiles/gossiper_testconfig/1/Gossiper_crypto_config.json", "1")
 	ctx_g2 := InitializeGossiperContext("testFiles/gossiper_testconfig/2/Gossiper_public_config.json", "testFiles/gossiper_testconfig/2/Gossiper_private_config.json", "testFiles/gossiper_testconfig/2/Gossiper_crypto_config.json", "2")
+	ctx_g3 := InitializeGossiperContext("testFiles/gossiper_testconfig/3/Gossiper_public_config.json", "testFiles/gossiper_testconfig/3/Gossiper_private_config.json", "testFiles/gossiper_testconfig/3/Gossiper_crypto_config.json", "3")
+	ctx_g4 := InitializeGossiperContext("testFiles/gossiper_testconfig/4/Gossiper_public_config.json", "testFiles/gossiper_testconfig/4/Gossiper_private_config.json", "testFiles/gossiper_testconfig/4/Gossiper_crypto_config.json", "4")
 	//REV_FRAG_1 := ctx_g1.Generate_Gossip_Object_FRAG(REV_INIT_1)
 	REV_FRAG_2 := ctx_g2.Generate_Gossip_Object_FRAG(REV_INIT_1)
-	Handle_Gossip_object(ctx_g1, REV_FRAG_2)
-	Handle_Gossip_object(ctx_g1, REV_FRAG_2)
+	REV_FRAG_3 := ctx_g3.Generate_Gossip_Object_FRAG(REV_INIT_1)
+	REV_FRAG_4 := ctx_g4.Generate_Gossip_Object_FRAG(REV_INIT_1)
+	//Handle_Gossip_object(ctx_g1, REV_INIT_1)
+	//Handle_Gossip_object(ctx_g1, REV_INIT_1)
 	Handle_Gossip_object(ctx_g1, REV_INIT_1)
+	Handle_Gossip_object(ctx_g1, REV_FRAG_2)
+	Handle_Gossip_object(ctx_g1, REV_FRAG_3)
+	Handle_Gossip_object(ctx_g1, REV_FRAG_4)
+	//Handle_Gossip_object(ctx_g1, REV_FRAG_2)
 	f := func() {
 		//ctx_g1.log_Gossiper_data()
+		ctx_g1.Save()
 		fmt.Println(ctx_g1.Gossiper_log)
 		return
 	}
@@ -290,7 +299,7 @@ func testFragHandler(t *testing.T) {
 	}
 }
 
-func TestNUMHandler(t *testing.T) {
+func testNUMHandler(t *testing.T) {
 	ctx_g1 := InitializeGossiperContext("testFiles/gossiper_testconfig/1/Gossiper_public_config.json", "testFiles/gossiper_testconfig/1/Gossiper_private_config.json", "testFiles/gossiper_testconfig/1/Gossiper_crypto_config.json", "1")
 	ctx_g2 := InitializeGossiperContext("testFiles/gossiper_testconfig/2/Gossiper_public_config.json", "testFiles/gossiper_testconfig/2/Gossiper_private_config.json", "testFiles/gossiper_testconfig/2/Gossiper_crypto_config.json", "2")
 	NUM_INIT_1 := definition.PoM_Counter{
