@@ -2,9 +2,7 @@
   "Signer": "localhost:9100",
   "Port": "9100",
   "Loggerlist": [
-   "localhost:9000",
-   "localhost:9001",
-   "localhost:9002"
+   "localhost:9000"
   ],
   "Monitorlist": [
    "localhost:8180",

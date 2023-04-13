@@ -315,9 +315,12 @@ func Handle_OBJ_FULL(c *GossiperContext, gossip_obj definition.Gossip_object) {
 	if c.InBlacklist(gossip_obj.Payload[0]) && (gossip_obj.Type == definition.STH_FULL || gossip_obj.Type == definition.REV_FULL || gossip_obj.Type == definition.ACC_FULL) {
 		return
 	}
-	c.Store(gossip_obj)
-	c.Send_to_Gossipers(gossip_obj)
-	c.Send_to_Monitor(gossip_obj)
+	icount, _ := c.GetItemCount(gossip_obj.GetID(), gossip_obj.Type)
+	if icount == 0 {
+		c.Store(gossip_obj)
+		c.Send_to_Gossipers(gossip_obj)
+		c.Send_to_Monitor(gossip_obj)
+	}
 	return
 }
 
@@ -354,9 +357,12 @@ func Handle_NUM_FRAG(c *GossiperContext, pom_counter definition.PoM_Counter) {
 	}
 }
 func Handle_NUM_FULL(c *GossiperContext, pom_counter definition.PoM_Counter) {
-	c.Store(pom_counter)
-	c.Send_to_Gossipers(pom_counter)
-	c.Send_to_Monitor(pom_counter)
+	icount, _ := c.GetItemCount(pom_counter.GetID(), definition.NUM_FULL)
+	if icount == 0 {
+		c.Store(pom_counter)
+		c.Send_to_Gossipers(pom_counter)
+		c.Send_to_Monitor(pom_counter)
+	}
 }
 
 func (c *GossiperContext) Send_to_Gossipers(obj any) error {
