@@ -523,7 +523,7 @@ func PeriodicTasks(c *GossiperContext) {
 		c.Save()
 		c.WipeStorage()
 	}
-	time.AfterFunc(time.Duration(c.Gossiper_public_config.MMD-10)*time.Second, f1)
+	time.AfterFunc(time.Duration(c.Gossiper_public_config.MMD-20)*time.Second, f1)
 }
 
 func StartGossiperServer(c *GossiperContext) {

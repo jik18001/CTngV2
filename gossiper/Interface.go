@@ -565,14 +565,14 @@ func (ctx GossiperContext) IsMalicious(obj definition.Gossip_object) bool {
 func (ctx GossiperContext) WipeStorage() {
 	// clear all storage
 	CON_FULL := ctx.Gossip_object_storage.CON_FULL
-	ctx.Gossip_object_storage = InitializeGossipObjectStorage()
+	*ctx.Gossip_object_storage = *InitializeGossipObjectStorage()
 	ctx.Gossip_object_storage.CON_FULL = CON_FULL
 	// clear all temperary blacklist
 	Blacklistperm := ctx.Gossip_blacklist.BLACKLIST_PERM
-	ctx.Gossip_blacklist = InitializeGossipBlacklist()
+	*ctx.Gossip_blacklist = *InitializeGossipBlacklist()
 	ctx.Gossip_blacklist.BLACKLIST_PERM = Blacklistperm
 	// clear all PoM counter and gossiper log
-	ctx.Gossip_PoM_Counter = InitializeGossipPoMCounter()
+	*ctx.Gossip_PoM_Counter = *InitializeGossipPoMCounter()
 }
 
 func (ctx GossiperContext) CleanUpGossiperStorage() {
