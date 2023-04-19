@@ -19,9 +19,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.16.x'
-      - name: Install dependencies
-        run: |
-          go get .
+
       - name: Run Network Tests 
         run: |
           cd tests/networktests/Test1
