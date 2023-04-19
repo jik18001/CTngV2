@@ -1,0 +1,37 @@
+name: 'Run Tests'
+ 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+ 
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+ 
+jobs:
+  run-network-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.19.x'
+
+      - name: Run Network Tests 
+        run: |
+          cd tests/networktests/Test1
+          go run Test1.go CA 1 &
+          go run Test1.go Logger 1 &
+          go run Test1.go Monitor 1 &
+          go run Test1.go Monitor 2 &
+          go run Test1.go Monitor 3 &
+          go run Test1.go Monitor 4 &
+          go run Test1.go Gossiper 1 &
+          go run Test1.go Gossiper 2 &
+          go run Test1.go Gossiper 3 &
+          go run Test1.go Gossiper 4 &
+          sleep 200
+          go test 
