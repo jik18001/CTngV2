@@ -44,17 +44,21 @@ func handleLoggerRequests(ctx *LoggerContext) {
 func requestSTH(c *LoggerContext, w http.ResponseWriter, r *http.Request) {
 	// get current period
 	Period := util.GetCurrentPeriod()
+	c.Request_Count_lock.Lock()
+	defer c.Request_Count_lock.Unlock()
 	c.Request_Count++
 	switch c.Logger_Type {
 	case 0:
 		// normal logger
 		json.NewEncoder(w).Encode(c.STH_storage[Period])
+		return
 	case 1:
 		// split-world logger
 		if c.Request_Count%c.MisbehaviorInterval == 0 {
 			// misbehave
 			json.NewEncoder(w).Encode(c.STH_storage_fake[Period])
 		}
+		return
 	case 2:
 		// ALways unresponsive logger
 		// do nothing
@@ -63,6 +67,34 @@ func requestSTH(c *LoggerContext, w http.ResponseWriter, r *http.Request) {
 		// sometimes unresponsive logger
 		if c.Request_Count%c.MisbehaviorInterval == 0 {
 			// misbehave
+			return
+		} else {
+			json.NewEncoder(w).Encode(c.STH_storage[Period])
+			return
+		}
+	case 4:
+		// Split-world-logger on second round since requested by monitor, behave normally on other rounds
+		if c.Request_Count%c.MisbehaviorInterval == 0 && c.OnlineDuration == 1 {
+			json.NewEncoder(w).Encode(c.STH_storage_fake[Period])
+			return
+		} else {
+			json.NewEncoder(w).Encode(c.STH_storage[Period])
+			return
+		}
+	case 5:
+		// always unresponsive logger on second round since requested by monitor, behave normally on other rounds
+		if c.OnlineDuration == 1 {
+			return
+		} else {
+			json.NewEncoder(w).Encode(c.STH_storage[Period])
+			return
+		}
+	case 6:
+		// sometimes unreponsive on second round since requested by monitor, behave normally on other rounds
+		if c.Request_Count%c.MisbehaviorInterval == 0 && c.OnlineDuration == 1 {
+			return
+		} else {
+			json.NewEncoder(w).Encode(c.STH_storage[Period])
 			return
 		}
 	}
@@ -189,9 +221,14 @@ func PeriodicTask(ctx *LoggerContext) {
 		// update STH
 		certlist := ctx.CurrentPrecertPool.GetCerts()
 		STH, _, POIs := BuildMerkleTreeFromCerts(certlist, *ctx, periodint)
+		// duplicate the STH for testing
+		certlist2 := ctx.CurrentPrecertPool.GetCerts()
+		certlist2 = append(certlist2, certlist2[0])
+		STH_FAKE, _, _ := BuildMerkleTreeFromCerts(certlist2, *ctx, periodint)
 		//fmt.Println("STH: ", STH)
 		// update STH storage
 		ctx.STH_storage[period] = STH
+		ctx.STH_storage_fake[period] = STH_FAKE
 		// send STH to all CAs
 		// fmt.Println(ctx.Logger_public_config.All_CA_URLs)
 		for i := 0; i < len(ctx.Logger_public_config.All_CA_URLs); i++ {
@@ -199,6 +236,12 @@ func PeriodicTask(ctx *LoggerContext) {
 		}
 		// send POI to the Issuer CA
 		Send_POIs_to_CAs(ctx, POIs)
+		ctx.Request_Count_lock.Lock()
+		if ctx.Request_Count > 0 {
+			ctx.OnlineDuration = ctx.OnlineDuration + 1
+		}
+		ctx.Request_Count = 0
+		ctx.Request_Count_lock.Unlock()
 	}
 	time.AfterFunc(time.Duration(ctx.Logger_public_config.MMD-20)*time.Second, f1)
 }

@@ -73,6 +73,8 @@ func Generate_Revocation(c *CAContext, Period string, REV_type int) definition.G
 		if err != nil {
 			panic(err)
 		}
+		m2.Set(1)
+		m2.Set(2)
 		// compute the complement of m2
 		m2_complement := m2.Complement()
 		hashmsgdelta, err = m2_complement.MarshalBinary()

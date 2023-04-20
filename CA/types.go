@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sync"
 )
 
 type CAContext struct {
@@ -28,11 +29,13 @@ type CAContext struct {
 	CRV                    *CRV
 	CA_Type                int                                 //0 for normal CA, 1 for Split-world CA, 2 for always unreponsive CA, 3 for sometimes unreponsive CA
 	Request_Count          int                                 //Only used for sometimes unreponsive CA and Split-world CA
+	OnlineDuration         int                                 //Only used for sometimes unreponsive CA and Split-world CA
 	REV_storage            map[string]definition.Gossip_object //for monitor to query
 	REV_storage_fake       map[string]definition.Gossip_object //for monitor to query
 	MisbehaviorInterval    int                                 //for sometimes unreponsive CA and Split-world CA, misbehave every x requests
 	StoragePath            string
 	STH_storage            map[string]definition.Gossip_object //store the STH by LID
+	Request_Count_lock     *sync.Mutex
 }
 
 type CA_public_config struct {
@@ -278,11 +281,13 @@ func InitializeCAContext(public_config_path string, private_config_file_path str
 		CertPoolStorage:        &CTngCertPoolStorage{Certpools: make(map[string]crypto.CertPool)},
 		CA_Type:                0,
 		Request_Count:          0,
+		OnlineDuration:         0,
 		REV_storage:            make(map[string]definition.Gossip_object),
 		REV_storage_fake:       make(map[string]definition.Gossip_object),
 		MisbehaviorInterval:    0,
 		CertCounter:            0,
 		STH_storage:            make(map[string]definition.Gossip_object),
+		Request_Count_lock:     &sync.Mutex{},
 	}
 	// Initialize http client
 	tr := &http.Transport{}

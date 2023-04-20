@@ -1,0 +1,15 @@
+{
+  "Crypto_config_location": "monitor_testconfig/1/crypto_config.json",
+  "CA_URLs": [
+   "localhost:9100"
+  ],
+  "Logger_URLs": [
+   "localhost:9000"
+  ],
+  "Signer": "localhost:8180",
+  "Gossiper_URL": "localhost:8080",
+  "Inbound_gossiper_port": "8080",
+  "Port": "8180",
+  "Crypto": null,
+  "Public": null
+ }

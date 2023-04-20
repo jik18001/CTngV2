@@ -7,6 +7,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"net/http"
+	"sync"
 	//"fmt"
 )
 
@@ -42,8 +43,10 @@ type LoggerContext struct {
 	STH_storage           map[string]definition.Gossip_object //for monitor to query
 	STH_storage_fake      map[string]definition.Gossip_object //for monitor to query
 	MisbehaviorInterval   int                                 //for sometimes unreponsive Logger and Split-world Logger, misbehave every x requests
+	OnlineDuration        int                                 //for sometimes unreponsive Logger and Split-world Logger, misbehave every x requests
 	StorageDirectory      string
 	StorageFile           string
+	Request_Count_lock    *sync.Mutex
 }
 
 type PrecertStorage struct {
@@ -106,9 +109,11 @@ func InitializeLoggerContext(public_config_path string, private_config_file_path
 		OnlinePeriod:          0,
 		Logger_Type:           0,
 		Request_Count:         0,
+		OnlineDuration:        0,
 		STH_storage:           make(map[string]definition.Gossip_object),
 		STH_storage_fake:      make(map[string]definition.Gossip_object),
 		MisbehaviorInterval:   0,
+		Request_Count_lock:    &sync.Mutex{},
 	}
 	// Initialize http client
 	tr := &http.Transport{}

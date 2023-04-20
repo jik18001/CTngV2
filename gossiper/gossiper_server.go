@@ -347,10 +347,12 @@ func Handle_NUM_FRAG(c *GossiperContext, pom_counter definition.PoM_Counter) {
 	if icount > 0 {
 		return
 	}
-	c.Store(pom_counter)
-	c.Send_to_Gossipers(pom_counter)
 	itemcount, _ := c.GetItemCount(pom_counter.GetID(), pom_counter.Type)
-	if itemcount == c.Gossiper_crypto_config.Threshold {
+	if itemcount < c.Gossiper_crypto_config.Threshold {
+		c.Store(pom_counter)
+		c.Send_to_Gossipers(pom_counter)
+	}
+	if itemcount == c.Gossiper_crypto_config.Threshold-1 {
 		num_frag_list := c.GetNUMList(pom_counter.GetID())
 		NUM_FULL := c.Generate_NUM_FULL(num_frag_list)
 		Handle_PoM_Counter(c, NUM_FULL)

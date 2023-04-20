@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 
@@ -47,7 +48,7 @@ func testCAContext(t *testing.T) {
 }
 
 func testCertMarshal(t *testing.T) {
-	ctx := InitializeCAContext("../Gen/ca_testconfig/1/CA_public_config.json", "../Gen/ca_testconfig/1/CA_private_config.json", "../Gen/ca_testconfig/1/CA_crypto_config.json")
+	ctx := InitializeCAContext("testFiles/ca_testconfig/1/CA_public_config.json", "testFiles/ca_testconfig/1/CA_private_config.json", "testFiles/ca_testconfig/1/CA_crypto_config.json")
 	//Generate N signed pre-certificates
 	issuer := Generate_Issuer(ctx.CA_private_config.Signer)
 	// generate host
@@ -63,7 +64,7 @@ func testCertMarshal(t *testing.T) {
 	fmt.Println(cert)
 }
 
-func TestPOIjson(t *testing.T) {
+func testPOIjson(t *testing.T) {
 	SiblingHashes := make([][]byte, 0)
 	SiblingHashes = append(SiblingHashes, []byte("1"))
 	NeighborHash := []byte("2")
@@ -107,7 +108,7 @@ func testCtngExtension(t *testing.T) {
 	fmt.Println(GetCTngExtensions(&signed_certs[0]))
 }
 
-func TestGenerateKeypairs(t *testing.T) {
+func testGenerateKeypairs(t *testing.T) {
 	subjectlist := Generate_N_Subjects(1, 0)
 	publ, privl := Generate_and_return_N_KeyPairs(subjectlist)
 	pub1 := *publ["Testing Dummy 0"]
@@ -115,4 +116,24 @@ func TestGenerateKeypairs(t *testing.T) {
 	fmt.Println(pub1)
 	fmt.Println(pub1 == pub2)
 
+}
+
+func TestREV(t *testing.T) {
+	ctx := InitializeCAContext("testFiles/ca_testconfig/1/CA_public_config.json", "testFiles/ca_testconfig/1/CA_private_config.json", "testFiles/ca_testconfig/1/CA_crypto_config.json")
+	// get current period
+	period := GetCurrentPeriod()
+	// convert string to int
+	periodnum, err := strconv.Atoi(period)
+	if err != nil {
+	}
+	// add 1 to current period
+	periodnum = periodnum + 1
+	// convert int to string
+	period = strconv.Itoa(periodnum)
+	rev := Generate_Revocation(ctx, period, 0)
+	fake_rev := Generate_Revocation(ctx, period, 1)
+	ctx.REV_storage[period] = rev
+	ctx.REV_storage[period] = fake_rev
+	fmt.Println(rev.Payload[2])
+	fmt.Println(fake_rev.Payload[2])
 }

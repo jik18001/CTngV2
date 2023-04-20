@@ -54,6 +54,8 @@ func handleCARequests(c *CAContext) {
 
 // receive get request from monitor
 func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
+	c.Request_Count_lock.Lock()
+	defer c.Request_Count_lock.Unlock()
 	Period := util.GetCurrentPeriod()
 	c.Request_Count++
 	switch c.CA_Type {
@@ -78,8 +80,35 @@ func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
 			return
 		} else {
 			json.NewEncoder(w).Encode(c.REV_storage[Period])
+			return
+		}
+	case 4:
+		// Split-world CA on second round since requested by monitor, behave normally on other rounds
+		if c.Request_Count%c.MisbehaviorInterval == 0 && c.OnlineDuration == 1 {
+			json.NewEncoder(w).Encode(c.REV_storage_fake[Period])
+		} else {
+			json.NewEncoder(w).Encode(c.REV_storage[Period])
+		}
+		return
+	case 5:
+		// always unresponsive CA on second round since requested by monitor, behave normally on other rounds
+		if c.OnlineDuration == 1 {
+			return
+		} else {
+			json.NewEncoder(w).Encode(c.REV_storage[Period])
+			return
+		}
+
+	case 6:
+		// sometimes unreponsive on second round since requested by monitor, behave normally on other rounds
+		if c.Request_Count%c.MisbehaviorInterval == 0 && c.OnlineDuration == 1 {
+			return
+		} else {
+			json.NewEncoder(w).Encode(c.REV_storage[Period])
+			return
 		}
 	}
+
 }
 
 // receive STH from logger
@@ -254,9 +283,15 @@ func PeriodicTask(ctx *CAContext) {
 		rev := Generate_Revocation(ctx, period, 0)
 		fake_rev := Generate_Revocation(ctx, period, 1)
 		ctx.REV_storage[period] = rev
-		ctx.REV_storage[fake_rev.Period] = fake_rev
+		ctx.REV_storage[period] = fake_rev
 		fmt.Println("CA Finished Generating Revocation for next period")
 		ctx.SaveToStorage()
+		ctx.Request_Count_lock.Lock()
+		if ctx.Request_Count > 0 {
+			ctx.OnlineDuration = ctx.OnlineDuration + 1
+		}
+		ctx.Request_Count = 0
+		ctx.Request_Count_lock.Unlock()
 	}
 	time.AfterFunc(time.Duration(ctx.CA_public_config.MMD-20)*time.Second, f1)
 }

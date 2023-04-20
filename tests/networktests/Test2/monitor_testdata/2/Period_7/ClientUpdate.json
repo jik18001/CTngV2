@@ -1,0 +1,67 @@
+{
+  "STHs": [],
+  "REVs": [],
+  "ACCs": [
+    {
+      "application": "CTng",
+      "period": "7",
+      "type": "http://ctng.uconn.edu/303",
+      "signer": "",
+      "signers": [
+        "localhost:8080",
+        "localhost:8082"
+      ],
+      "signature": [
+        "{\"sign\":\"1606c691a0568b06c02763dca87e163dc02db13000107475795e969e2ef46cfe42171c672715d2945d72078625d09196\", \"ids\":[\"localhost:8080\",\"localhost:8082\"]}",
+        ""
+      ],
+      "timestamp": "2023-04-20T03:07:05Z",
+      "crypto_scheme": "bls",
+      "payload": [
+        "localhost:9000",
+        "",
+        ""
+      ]
+    },
+    {
+      "application": "CTng",
+      "period": "7",
+      "type": "http://ctng.uconn.edu/303",
+      "signer": "",
+      "signers": [
+        "localhost:8080",
+        "localhost:8082"
+      ],
+      "signature": [
+        "{\"sign\":\"3315a7a1c17f7de01f9bd04e0875e14bee03e8cf612120d6aa1fec95eac1a591e28cd8ac91e301d4fc1c581f36ae7092\", \"ids\":[\"localhost:8080\",\"localhost:8082\"]}",
+        ""
+      ],
+      "timestamp": "2023-04-20T03:07:05Z",
+      "crypto_scheme": "bls",
+      "payload": [
+        "localhost:9100",
+        "",
+        ""
+      ]
+    }
+  ],
+  "CONs": [],
+  "NUM": {
+    "type": "http://ctng.uconn.edu/105",
+    "ACC_FULL_Counter": "2",
+    "CON_FULL_Counter": "0",
+    "period": "7",
+    "signer_monitor": "localhost:8181",
+    "crypto_scheme": "rsa",
+    "signature": "{\"sig\":\"639a24b3759a4ca39515d6633828ca6fc5bd139700cd797f8bbbdf30fe3391c661c24d0123b98643d8aea17b850969edd4cc138415848da6c4ca4fe225f55184f3ff8dd63a6bba9605dc558f6edd2cbe6054ae514414408ed60f6fa39d4ba9ce271d821079f2597195944366c8e95782363d4f4c4a52a50f56c981dbeaf1838a5609737cacadd13d39b047d23af8dd46891aaeac2cda43c38dc7ab4a05e405b5ee6bc0a159a14becf749c80293bd43173a96a496f2b3216da0906bb9eb4c2cfc9bfd463eceaf7a4bb9fc3af8ea990914bc5d8887ae39f9be02f6f2eb5e6678925e76108c0a7e62fa382c63345a164b2b785b7847fea07b764e23969993237331\",\"id\":\"localhost:8181\"}"
+  },
+  "NUM_FULL": {
+    "type": "",
+    "ACC_FULL_Counter": "",
+    "CON_FULL_Counter": "",
+    "period": "",
+    "crypto_scheme": ""
+  },
+  "MonitorID": "localhost:8181",
+  "Period": "7"
+}
