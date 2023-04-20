@@ -46,7 +46,7 @@ func requestSTH(c *LoggerContext, w http.ResponseWriter, r *http.Request) {
 	Period := util.GetCurrentPeriod()
 	c.Request_Count_lock.Lock()
 	defer c.Request_Count_lock.Unlock()
-	c.Request_Count++
+	c.Request_Count = c.Request_Count + 1
 	switch c.Logger_Type {
 	case 0:
 		// normal logger
@@ -57,8 +57,11 @@ func requestSTH(c *LoggerContext, w http.ResponseWriter, r *http.Request) {
 		if c.Request_Count%c.MisbehaviorInterval == 0 {
 			// misbehave
 			json.NewEncoder(w).Encode(c.STH_storage_fake[Period])
+			return
+		} else {
+			json.NewEncoder(w).Encode(c.STH_storage[Period])
+			return
 		}
-		return
 	case 2:
 		// ALways unresponsive logger
 		// do nothing

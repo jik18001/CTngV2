@@ -20,15 +20,15 @@ jobs:
       - name: Run Network Test2 2 
         run: |
           cd tests/networktests/Test2
-          go run Test1.go CA 1 &
-          go run Test1.go Logger 1 &
-          go run Test1.go Monitor 1 &
-          go run Test1.go Monitor 2 &
-          go run Test1.go Monitor 3 &
-          go run Test1.go Monitor 4 &
-          go run Test1.go Gossiper 1 &
-          go run Test1.go Gossiper 2 &
-          go run Test1.go Gossiper 3 &
-          go run Test1.go Gossiper 4 &
+          go run Test2.go CA 1 &
+          go run Test2.go Logger 1 &
+          go run Test2.go Monitor 1 &
+          go run Test2.go Monitor 2 &
+          go run Test2.go Monitor 3 &
+          go run Test2.go Monitor 4 &
+          go run Test2.go Gossiper 1 &
+          go run Test2.go Gossiper 2 &
+          go run Test2.go Gossiper 3 &
+          go run Test2.go Gossiper 4 &
           sleep 200
           go test 

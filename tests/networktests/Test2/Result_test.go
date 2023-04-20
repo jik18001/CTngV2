@@ -104,7 +104,10 @@ func TestGMResult(t *testing.T) {
 	for i, gossiper_log_map_1_list := range gossiper_log_database {
 		fmt.Println("Start testing gossiper ", i+1)
 		//fmt.Println(gossiper_log_map_1_list)
-		testfirstglogentry(gossiper_log_map_1_list[0])
+		bool1 := testfirstglogentry(gossiper_log_map_1_list[0])
+		if bool1 == false {
+			t.Fail()
+		}
 		//test other entries
 		for i := 1; i < len(gossiper_log_map_1_list); i++ {
 			newbool := testotherglogentry(gossiper_log_map_1_list[i], i)

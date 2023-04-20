@@ -57,7 +57,7 @@ func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	c.Request_Count_lock.Lock()
 	defer c.Request_Count_lock.Unlock()
 	Period := util.GetCurrentPeriod()
-	c.Request_Count++
+	c.Request_Count = c.Request_Count + 1
 	switch c.CA_Type {
 	case 0:
 		//normal CA
@@ -67,10 +67,11 @@ func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
 		//split-world CA
 		if c.Request_Count%c.MisbehaviorInterval == 0 {
 			json.NewEncoder(w).Encode(c.REV_storage_fake[Period])
+			return
 		} else {
 			json.NewEncoder(w).Encode(c.REV_storage[Period])
+			return
 		}
-		return
 	case 2:
 		//always unresponsive CA
 		return
@@ -283,7 +284,9 @@ func PeriodicTask(ctx *CAContext) {
 		rev := Generate_Revocation(ctx, period, 0)
 		fake_rev := Generate_Revocation(ctx, period, 1)
 		ctx.REV_storage[period] = rev
-		ctx.REV_storage[period] = fake_rev
+		ctx.REV_storage_fake[period] = fake_rev
+		//fmt.Println(ctx.REV_storage_fake[period].Verify(ctx.CA_crypto_config))
+		//fmt.Println(ctx.REV_storage[period].Verify(ctx.CA_crypto_config))
 		fmt.Println("CA Finished Generating Revocation for next period")
 		ctx.SaveToStorage()
 		ctx.Request_Count_lock.Lock()

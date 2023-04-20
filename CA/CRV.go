@@ -22,8 +22,8 @@ type Revocation struct {
 
 func CRV_init() *CRV {
 	CRV := new(CRV)
-	CRV.CRV_pre_update = bitset.New(0)
-	CRV.CRV_current = bitset.New(0)
+	CRV.CRV_pre_update = bitset.New(700)
+	CRV.CRV_current = bitset.New(700)
 	CRV.CRV_cache = make(map[string]*bitset.BitSet)
 	return CRV
 }
@@ -74,10 +74,7 @@ func Generate_Revocation(c *CAContext, Period string, REV_type int) definition.G
 			panic(err)
 		}
 		m2.Set(1)
-		m2.Set(2)
-		// compute the complement of m2
-		m2_complement := m2.Complement()
-		hashmsgdelta, err = m2_complement.MarshalBinary()
+		hashmsgdelta, err = m2.MarshalBinary()
 		if err != nil {
 			panic(err)
 		}

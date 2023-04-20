@@ -12,7 +12,7 @@ import (
 	"github.com/bits-and-blooms/bitset"
 )
 
-func TestCRV(t *testing.T) {
+func testCRV(t *testing.T) {
 	newCRV := CRV_init()
 	newCRV.Revoke(1)
 	newCRV.Revoke(4)
@@ -134,6 +134,15 @@ func TestREV(t *testing.T) {
 	fake_rev := Generate_Revocation(ctx, period, 1)
 	ctx.REV_storage[period] = rev
 	ctx.REV_storage[period] = fake_rev
-	fmt.Println(rev.Payload[2])
-	fmt.Println(fake_rev.Payload[2])
+	bool1 := rev.Verify(ctx.CA_crypto_config)
+	bool2 := fake_rev.Verify(ctx.CA_crypto_config)
+	fmt.Println(rev.Type == fake_rev.Type)
+	fmt.Println(bool1)
+	fmt.Println(bool2)
+
+}
+
+func TestTask(t *testing.T) {
+	ctx := InitializeCAContext("testFiles/ca_testconfig/1/CA_public_config.json", "testFiles/ca_testconfig/1/CA_private_config.json", "testFiles/ca_testconfig/1/CA_crypto_config.json")
+	StartCA(ctx)
 }

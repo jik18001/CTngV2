@@ -21,7 +21,7 @@ func StartCA(CID string) {
 	ctx_ca.StoragePath = path_4
 	ctx_ca.OnlineDuration = 0
 	ctx_ca.MisbehaviorInterval = 4
-	ctx_ca.CA_Type = 2
+	ctx_ca.CA_Type = 1
 	CA.StartCA(ctx_ca)
 }
 
@@ -33,7 +33,7 @@ func StartLogger(LID string) {
 	ctx_logger := Logger.InitializeLoggerContext(path_1, path_2, path_3)
 	ctx_logger.OnlineDuration = 0
 	ctx_logger.MisbehaviorInterval = 4
-	ctx_logger.Logger_Type = 2
+	ctx_logger.Logger_Type = 1
 	Logger.StartLogger(ctx_logger)
 }
 
