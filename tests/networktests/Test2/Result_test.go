@@ -11,51 +11,77 @@ import (
 	"testing"
 )
 
-func testgossipobjectnum(entry gossiper.Gossiper_log_entry, Periodoffset int) {
-	if entry.NUM_STH_INIT != 1 {
-		fmt.Println("Number of STH_INIT is ", entry.NUM_STH_INIT, "but should be 1.")
+func testgossipobjectnum(entry gossiper.Gossiper_log_entry, Periodoffset int) bool {
+	if entry.NUM_STH_INIT != 0 {
+		fmt.Println("Number of STH_INIT is ", entry.NUM_STH_INIT, "but should be 0.")
+		return false
 	}
-	if entry.NUM_STH_FRAG != 2 {
-		fmt.Println("Number of NUM_FRAG is ", entry.NUM_STH_FRAG, "but should be 2.")
+	if entry.NUM_STH_FRAG != 0 {
+		fmt.Println("Number of NUM_FRAG is ", entry.NUM_STH_FRAG, "but should be 0.")
+		return false
 	}
-	if entry.NUM_STH_FULL != 1 {
-		fmt.Println("Number of NUM_FULL is ", entry.NUM_STH_FULL, "but should be 1.")
+	if entry.NUM_STH_FULL != 0 {
+		fmt.Println("Number of NUM_FULL is ", entry.NUM_STH_FULL, "but should be 0.")
+		return false
 	}
-	if entry.NUM_REV_INIT != 1 {
-		fmt.Println("Number of REV_INIT is ", entry.NUM_REV_FULL, "but should be 1.")
+	if entry.NUM_REV_INIT != 0 {
+		fmt.Println("Number of REV_INIT is ", entry.NUM_REV_FULL, "but should be 0.")
+		return false
 	}
-	if entry.NUM_REV_FRAG != 2 {
-		fmt.Println("Number of REV_FRAG is ", entry.NUM_REV_FRAG, "but should be 2.")
+	if entry.NUM_REV_FRAG != 0 {
+		fmt.Println("Number of REV_FRAG is ", entry.NUM_REV_FRAG, "but should be 0.")
+		return false
 	}
-	if entry.NUM_REV_FULL != 1 {
-		fmt.Println("Number of REV_FULL is ", entry.NUM_ACC_FULL, "but should be 1.")
+	if entry.NUM_REV_FULL != 0 {
+		fmt.Println("Number of REV_FULL is ", entry.NUM_ACC_FULL, "but should be 0.")
+		return false
 	}
+	if entry.NUM_ACC_INIT != 2 {
+		fmt.Println("Number of ACC_INIT is ", entry.NUM_ACC_INIT, "but should be 2.")
+		return false
+	}
+	if entry.NUM_ACC_FRAG != 4 {
+		fmt.Println("Number of ACC_FRAG is ", entry.NUM_ACC_FRAG, "but should be 4.")
+		return false
+	}
+	if entry.NUM_ACC_FULL != 2 {
+		fmt.Println("Number of ACC_FULL is ", entry.NUM_ACC_FULL, "but should be 2.")
+		return false
+	}
+	return true
+
 }
 
-func testfirstglogentry(entry gossiper.Gossiper_log_entry) {
+func testfirstglogentry(entry gossiper.Gossiper_log_entry) bool {
 	if entry.NUM_POM_INIT != 0 {
 		fmt.Println("Number of NUM_POM_INIT is ", entry.NUM_POM_INIT, "but should be 0.")
+		return false
 	}
 	if entry.NUM_POM_FRAG != 0 {
 		fmt.Println("Number of NUM_POM_FRAG is ", entry.NUM_POM_FRAG, "but should be 0.")
+		return false
 	}
 	if entry.NUM_POM_FULL != 0 {
 		fmt.Println("Number of NUM_POM_FULL is ", entry.NUM_POM_FULL, "but should be 0.")
+		return false
 	}
-	testgossipobjectnum(entry, 0)
+	return testgossipobjectnum(entry, 0)
 }
-func testotherglogentry(entry gossiper.Gossiper_log_entry, Periodoffset int) {
+func testotherglogentry(entry gossiper.Gossiper_log_entry, Periodoffset int) bool {
 	if entry.NUM_POM_INIT != 1 {
 		// if number of unique NUM_POMs is not 1, then some monitors are cheating
 		fmt.Println("Number of unique NUM_POMs is", entry.NUM_POM_INIT, "but should be 1. note: if number of unique NUM_POMs is not 1, then at least one monitor is cheating")
+		return false
 	}
 	if entry.NUM_POM_FRAG != 2 {
 		fmt.Println("Num_NUM_FRAG is ", entry.NUM_POM_FRAG, "but should be 2.")
+		return false
 	}
 	if entry.NUM_POM_FULL != 1 {
 		fmt.Println("Num_NUM_FULL is ", entry.NUM_POM_FULL, "but should be 1.")
+		return false
 	}
-	testgossipobjectnum(entry, Periodoffset)
+	return testgossipobjectnum(entry, Periodoffset)
 }
 func TestGMResult(t *testing.T) {
 	//read from /gossiper_testdata/$storage_ID$/gossiper_testdata.json
@@ -81,7 +107,10 @@ func TestGMResult(t *testing.T) {
 		testfirstglogentry(gossiper_log_map_1_list[0])
 		//test other entries
 		for i := 1; i < len(gossiper_log_map_1_list); i++ {
-			testotherglogentry(gossiper_log_map_1_list[i], i)
+			newbool := testotherglogentry(gossiper_log_map_1_list[i], i)
+			if newbool == false {
+				t.Fail()
+			}
 		}
 	}
 }
