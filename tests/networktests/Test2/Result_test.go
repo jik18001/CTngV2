@@ -12,40 +12,28 @@ import (
 )
 
 func testgossipobjectnum(entry gossiper.Gossiper_log_entry, Periodoffset int) bool {
-	if entry.NUM_STH_INIT != 0 {
-		fmt.Println("Number of STH_INIT is ", entry.NUM_STH_INIT, "but should be 0.")
-		return false
-	}
-	if entry.NUM_STH_FRAG != 0 {
-		fmt.Println("Number of NUM_FRAG is ", entry.NUM_STH_FRAG, "but should be 0.")
-		return false
-	}
 	if entry.NUM_STH_FULL != 0 {
 		fmt.Println("Number of NUM_FULL is ", entry.NUM_STH_FULL, "but should be 0.")
-		return false
-	}
-	if entry.NUM_REV_INIT != 0 {
-		fmt.Println("Number of REV_INIT is ", entry.NUM_REV_FULL, "but should be 0.")
-		return false
-	}
-	if entry.NUM_REV_FRAG != 0 {
-		fmt.Println("Number of REV_FRAG is ", entry.NUM_REV_FRAG, "but should be 0.")
 		return false
 	}
 	if entry.NUM_REV_FULL != 0 {
 		fmt.Println("Number of REV_FULL is ", entry.NUM_ACC_FULL, "but should be 0.")
 		return false
 	}
-	if entry.NUM_ACC_INIT != 2 {
-		fmt.Println("Number of ACC_INIT is ", entry.NUM_ACC_INIT, "but should be 2.")
+	if entry.NUM_ACC_INIT != 0 {
+		fmt.Println("Number of ACC_INIT is ", entry.NUM_ACC_INIT, "but should be 0.")
 		return false
 	}
-	if entry.NUM_ACC_FRAG != 4 {
-		fmt.Println("Number of ACC_FRAG is ", entry.NUM_ACC_FRAG, "but should be 4.")
+	if entry.NUM_ACC_FRAG != 0 {
+		fmt.Println("Number of ACC_FRAG is ", entry.NUM_ACC_FRAG, "but should be 0.")
 		return false
 	}
-	if entry.NUM_ACC_FULL != 2 {
-		fmt.Println("Number of ACC_FULL is ", entry.NUM_ACC_FULL, "but should be 2.")
+	if entry.NUM_ACC_FULL != 0 {
+		fmt.Println("Number of ACC_FULL is ", entry.NUM_ACC_FULL, "but should be 0.")
+		return false
+	}
+	if entry.NUM_CON_FULL != 2 {
+		fmt.Println("Number of CON_FULL is ", entry.NUM_POM_FULL, "but should be 2.")
 		return false
 	}
 	return true
