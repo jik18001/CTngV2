@@ -201,7 +201,7 @@ func wipeSTHstorage(c *CAContext) {
 
 func SignAllCerts(c *CAContext) []x509.Certificate {
 	root := c.Rootcert
-	priv := c.CA_crypto_config.RSAPrivateKey
+	priv := c.CA_crypto_config.SignSecretKey
 	certs := c.CurrentCertificatePool.GetCerts()
 	var signed_certs []x509.Certificate
 	for i := 0; i < len(certs); i++ {

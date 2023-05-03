@@ -50,8 +50,6 @@ type Monitor_public_config struct {
 	Gossip_wait_time int
 	MMD              int
 	MRD              int
-	Length           uint64 // max size of revocators
-	Http_vers        []string
 }
 
 func (c *MonitorContext) GetObjectNumber(objtype string) int {

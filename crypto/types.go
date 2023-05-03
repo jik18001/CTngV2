@@ -261,8 +261,8 @@ type CryptoConfig struct {
 	ThresholdScheme string // "bls" is the only valid value currently.
 	//entityIDs          []CTngID      // id of each entity (DNS string), should really exist outside of this struct.
 	SelfID             CTngID         // id of the current entity
-	SignaturePublicMap RSAPublicMap   // map of entityID to RSA public key
-	RSAPrivateKey      rsa.PrivateKey // RSA private key
+	SignPublicMap      RSAPublicMap   // map of entityID to RSA public key
+	SignSecretKey      rsa.PrivateKey // RSA private key
 	ThresholdPublicMap BlsPublicMap   // mapping of BLS IDs to public keys
 	ThresholdSecretKey bls.SecretKey  // secret key for the current entity
 }
@@ -288,8 +288,8 @@ type StoredCryptoConfig struct {
 	SignScheme      string // "rsa" is the only valid value currently.
 	ThresholdScheme string // "bls" is the only valid value currently.
 	//entityIDs          []CTngID      // id of each entity (DNS string), should really exist outside of this struct.
-	SignaturePublicMap RSAPublicMap      // map of entityID to RSA public key
-	RSAPrivateKey      rsa.PrivateKey    // RSA private key
+	SignPublicMap      RSAPublicMap      // map of entityID to RSA public key
+	SignSecretKey      rsa.PrivateKey    // RSA private key
 	ThresholdPublicMap map[string][]byte // mapping of BLS IDs to public keys
-	ThresholdSecretKey []byte            
+	ThresholdSecretKey []byte
 }

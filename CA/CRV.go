@@ -83,7 +83,7 @@ func Generate_Revocation(c *CAContext, Period string, REV_type int) definition.G
 	// hash Period||hash CRVcurrent||hash delta CRV
 	hash_revocation, _ := crypto.GenerateSHA256([]byte(Period + string(hash) + string(hash_delta)))
 	// sign hash_revocation
-	signature, _ := crypto.RSASign(hash_revocation, &c.CA_crypto_config.RSAPrivateKey, c.CA_crypto_config.SelfID)
+	signature, _ := crypto.RSASign(hash_revocation, &c.CA_crypto_config.SignSecretKey, c.CA_crypto_config.SelfID)
 	// create revocation object
 	revocation := Revocation{
 		Period:    Period,
@@ -93,7 +93,7 @@ func Generate_Revocation(c *CAContext, Period string, REV_type int) definition.G
 	// create gossip object
 	payload3, _ := json.Marshal(revocation)
 	payload := string(c.CA_private_config.Signer) + "CRV" + string(payload3)
-	sig, _ := crypto.RSASign([]byte(payload), &c.CA_crypto_config.RSAPrivateKey, c.CA_crypto_config.SelfID)
+	sig, _ := crypto.RSASign([]byte(payload), &c.CA_crypto_config.SignSecretKey, c.CA_crypto_config.SelfID)
 	gossipREV := definition.Gossip_object{
 		Application:   "CTng",
 		Type:          definition.REV_INIT,

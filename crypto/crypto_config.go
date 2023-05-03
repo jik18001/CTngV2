@@ -1,6 +1,7 @@
 package crypto
 
 import "errors"
+
 //import "fmt"
 
 // CryptoConfig Method Versions of all crypto functions.
@@ -32,7 +33,7 @@ func (c *CryptoConfig) Hash(msg []byte) ([]byte, error) {
 // Note: This is not a threshold signature/threshold signature fragment.
 func (c *CryptoConfig) Sign(msg []byte) (RSASig, error) {
 	if c.SignScheme == "rsa" {
-		return RSASign(msg, &c.RSAPrivateKey, c.SelfID)
+		return RSASign(msg, &c.SignSecretKey, c.SelfID)
 	}
 	return RSASig{}, errors.New("Sign Scheme not supported")
 }
@@ -40,7 +41,7 @@ func (c *CryptoConfig) Sign(msg []byte) (RSASig, error) {
 // Verify a message using the configured "normal signature" scheme, and the stored public keys.
 func (c *CryptoConfig) Verify(msg []byte, sig RSASig) error {
 	if c.SignScheme == "rsa" {
-		pub := c.SignaturePublicMap[sig.ID]
+		pub := c.SignPublicMap[sig.ID]
 		//fmt.Println("PublicKey Found: ",pub)
 		return RSAVerify(msg, sig, &pub)
 	}

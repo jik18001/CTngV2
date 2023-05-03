@@ -70,7 +70,7 @@ func Verifyprecert(precert x509.Certificate, ctx LoggerContext) bool {
 		return false
 	}
 	//retrieve the public key of the issuer
-	issuerPublicKey := ctx.Logger_crypto_config.SignaturePublicMap[crypto.CTngID(issuer)]
+	issuerPublicKey := ctx.Logger_crypto_config.SignPublicMap[crypto.CTngID(issuer)]
 	//retrieve the signature of the precert
 	signature := precert.Signature
 	rsasig := new(crypto.RSASig)
@@ -102,8 +102,8 @@ func InitializeLoggerContext(public_config_path string, private_config_file_path
 		Logger_public_config:  pubconf,
 		Logger_private_config: privconf,
 		Logger_crypto_config:  cryptoconfig,
-		PublicKey:             cryptoconfig.SignaturePublicMap[cryptoconfig.SelfID],
-		PrivateKey:            cryptoconfig.RSAPrivateKey,
+		PublicKey:             cryptoconfig.SignPublicMap[cryptoconfig.SelfID],
+		PrivateKey:            cryptoconfig.SignSecretKey,
 		CurrentPrecertPool:    crypto.NewCertPool(),
 		PrecertStorage:        &PrecertStorage{PrecertPools: make(map[string]*crypto.CertPool)},
 		OnlinePeriod:          0,
@@ -151,8 +151,8 @@ func GenerateLogger_crypto_config_template() *crypto.StoredCryptoConfig {
 		HashScheme:         0,
 		SignScheme:         "",
 		ThresholdScheme:    "",
-		SignaturePublicMap: crypto.RSAPublicMap{},
-		RSAPrivateKey:      rsa.PrivateKey{},
+		SignPublicMap:      crypto.RSAPublicMap{},
+		SignSecretKey:      rsa.PrivateKey{},
 		ThresholdPublicMap: map[string][]byte{},
 		ThresholdSecretKey: []byte{},
 	}

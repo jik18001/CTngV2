@@ -12,7 +12,7 @@ import (
 )
 
 func StartCA(CID string) {
-	path_prefix := "config/ca_testconfig/" + CID
+	path_prefix := "../ca_testconfig/" + CID
 	path_1 := path_prefix + "/CA_public_config.json"
 	path_2 := path_prefix + "/CA_private_config.json"
 	path_3 := path_prefix + "/CA_crypto_config.json"
@@ -23,7 +23,7 @@ func StartCA(CID string) {
 }
 
 func StartLogger(LID string) {
-	path_prefix := "config/logger_testconfig/" + LID
+	path_prefix := "../logger_testconfig/" + LID
 	path_1 := path_prefix + "/Logger_public_config.json"
 	path_2 := path_prefix + "/Logger_private_config.json"
 	path_3 := path_prefix + "/Logger_crypto_config.json"
@@ -32,7 +32,7 @@ func StartLogger(LID string) {
 }
 
 func StartMonitor(MID string) {
-	path_prefix := "config/monitor_testconfig/" + MID
+	path_prefix := "../monitor_testconfig/" + MID
 	path_1 := path_prefix + "/Monitor_public_config.json"
 	path_2 := path_prefix + "/Monitor_private_config.json"
 	path_3 := path_prefix + "/Monitor_crypto_config.json"
@@ -49,7 +49,7 @@ func StartMonitor(MID string) {
 }
 
 func StartGossiper(GID string) {
-	path_prefix := "config/gossiper_testconfig/" + GID
+	path_prefix := "../gossiper_testconfig/" + GID
 	path_1 := path_prefix + "/Gossiper_public_config.json"
 	path_2 := path_prefix + "/Gossiper_private_config.json"
 	path_3 := path_prefix + "/Gossiper_crypto_config.json"

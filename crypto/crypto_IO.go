@@ -51,8 +51,8 @@ func GenerateEntityCryptoConfigs(entityIDs []CTngID, threshold int) ([]CryptoCon
 			Threshold:          threshold,
 			N:                  len(entityIDs),
 			SelfID:             entityIDs[i],
-			SignaturePublicMap: rsaPubMap,
-			RSAPrivateKey:      rsaPrivMap[entityIDs[i]],
+			SignPublicMap:      rsaPubMap,
+			SignSecretKey:      rsaPrivMap[entityIDs[i]],
 			ThresholdPublicMap: blsPubMap,
 			ThresholdSecretKey: blsPrivMap[entityIDs[i]],
 		}
@@ -104,14 +104,14 @@ func ReadBasicCryptoConfig(file string) (*CryptoConfig, error) {
 func NewStoredCryptoConfig(c *CryptoConfig) *StoredCryptoConfig {
 	scc := new(StoredCryptoConfig)
 	scc = &StoredCryptoConfig{
-		Threshold:          c.Threshold,
-		N:                  c.N,
-		SignScheme:         c.SignScheme,
-		ThresholdScheme:    c.ThresholdScheme,
-		HashScheme:         int(c.HashScheme),
-		SelfID:             c.SelfID,
-		SignaturePublicMap: c.SignaturePublicMap,
-		RSAPrivateKey:      c.RSAPrivateKey,
+		Threshold:       c.Threshold,
+		N:               c.N,
+		SignScheme:      c.SignScheme,
+		ThresholdScheme: c.ThresholdScheme,
+		HashScheme:      int(c.HashScheme),
+		SelfID:          c.SelfID,
+		SignPublicMap:   c.SignPublicMap,
+		SignSecretKey:   c.SignSecretKey,
 	}
 	scc.ThresholdPublicMap = (&c.ThresholdPublicMap).Serialize()
 	scc.ThresholdSecretKey = (&c.ThresholdSecretKey).Serialize()
@@ -129,8 +129,8 @@ func NewCryptoConfig(scc *StoredCryptoConfig) (*CryptoConfig, error) {
 		ThresholdScheme:    scc.ThresholdScheme,
 		HashScheme:         HashAlgorithm(scc.HashScheme),
 		SelfID:             scc.SelfID,
-		RSAPrivateKey:      scc.RSAPrivateKey,
-		SignaturePublicMap: scc.SignaturePublicMap,
+		SignSecretKey:      scc.SignSecretKey,
+		SignPublicMap:      scc.SignPublicMap,
 		ThresholdPublicMap: make(BlsPublicMap),
 	}
 	err := (&c.ThresholdPublicMap).Deserialize(scc.ThresholdPublicMap)
@@ -155,8 +155,8 @@ func NewBasicCryptoConfig(scc *StoredCryptoConfig) (*CryptoConfig, error) {
 		ThresholdScheme:    "",
 		HashScheme:         HashAlgorithm(scc.HashScheme),
 		SelfID:             scc.SelfID,
-		RSAPrivateKey:      scc.RSAPrivateKey,
-		SignaturePublicMap: scc.SignaturePublicMap,
+		SignSecretKey:      scc.SignSecretKey,
+		SignPublicMap:      scc.SignPublicMap,
 		ThresholdPublicMap: nil,
 	}
 	return c, nil

@@ -8,24 +8,17 @@ import (
 )
 
 type Gossiper_public_config struct {
-	Communiation_delay int
-	Gossip_wait_time   int
-	Max_push_size      int
-	Period_interval    int64
-	Expiration_time    int // if 0, no expiration.
-	MMD                int
-	MRD                int
-	Gossiper_URLs      []string
-	Signer_URLs        []string // List of all potential signers' DNS names.
+	Gossip_wait_time int
+	MMD              int
+	MRD              int
+	Gossiper_URLs    []string
+	Signer_URLs      []string // List of all potential signers' DNS names.
 }
 
 type Gossiper_private_config struct {
-	Crypto_config_location string
-	Connected_Gossipers    []string
-	Owner_URL              string
-	Port                   string
-	Crypto                 *crypto.CryptoConfig
-	Public                 *Gossiper_public_config
+	Connected_Gossipers []string
+	Owner_URL           string
+	Port                string
 }
 
 type Gossip_object_storage struct {
