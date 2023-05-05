@@ -115,6 +115,8 @@ func receive_pre_cert(c *LoggerContext, w http.ResponseWriter, r *http.Request) 
 	// Parse the DER-encoded certificate
 	precert = CA.Unmarshall_Signed_PreCert(body)
 	fmt.Println(precert.SubjectKeyId)
+	// remove signature
+	precert = util.ParseTBSCertificate(precert)
 	// add to precert pool
 	c.CurrentPrecertPool.AddCert(precert)
 }
@@ -180,6 +182,7 @@ func Send_POIs_to_CAs(c *LoggerContext, MerkleNodes []MerkleNode) {
 			ca := MerkleNodes[i].Issuer
 			// send POI to CA
 			Send_POI_to_CA(c, CAPOI, ca)
+			SaveToStorage(*c)
 		}
 	}
 }

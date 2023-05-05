@@ -16,9 +16,7 @@ func StartCA(CID string) {
 	path_1 := path_prefix + "/CA_public_config.json"
 	path_2 := path_prefix + "/CA_private_config.json"
 	path_3 := path_prefix + "/CA_crypto_config.json"
-	path_4 := "ca_testdata/" + CID + "/ca_testdata.json"
 	ctx_ca := CA.InitializeCAContext(path_1, path_2, path_3)
-	ctx_ca.StoragePath = path_4
 	ctx_ca.OnlineDuration = 0
 	ctx_ca.MisbehaviorInterval = 4
 	ctx_ca.CA_Type = 1

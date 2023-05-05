@@ -33,7 +33,8 @@ type CAContext struct {
 	REV_storage            map[string]definition.Gossip_object //for monitor to query
 	REV_storage_fake       map[string]definition.Gossip_object //for monitor to query
 	MisbehaviorInterval    int                                 //for sometimes unreponsive CA and Split-world CA, misbehave every x requests
-	StoragePath            string
+	StoragePath1           string
+	StoragePath2           string
 	STH_storage            map[string]definition.Gossip_object //store the STH by LID
 	Request_Count_lock     *sync.Mutex
 }
@@ -242,18 +243,27 @@ func WriteConfigToFile(config interface{}, filepath string) {
 }
 
 func (ctx *CAContext) SaveToStorage() {
-	path := ctx.StoragePath
-	data := [][]any{}
+	path1 := ctx.StoragePath1
+	path2 := ctx.StoragePath2
+	data1 := [][]any{}
+	data2 := [][]any{}
 	//fmt.Println(path)
 	certs := ctx.CurrentCertificatePool.GetCerts()
 	// iterate through all certs
 	for _, cert := range certs {
 		ctngexts := GetCTngExtensions(&cert)
-		data = append(data, ctngexts)
+		data1 = append(data1, ctngexts)
+	}
+	for _, cert := range certs {
+		tbscert := util.ParseTBSCertificate(&cert)
+		tbscert_json, _ := json.Marshal(tbscert)
+		data2 = append(data2, []any{tbscert_json})
 	}
 	//write to file
-	util.CreateFile(path)
-	util.WriteData(path, data)
+	util.CreateFile(path1)
+	util.CreateFile(path2)
+	util.WriteData(path1, data1)
+	util.WriteData(path2, data2)
 }
 
 // initialize CA context

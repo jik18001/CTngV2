@@ -1,0 +1,32 @@
+[
+  [
+    {
+      "RID": 1
+    },
+    {
+      "STH": {
+        "application": "CTng",
+        "period": "12",
+        "type": "http://ctng.uconn.edu/101",
+        "signer": "localhost:9000",
+        "signature": [
+          "{\"sig\":\"2ab7f53a05d368195f51d6544c8df6273373cea7805500818426f0e6f9a6b82a81632adede32016271ff41dd0317c0f2328ded09ef080abfddd4004360dae6d28d4bee7cc19166ccf72572728ba78ef4fa106c0bdcbf878767b65d7ae9a7530701d62ca7f08440ec2833abdaa770c01a26fe6f7bd6e39258d44c41f09d7f66217068fb523d3d313cc6ec2a396780635c1d6d28d6572ef006375f60080df8e42775005d123a54c9ea819f0b340a34e4fc07b60d5ab4289efec68fde4abec0f40a2fc5b8df343be3bbca9da04f5aa3770b82a567da3cdf13f583423cfa6bb40bfcc30575cc0ddd93faade57cb7cc2654939bbfe1a1db1849e2d8f49cf1c330b40a\",\"id\":\"localhost:9000\"}",
+          ""
+        ],
+        "timestamp": "2023-05-05T03:11:40Z",
+        "crypto_scheme": "RSA",
+        "payload": [
+          "localhost:9000",
+          "{\"Signer\":\"localhost:9000\",\"Timestamp\":\"2023-05-05T03:11:40Z\",\"RootHash\":\"|\\u0016\\ufffdP`\\ufffd\\ufffd3rJ\\ufffd\\ufffdϞ\\ufffd\\ufffd\\u001c0\\ufffd\\ufffd@\\u0013A2\\u0014\\u0005\\ufffd\\ufffd\\ufffd\\ufffd r\",\"TreeSize\":1}",
+          ""
+        ]
+      },
+      "POI": {
+        "SiblingHashes": [
+          "GdI7afn93sLm8HVlPrYlBbYcCEbkRMCbvC33fE9o3zE="
+        ],
+        "NeighborHash": "GdI7afn93sLm8HVlPrYlBbYcCEbkRMCbvC33fE9o3zE="
+      }
+    }
+  ]
+]

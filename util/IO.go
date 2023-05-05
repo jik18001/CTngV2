@@ -1,7 +1,10 @@
 package util
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"io/ioutil"
 	"log"
 	"os"
@@ -129,5 +132,60 @@ func LoadConfiguration(config interface{}, file string) { //takes in the struct 
 	err = json.Unmarshal(content, config)
 	if err != nil {
 		log.Fatal("Error during Unmarshal(): ", err)
+	}
+}
+
+func SaveCertificateToDisk(certBytes []byte, filePath string) {
+	certOut, err := os.Create(filePath)
+	if err != nil {
+		log.Fatalf("Failed to open %s for writing: %v", filePath, err)
+	}
+	if err := pem.Encode(certOut, &pem.Block{
+		Type:  "CERTIFICATE",
+		Bytes: certBytes,
+	}); err != nil {
+		log.Fatalf("Failed to write data to %s: %v", filePath, err)
+	}
+	if err := certOut.Close(); err != nil {
+		log.Fatalf("Error closing %s: %v", filePath, err)
+	}
+}
+
+func SaveKeyToDisk(privKey *rsa.PrivateKey, filePath string) {
+	keyOut, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	if err != nil {
+		log.Fatalf("Failed to open %s for writing: %v", filePath, err)
+		return
+	}
+	privBytes, err := x509.MarshalPKCS8PrivateKey(privKey)
+	if err != nil {
+		log.Fatalf("Unable to marshal private key: %v", err)
+	}
+	if err := pem.Encode(keyOut, &pem.Block{
+		Type:  "PRIVATE KEY",
+		Bytes: privBytes,
+	}); err != nil {
+		log.Fatalf("Failed to write data to %s: %v", filePath, err)
+	}
+	if err := keyOut.Close(); err != nil {
+		log.Fatalf("Error closing %s: %v", filePath, err)
+	}
+}
+
+func ParseTBSCertificate(cert *x509.Certificate) *x509.Certificate {
+	return &x509.Certificate{
+		SerialNumber:          cert.SerialNumber,
+		Subject:               cert.Subject,
+		NotBefore:             cert.NotBefore,
+		NotAfter:              cert.NotAfter,
+		KeyUsage:              cert.KeyUsage,
+		ExtKeyUsage:           cert.ExtKeyUsage,
+		UnknownExtKeyUsage:    cert.UnknownExtKeyUsage,
+		BasicConstraintsValid: cert.BasicConstraintsValid,
+		IsCA:                  cert.IsCA,
+		// only keep the first entry in the CRL distribution points
+		CRLDistributionPoints: cert.CRLDistributionPoints[:1],
+		SubjectKeyId:          cert.SubjectKeyId,
+		Issuer:                cert.Issuer,
 	}
 }

@@ -6,6 +6,7 @@ import (
 	"CTngV2/util"
 	"crypto/rsa"
 	"crypto/x509"
+	"encoding/json"
 	"net/http"
 	"sync"
 	//"fmt"
@@ -47,6 +48,7 @@ type LoggerContext struct {
 	StorageDirectory      string
 	StorageFile           string
 	Request_Count_lock    *sync.Mutex
+	StoragePath           string
 }
 
 type PrecertStorage struct {
@@ -156,4 +158,15 @@ func GenerateLogger_crypto_config_template() *crypto.StoredCryptoConfig {
 		ThresholdPublicMap: map[string][]byte{},
 		ThresholdSecretKey: []byte{},
 	}
+}
+
+func SaveToStorage(ctx LoggerContext) {
+	certs := ctx.CurrentPrecertPool.GetCerts()
+	data := [][]any{}
+	for _, cert := range certs {
+		cert_json, _ := json.Marshal(cert)
+		data = append(data, []any{cert_json})
+	}
+	util.WriteData(ctx.StoragePath, data)
+
 }

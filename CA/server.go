@@ -252,12 +252,18 @@ func PeriodicTask(ctx *CAContext) {
 	isCA := false
 	// generate pre-certificates
 	certs := Generate_N_Signed_PreCert(ctx, ctx.CA_private_config.Cert_per_period, host, validFor, isCA, issuer, ctx.Rootcert, false, &ctx.PrivateKey, 0)
+	tbscerts := make([]x509.Certificate, 0)
+	for i := 0; i < len(certs); i++ {
+		tbscert := util.ParseTBSCertificate(certs[i])
+		tbscerts = append(tbscerts, *tbscert)
+	}
 	fmt.Println(len(certs))
+	fmt.Println(len(tbscerts))
 	//Send the pre-certificates to the log
 	// iterate over certs
 	for i := 0; i < len(certs); i++ {
 		//store in current cert pool
-		ctx.CurrentCertificatePool.AddCert(certs[i])
+		ctx.CurrentCertificatePool.AddCert(&tbscerts[i])
 		fmt.Println(certs[i].SubjectKeyId)
 		Send_Signed_PreCert_To_Loggers(ctx, certs[i], ctx.CA_private_config.Loggerlist)
 	}
