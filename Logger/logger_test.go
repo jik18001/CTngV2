@@ -27,7 +27,10 @@ func TestMerkleTree(t *testing.T) {
 		})
 	}
 	periodNum := 0
-	ctx := InitializeLoggerContext("testFiles/logger_testconfig/1/Logger_public_config.json", "testFiles/logger_testconfig/1/Logger_private_config.json", "testFiles/logger_testconfig/1/Logger_crypto_config.json")
+	ctx := InitializeLoggerContext("../tests/networktests/logger_testconfig/1/Logger_public_config.json",
+		"../tests/networktests/logger_testconfig/1/Logger_private_config.json",
+		"../tests/networktests/logger_testconfig/1/Logger_crypto_config.json",
+	)
 	_, sth, nodes := BuildMerkleTreeFromCerts(certs, *ctx, periodNum)
 	testExistsSubjectKeyId, _ := json.Marshal(2)
 	testCertExists := x509.Certificate{Version: 2, SubjectKeyId: testExistsSubjectKeyId}
