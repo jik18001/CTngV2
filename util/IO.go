@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -188,4 +189,65 @@ func ParseTBSCertificate(cert *x509.Certificate) *x509.Certificate {
 		SubjectKeyId:          cert.SubjectKeyId,
 		Issuer:                cert.Issuer,
 	}
+}
+
+func ReadCertificateFromDisk(filePath string) ([]byte, error) {
+	certFile, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer certFile.Close()
+
+	pemFileInfo, err := certFile.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	var certBytes []byte = make([]byte, pemFileInfo.Size())
+	_, err = certFile.Read(certBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	block, _ := pem.Decode(certBytes)
+	if block == nil {
+		return nil, fmt.Errorf("failed to decode certificate PEM data")
+	}
+
+	return block.Bytes, nil
+}
+
+func ReadKeyFromDisk(filePath string) (*rsa.PrivateKey, error) {
+	keyFile, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer keyFile.Close()
+
+	pemFileInfo, err := keyFile.Stat()
+	if err != nil {
+		return nil, err
+	}
+
+	var keyBytes []byte = make([]byte, pemFileInfo.Size())
+	_, err = keyFile.Read(keyBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	block, _ := pem.Decode(keyBytes)
+	if block == nil {
+		return nil, fmt.Errorf("failed to decode private key PEM data")
+	}
+
+	key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+	privKey, ok := key.(*rsa.PrivateKey)
+	if !ok {
+		return nil, fmt.Errorf("private key is not RSA")
+	}
+
+	return privKey, nil
 }

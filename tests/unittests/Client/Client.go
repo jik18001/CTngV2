@@ -1,8 +1,10 @@
 package main
 
 import (
+	"CTngV2/CA"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/asn1"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -10,11 +12,45 @@ import (
 )
 
 func main() {
-	err := verifyTLSCertificate("localhost:8000")
+	err := verifyTLSCertificate("localhost")
 	if err != nil {
 		log.Fatalf("Failed to verify TLS certificate: %v", err)
 	}
 	fmt.Println("TLS certificate verification succeeded!")
+}
+
+type CTngExtensions struct {
+	SequenceNumber int
+	Loggerinfo     CA.CTngExtension
+}
+
+var (
+	oidCustomExtension = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 67847871} // Replace with your own OID
+)
+
+func parseCTngextensions(cert *x509.Certificate) CTngExtensions {
+	var ctngext CTngExtensions
+	for _, ext := range cert.Extensions {
+		if ext.Id.Equal(oidCustomExtension) {
+			decoded, err := decodeCTngExtensions(ext.Value)
+			if err != nil {
+				fmt.Println("Error decoding extensions")
+			}
+			ctngext = decoded
+			return ctngext
+		}
+	}
+	return ctngext
+}
+func encodeCTngExtensions(ext CTngExtensions) []byte {
+	bytes, _ := asn1.Marshal(ext)
+	return bytes
+}
+
+func decodeCTngExtensions(ext []byte) (CTngExtensions, error) {
+	var decoded CTngExtensions
+	_, err := asn1.Unmarshal(ext, &decoded)
+	return decoded, err
 }
 
 func verifyTLSCertificate(serverAddr string) error {
@@ -33,7 +69,7 @@ func verifyTLSCertificate(serverAddr string) error {
 	}
 
 	// Create a TLS connection
-	conn, err := tls.Dial("tcp", serverAddr, tlsConfig)
+	conn, err := tls.Dial("tcp", serverAddr+":8000", tlsConfig)
 	if err != nil {
 		return fmt.Errorf("failed to establish a TLS connection: %v", err)
 	}
@@ -61,6 +97,8 @@ func verifyTLSCertificate(serverAddr string) error {
 	}
 	// Get the certificate from the server's TLS connection state
 	cert := resp.TLS.PeerCertificates[0]
+	ext := parseCTngextensions(cert)
+	fmt.Println("CTngextension: ", ext)
 
 	// Print the certificate information
 	fmt.Println("Subject:", cert.Subject.CommonName)

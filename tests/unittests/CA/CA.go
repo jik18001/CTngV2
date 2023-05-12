@@ -1,13 +1,14 @@
 package main
 
 import (
+	"CTngV2/CA"
 	"CTngV2/crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/json"
+	"encoding/asn1"
 	"fmt"
 	"math/big"
 	"net"
@@ -42,10 +43,6 @@ func main() {
 	if err := normalServer.ListenAndServeTLS("subject_cert.crt", "subject_key.key"); err != nil {
 		fmt.Printf("Failed to start server: %v\n", err)
 	}
-}
-
-type CTngExtension struct {
-	SequenceNumber int
 }
 
 func GenerateRootCA(ID string, ctx crypto.CryptoConfig) *x509.Certificate {
@@ -86,9 +83,9 @@ func GenerateDummyCert(ID string, Rootcert *x509.Certificate, priv rsa.PrivateKe
 	// set up our server certificate
 	ID_int, _ := strconv.Atoi(ID)
 	cert := &x509.Certificate{
-		SerialNumber: big.NewInt(int64(ID_int * 1001)),
+		SerialNumber: big.NewInt(int64(ID_int * 2003)),
 		Subject: pkix.Name{
-			CommonName:    "localhost:8000",
+			CommonName:    "localhost",
 			Organization:  []string{"UCONN"},
 			Country:       []string{"US"},
 			PostalCode:    []string{"06269"},
@@ -102,16 +99,53 @@ func GenerateDummyCert(ID string, Rootcert *x509.Certificate, priv rsa.PrivateKe
 		SubjectKeyId: []byte(ID),
 		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		KeyUsage:     x509.KeyUsageDigitalSignature,
+		Extensions: []pkix.Extension{
+			{
+				Id:       oidCustomExtension,
+				Critical: false,
+				Value:    encodeCTngExtensions(CTngExtensions{SequenceNumber: 1, Loggerinfo: CA.CTngExtension{}}),
+			},
+		},
 	}
-	cert.DNSNames = []string{"localhost:8000"}
-	newext := CTngExtension{
-		SequenceNumber: 0,
-	}
-	bytes, _ := json.Marshal(newext)
-	cert.CRLDistributionPoints = []string{string(bytes)}
+	cert.DNSNames = []string{"localhost"}
 	certPrivKey, _ := rsa.GenerateKey(rand.Reader, 2048)
 	certBytes, _ := x509.CreateCertificate(rand.Reader, cert, Rootcert, &certPrivKey.PublicKey, &priv)
 	cert1, _ := x509.ParseCertificate(certBytes)
 	//fmt.Println(cert1.RawTBSCertificate)
 	return cert1, certPrivKey
+}
+
+type CTngExtensions struct {
+	SequenceNumber int
+	Loggerinfo     CA.CTngExtension
+}
+
+var (
+	oidCustomExtension = asn1.ObjectIdentifier{1, 3, 6, 1, 4, 1, 67847871} // Replace with your own OID
+)
+
+func encodeCTngExtensions(ext CTngExtensions) []byte {
+	bytes, _ := asn1.Marshal(ext)
+	return bytes
+}
+
+func decodeCTngExtensions(ext []byte) (CTngExtensions, error) {
+	var decoded CTngExtensions
+	_, err := asn1.Unmarshal(ext, &decoded)
+	return decoded, err
+}
+
+func parseCTngextensions(cert *x509.Certificate) CTngExtensions {
+	var ctngext CTngExtensions
+	for _, ext := range cert.Extensions {
+		if ext.Id.Equal(oidCustomExtension) {
+			decoded, err := decodeCTngExtensions(ext.Value)
+			if err != nil {
+				fmt.Println("Error decoding extensions")
+			}
+			ctngext = decoded
+			return ctngext
+		}
+	}
+	return ctngext
 }
