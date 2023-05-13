@@ -24,7 +24,7 @@ func testCRV(t *testing.T) {
 }
 
 func testCAContext(t *testing.T) {
-	ctx := InitializeCAContext("../Gen/ca_testconfig/1/CA_public_config.json", "../Gen/ca_testconfig/1/CA_private_config.json", "../Gen/ca_testconfig/1/CA_crypto_config.json")
+	ctx := InitializeCAContext("testFiles/ca_testconfig/1/CA_public_config.json", "testFiles/ca_testconfig/1/CA_private_config.json", "testFiles/ca_testconfig/1/CA_crypto_config.json")
 	ctx.CRV.Revoke(1)
 	ctx.CRV.Revoke(4)
 	//fmt.Println(ctx.CRV.CRV_current)
@@ -77,9 +77,8 @@ func testPOIjson(t *testing.T) {
 	fmt.Println(newpoi2)
 }
 
-func testCtngExtension(t *testing.T) {
-	ctx := InitializeCAContext("../Gen/ca_testconfig/1/CA_public_config.json", "../Gen/ca_testconfig/1/CA_private_config.json", "../Gen/ca_testconfig/1/CA_crypto_config.json")
-	//Generate N signed pre-certificates
+func TestCtngExtension(t *testing.T) {
+	ctx := InitializeCAContext("testFiles/ca_testconfig/1/CA_public_config.json", "testFiles/ca_testconfig/1/CA_private_config.json", "testFiles/ca_testconfig/1/CA_crypto_config.json")
 	issuer := Generate_Issuer(ctx.CA_private_config.Signer)
 	// generate host
 	host := "www.example.com"
@@ -136,13 +135,13 @@ func TestREV(t *testing.T) {
 	ctx.REV_storage[period] = fake_rev
 	bool1 := rev.Verify(ctx.CA_crypto_config)
 	bool2 := fake_rev.Verify(ctx.CA_crypto_config)
-	fmt.Println(rev.Type == fake_rev.Type)
+	fmt.Println(rev.Type, fake_rev.Type)
 	fmt.Println(bool1)
 	fmt.Println(bool2)
 
 }
 
-func TestTask(t *testing.T) {
+func testTask(t *testing.T) {
 	ctx := InitializeCAContext("testFiles/ca_testconfig/1/CA_public_config.json", "testFiles/ca_testconfig/1/CA_private_config.json", "testFiles/ca_testconfig/1/CA_crypto_config.json")
 	StartCA(ctx)
 }

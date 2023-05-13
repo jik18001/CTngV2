@@ -1,9 +1,5 @@
 {
-  "Communiation_delay": 5,
   "Gossip_wait_time": 5,
-  "Max_push_size": 100,
-  "Period_interval": 1000,
-  "Expiration_time": 0,
   "MMD": 60,
   "MRD": 60,
   "Gossiper_URLs": [
