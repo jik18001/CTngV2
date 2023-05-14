@@ -2,6 +2,7 @@ package CA
 
 import (
 	"CTngV2/definition"
+	"CTngV2/util"
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
@@ -105,6 +106,7 @@ func TestCtngExtension(t *testing.T) {
 	fmt.Println(GetCTngExtensions(ctx.CurrentCertificatePool.GetCertBySubjectKeyID(string(certs[0].SubjectKeyId))))
 	signed_certs := SignAllCerts(ctx)
 	fmt.Println(GetCTngExtensions(&signed_certs[0]))
+	util.SaveCertificateToDisk(signed_certs[0].Raw, "testFiles/1.crt")
 }
 
 func testGenerateKeypairs(t *testing.T) {

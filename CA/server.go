@@ -251,7 +251,9 @@ func PeriodicTask(ctx *CAContext) {
 	validFor := 365 * 24 * time.Hour
 	isCA := false
 	// generate pre-certificates
-	certs := Generate_N_Signed_PreCert(ctx, ctx.CA_private_config.Cert_per_period, host, validFor, isCA, issuer, ctx.Rootcert, false, &ctx.PrivateKey, 0)
+	//certs := Generate_N_Signed_PreCert(ctx, ctx.CA_private_config.Cert_per_period, host, validFor, isCA, issuer, ctx.Rootcert, false, &ctx.PrivateKey, 0)
+	certs, privkeys := Generate_N_Signed_PreCert_with_priv(ctx, ctx.CA_private_config.Cert_per_period, host, validFor, isCA, issuer, ctx.Rootcert, false, &ctx.PrivateKey, 0)
+	ctx.CurrentKeyPool = privkeys
 	tbscerts := make([]x509.Certificate, 0)
 	for i := 0; i < len(certs); i++ {
 		tbscert := util.ParseTBSCertificate(certs[i])
@@ -277,6 +279,7 @@ func PeriodicTask(ctx *CAContext) {
 			//ctngexts = GetCTngExtensions(&certlist[i])
 			//fmt.Println("CTng Extension for Cert", i, "is", ctngexts)
 		}
+		fmt.Println(certlist)
 		// get current period
 		period := GetCurrentPeriod()
 		// convert string to int

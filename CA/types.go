@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"sync"
 )
 
@@ -23,6 +24,7 @@ type CAContext struct {
 	PublicKey              rsa.PublicKey
 	PrivateKey             rsa.PrivateKey
 	CurrentCertificatePool *crypto.CertPool
+	CurrentKeyPool         map[string]*rsa.PrivateKey
 	CertPoolStorage        *CTngCertPoolStorage
 	Rootcert               *x509.Certificate
 	CertCounter            int
@@ -249,10 +251,15 @@ func (ctx *CAContext) SaveToStorage() {
 	data2 := [][]any{}
 	//fmt.Println(path)
 	certs := ctx.CurrentCertificatePool.GetCerts()
+	signed_certs := SignAllCerts(ctx)
+
 	// iterate through all certs
-	for _, cert := range certs {
+	for _, cert := range signed_certs {
 		ctngexts := GetCTngExtensions(&cert)
 		data1 = append(data1, ctngexts)
+		rid := GetSequenceNumberfromCert(&cert)
+		util.SaveCertificateToDisk(cert.Raw, cert.Subject.CommonName+"_RID_"+strconv.Itoa(rid)+".crt")
+		util.SaveKeyToDisk(ctx.CurrentKeyPool[cert.Subject.CommonName], cert.Subject.CommonName+"_RID_"+strconv.Itoa(rid)+".key")
 	}
 	for _, cert := range certs {
 		tbscert := util.ParseTBSCertificate(&cert)

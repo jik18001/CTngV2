@@ -188,6 +188,7 @@ func ParseTBSCertificate(cert *x509.Certificate) *x509.Certificate {
 		CRLDistributionPoints: cert.CRLDistributionPoints[:1],
 		SubjectKeyId:          cert.SubjectKeyId,
 		Issuer:                cert.Issuer,
+		PublicKey:             cert.PublicKey,
 	}
 }
 
