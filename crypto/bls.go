@@ -10,11 +10,15 @@ import (
 // Train of thought: "github.com/prysmaticlabs/prysm/v2/crypto/bls", while natively in go, can't generate keys in Go.
 // Therefore we will use a precomiled C library that
 
-/* Threshold signatures will use the BLS12-381 signature scheme, which also happens to be used by Ethereum 2.0.
+/*
+	Threshold signatures will use the BLS12-381 signature scheme, which also happens to be used by Ethereum 2.0.
+
 /* The "k of n" Threshold signature scheme which we rely on is described here:
-	 https://github.com/herumi/bls/blob/master/sample/minsample.c#L20
-	 View The Go function translations here:
-	 https://github.com/herumi/bls-go-binary/blob/master/bls/bls.go*/
+
+	https://github.com/herumi/bls/blob/master/sample/minsample.c#L20
+	View The Go function translations here:
+	https://github.com/herumi/bls-go-binary/blob/master/bls/bls.go
+*/
 type BLSThresholdSignatures interface {
 	GenerateThresholdKeypairs([]CTngID, int) ([]bls.ID, BlsPublicMap, BlsPrivateMap, error)
 	ThresholdSign(msg string, secret bls.SecretKey) (SigFragment, error)
@@ -108,5 +112,6 @@ func (f SigFragment) Verify(msg string, pubs *BlsPublicMap) bool {
 
 func init() {
 	// The init function needs to be immediately called upon import.
-	bls.Init(bls.BLS12_381)
+	x := bls.BLS12_381
+	bls.Init(x)
 }
