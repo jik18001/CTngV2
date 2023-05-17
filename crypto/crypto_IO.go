@@ -88,6 +88,17 @@ func ReadCryptoConfig(file string) (*CryptoConfig, error) {
 	return cc, err
 }
 
+func ReadVerifyOnlyCryptoConfig(file string) (*CryptoConfig, error) {
+	scc := new(StoredCryptoConfig)
+	bytes, err := util.ReadByte(file)
+	json.Unmarshal(bytes, scc)
+	if err != nil {
+		return nil, err
+	}
+	cc, err := NewVerifyOnlyCryptoConfig(scc)
+	return cc, err
+}
+
 // Read a stored basic crypto config from a file, convert it to a basiccryptoconfig and return a pointer to it.
 func ReadBasicCryptoConfig(file string) (*CryptoConfig, error) {
 	scc := new(StoredCryptoConfig)
@@ -138,6 +149,25 @@ func NewCryptoConfig(scc *StoredCryptoConfig) (*CryptoConfig, error) {
 		return c, err
 	}
 	err = (&c.ThresholdSecretKey).Deserialize(scc.ThresholdSecretKey)
+	if err != nil {
+		return c, err
+	}
+	return c, nil
+}
+
+func NewVerifyOnlyCryptoConfig(scc *StoredCryptoConfig) (*CryptoConfig, error) {
+	c := new(CryptoConfig)
+	c = &CryptoConfig{
+		Threshold:          scc.Threshold,
+		N:                  scc.N,
+		SignScheme:         scc.SignScheme,
+		ThresholdScheme:    scc.ThresholdScheme,
+		HashScheme:         HashAlgorithm(scc.HashScheme),
+		SelfID:             scc.SelfID,
+		SignPublicMap:      scc.SignPublicMap,
+		ThresholdPublicMap: make(BlsPublicMap),
+	}
+	err := (&c.ThresholdPublicMap).Deserialize(scc.ThresholdPublicMap)
 	if err != nil {
 		return c, err
 	}
