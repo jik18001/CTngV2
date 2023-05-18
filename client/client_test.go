@@ -103,10 +103,11 @@ func TestHandleUpdate(t *testing.T) {
 	update_1 := ctx.LoadUpdate("monitor_testdata/1/Period_19/ClientUpdate.json")
 	update_2 := ctx.LoadUpdate("monitor_testdata/1/Period_20/ClientUpdate.json")
 	update_3 := ctx.LoadUpdate("monitor_testdata/1/Period_21/ClientUpdate.json")
-	ctx.HandleUpdate(update_1)
-	ctx.HandleUpdate(update_2)
-	ctx.HandleUpdate(update_3)
+	ctx.HandleUpdate(update_1, true, true)
+	ctx.HandleUpdate(update_2, true, false)
+	ctx.HandleUpdate(update_3, false, false)
+	fmt.Println("Presenting STH database:")
 	fmt.Println(ctx.STH_database)
+	fmt.Println("Presenting CRV database:")
 	fmt.Println(ctx.CRV_database)
-
 }

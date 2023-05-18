@@ -25,15 +25,15 @@ type ClientConfig struct {
 }
 
 type ClientContext struct {
-	Config *ClientConfig
-	Crypto *crypto.CryptoConfig
+	Config              *ClientConfig
+	Crypto              *crypto.CryptoConfig
+	Current_Monitor_URL string
 	// the databases are shared resources and should be protected with mutex
 	STH_database              map[string]string         // key = entity_ID + @ + Period, content = RootHash
 	CRV_database              map[string]*bitset.BitSet // key = entity_ID, content = CRV
 	D1_Blacklist_database     map[string]bool           // key = entity_ID + "@" + Period. content = bool
 	D2_Blacklist_database     map[string]string         // key = entity_ID, content = Period since
-	Current_Monitor_URL       string
-	Monitor_Interity_database map[string]string // key = Period, content = NUM_ACC_FULL + "@" + NUM_CON_FULL
+	Monitor_Interity_database map[string]string         // key = Period, content = NUM_ACC_FULL + "@" + NUM_CON_FULL
 	STH_DB_RWLock             *sync.RWMutex
 	CRV_DB_RWLock             *sync.RWMutex
 	D1_Blacklist_DB_RWLock    *sync.RWMutex

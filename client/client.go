@@ -1,6 +1,7 @@
 package client
 
 import (
+	"CTngV2/crypto"
 	"CTngV2/definition"
 	"CTngV2/monitor"
 	"crypto/tls"
@@ -10,6 +11,8 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+
+	"github.com/bits-and-blooms/bitset"
 )
 
 type MonitorData = []definition.Gossip_object
@@ -92,21 +95,52 @@ func fetch(url string) ([]byte, error) {
 	return resBody, nil
 }
 
-func VerifySRH(SRH string) bool {
-	//TODO
+func (ctx *ClientContext) VerifySRH(srh string, dCRV *bitset.BitSet, CAID string, Period string) bool {
+	// find the corresponding CRV
+	CRV_old := ctx.CRV_database[CAID]
+	if CRV_old == nil {
+		CRV_old = dCRV
+	}
+	// verify the SRH
+	hashmsg1, _ := CRV_old.MarshalBinary()
+	hashmsg2, _ := dCRV.MarshalBinary()
+	hash1, _ := crypto.GenerateSHA256(hashmsg1)
+	hash2, _ := crypto.GenerateSHA256(hashmsg2)
+
+	localhash, _ := crypto.GenerateSHA256([]byte(Period + string(hash1) + string(hash2)))
+	// the localhash will be te message we used to verify the Signature on the SRH
+	// verify the signature
+	rsasig, err := crypto.RSASigFromString(srh)
+	if err != nil {
+		fmt.Println("Fail to convert the signature from the SRH to RSA signature")
+	}
+	ca_publickey := ctx.Crypto.SignPublicMap[rsasig.ID]
+	err = crypto.RSAVerify(localhash, rsasig, &ca_publickey)
+	if err != nil {
+		fmt.Println("Fail to verify the signature on the SRH")
+		return false
+	}
+	//fmt.Println("SRH verification success")
 	return true
 }
 
-func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate) {
+func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate, verify bool, newmonitor bool) bool {
 	ctx.CRV_DB_RWLock.Lock()
 	for _, rev := range update.REVs {
+		if verify {
+			err := rev.Verify(ctx.Crypto)
+			if err != nil {
+				fmt.Println("REV verification failed")
+				return false
+			}
+		}
 		SRH, DCRV := Get_SRH_and_DCRV(rev)
 		key := rev.Payload[0]
 		//verif REV_FULL
 		//verify SRH
-		if !VerifySRH(SRH) {
+		if !ctx.VerifySRH(SRH, &DCRV, key, rev.Period) {
 			fmt.Println("SRH verification failed")
-			return
+			return false
 		}
 		//Update CRV
 		// look for CRV first
@@ -119,11 +153,18 @@ func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate) {
 	ctx.CRV_DB_RWLock.Unlock()
 	ctx.STH_DB_RWLock.Lock()
 	for _, sth := range update.STHs {
+		if verify {
+			err := sth.Verify(ctx.Crypto)
+			if err != nil {
+				fmt.Println("sth verification failed")
+				return false
+			}
+		}
 		var STH_def definition.STH
 		err := json.Unmarshal([]byte(sth.Payload[1]), &STH_def)
 		if err != nil {
 			fmt.Println("sth unmarshal failed")
-			return
+			return false
 		}
 		newrecord := STH_def.RootHash
 		key := sth.Payload[0] + "@" + sth.Period
@@ -136,6 +177,13 @@ func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate) {
 	ctx.D1_Blacklist_DB_RWLock.Lock()
 	for _, d1pom := range update.ACCs {
 		//verify D1POM_FULL
+		if verify {
+			err := d1pom.Verify(ctx.Crypto)
+			if err != nil {
+				fmt.Println("d1pom verification failed")
+				return false
+			}
+		}
 		//Update D1POM
 		// look for D1POM first
 		key := d1pom.Payload[0] + "@" + d1pom.Period
@@ -145,6 +193,13 @@ func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate) {
 	ctx.D2_Blacklist_DB_RWLock.Lock()
 	for _, d2pom := range update.CONs {
 		//verify D2POM_FULL
+		if verify {
+			err := d2pom.Verify(ctx.Crypto)
+			if err != nil {
+				fmt.Println("d2pom verification failed")
+				return false
+			}
+		}
 		//Update D2POM
 		// look for D2POM first
 		key := d2pom.Payload[0]
@@ -154,6 +209,22 @@ func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate) {
 	}
 	ctx.D2_Blacklist_DB_RWLock.Unlock()
 	// now verify and store monitor integrity data
+	// first verify the signature on the monitor integrity data
+	if verify {
+		//fmt.Println("Verifying Monitor Integrity data signatures for period " + update.Period + " ...")
+		err := update.NUM.Verify(ctx.Crypto)
+		if err != nil {
+			fmt.Println("NUM verification failed")
+			return false
+		}
+		if !newmonitor {
+			err := update.NUM_FULL.Verify(ctx.Crypto)
+			if err != nil {
+				fmt.Println("NUM_FULL verification failed")
+				return false
+			}
+		}
+	}
 	ctx.Monitor_Interity_database[update.Period] = update.NUM.ACC_FULL_Counter + "@" + update.NUM.CON_FULL_Counter
 	// verify the Monitor Integrity data for the previous period against the NUM_FULL received in this period
 	// if the verification fails, then the monitor is not honest
@@ -166,7 +237,8 @@ func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate) {
 		if old_data != new_data {
 			// we should definitely do something else here, but for now we just print
 			fmt.Println("Monitor is not honest")
-			return
+			return false
 		}
 	}
+	return true
 }
