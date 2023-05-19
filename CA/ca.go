@@ -6,7 +6,6 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"crypto/x509/pkix"
-	"encoding/json"
 	"fmt"
 	"log"
 	"math/big"
@@ -18,6 +17,7 @@ import (
 
 // Unsigned Pre-certificate
 func Genrate_Unsigned_PreCert(host string, validFor time.Duration, isCA bool, issuer pkix.Name, subject pkix.Name, ctx *CAContext) *x509.Certificate {
+	ctngext := CTngExtension{SequenceNumber: SequenceNumber{RID: ctx.CertCounter}}
 	keyUsage := x509.KeyUsageDigitalSignature
 	// Only RSA subject keys should have the KeyEncipherment KeyUsage bits set. In
 	// the context of TLS this KeyUsage is particular to RSA key exchange and
@@ -54,14 +54,14 @@ func Genrate_Unsigned_PreCert(host string, validFor time.Duration, isCA bool, is
 		template.IsCA = true
 		template.KeyUsage |= x509.KeyUsageCertSign
 	}
-	ctng_extension := SequenceNumber{RID: ctx.CertCounter}
-	bytes, err := json.Marshal(ctng_extension)
-	if err != nil {
-		log.Fatalf("Failed to marshal CTngExtension: %v", err)
+
+	template.ExtraExtensions = []pkix.Extension{
+		{
+			Id:       OIDCTngExtension,
+			Critical: false,
+			Value:    EncodeCTngExtension(ctngext),
+		},
 	}
-	//convert to string
-	ctng_extension_string := string(bytes)
-	template.CRLDistributionPoints = []string{ctng_extension_string}
 	ctx.CertCounter++
 	return &template
 }
@@ -91,7 +91,7 @@ func Sign_certificate(cert *x509.Certificate, root_cert *x509.Certificate, root 
 	return cert
 }
 
-//Generate Root certificate self signed
+// Generate Root certificate self signed
 func Generate_Root_Certificate(ctx *CAContext) *x509.Certificate {
 	host := ctx.CA_private_config.Signer
 	validFor := 365 * 24 * time.Hour
@@ -119,7 +119,7 @@ func Generate_Selfsigned_root_cert(c *CAContext, host string, validFor time.Dura
 	return signed_precert
 }
 
-//generate N subject, with different common name
+// generate N subject, with different common name
 func Generate_N_Subjects(N int, global_offset int) []pkix.Name {
 	subjects := make([]pkix.Name, N)
 	for i := 0; i < N; i++ {
@@ -157,14 +157,14 @@ func Generate_and_return_N_KeyPairs(subjects []pkix.Name) (map[string]*rsa.Publi
 	return keypairs, keypairs_priv
 }
 
-//generate 1 issuer given N
+// generate 1 issuer given N
 func Generate_Issuer(name string) pkix.Name {
 	issuer := pkix.Name{}
 	issuer.CommonName = name
 	return issuer
 }
 
-//generate N signed precert, with different subject
+// generate N signed precert, with different subject
 func Generate_N_Signed_PreCert(c *CAContext, N int, host string, validFor time.Duration, isCA bool, issuer pkix.Name, root_cert *x509.Certificate, root bool, priv *rsa.PrivateKey, global_offset int) []*x509.Certificate {
 	precerts := make([]*x509.Certificate, N)
 	subjects := Generate_N_Subjects(N, global_offset)

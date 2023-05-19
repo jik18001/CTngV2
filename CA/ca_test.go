@@ -87,26 +87,33 @@ func TestCtngExtension(t *testing.T) {
 	validFor := 365 * 24 * time.Hour
 	isCA := false
 	// generate pre-certificates
-	certs := Generate_N_Signed_PreCert(ctx, 1, host, validFor, isCA, issuer, ctx.Rootcert, false, &ctx.PrivateKey, 0)
-	ctx.CurrentCertificatePool.AddCert(certs[0])
-	fmt.Println(GetCTngExtensions(certs[0]))
+	certs := Generate_N_Signed_PreCert(ctx, 2, host, validFor, isCA, issuer, ctx.Rootcert, false, &ctx.PrivateKey, 0)
+	cert_to_sign := GetPrecertfromCert(certs[0])
+	ctx.CurrentCertificatePool.AddCert(cert_to_sign)
+	fmt.Println(ParseCTngextension(cert_to_sign))
 	// now add STH and POI to it
 	// first generate STH
 	STH := definition.Gossip_object{
-		Type: definition.STH_INIT,
+		Type:   definition.STH_INIT,
+		Signer: "localhost:3333",
 	}
 	poi := ProofOfInclusion{make([][]byte, 0), []byte("1")}
-	newctngext := CTngExtension{
+	newloggerinfo := LoggerInfo{
 		STH: STH,
 		POI: poi,
 	}
-	target_cert := ctx.CurrentCertificatePool.GetCertBySubjectKeyID(string(certs[0].SubjectKeyId))
-	target_cert = AddCTngExtension(target_cert, newctngext)
-	ctx.CurrentCertificatePool.UpdateCertBySubjectKeyID(string(certs[0].SubjectKeyId), target_cert)
-	fmt.Println(GetCTngExtensions(ctx.CurrentCertificatePool.GetCertBySubjectKeyID(string(certs[0].SubjectKeyId))))
+	target_cert := ctx.CurrentCertificatePool.GetCertBySubjectKeyID(string(cert_to_sign.SubjectKeyId))
+	target_cert = UpdateCTngExtension(target_cert, newloggerinfo)
+	fmt.Println(ParseCTngextension(target_cert))
+	ctx.CurrentCertificatePool.UpdateCertBySubjectKeyID(string(cert_to_sign.SubjectKeyId), target_cert)
+	fmt.Println(ParseCTngextension(ctx.CurrentCertificatePool.GetCertBySubjectKeyID(string(cert_to_sign.SubjectKeyId))))
 	signed_certs := SignAllCerts(ctx)
-	fmt.Println(GetCTngExtensions(&signed_certs[0]))
+	fmt.Println(len(signed_certs))
+	fmt.Println(ParseCTngextension(signed_certs[0]))
 	util.SaveCertificateToDisk(signed_certs[0].Raw, "testFiles/1.crt")
+	certbyte_from_disk, _ := util.ReadCertificateFromDisk("testFiles/1.crt")
+	cert_from_disk, _ := x509.ParseCertificate(certbyte_from_disk)
+	fmt.Println(ParseCTngextension(cert_from_disk))
 }
 
 func testGenerateKeypairs(t *testing.T) {

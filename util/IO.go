@@ -32,7 +32,7 @@ func ReadByte(filename string) ([]byte, error) {
 	return byteValue, nil
 }
 
-//Writes arbitrary data as a JSON File.
+// Writes arbitrary data as a JSON File.
 // If the file does not exist, it will be created.
 func WriteData(filename string, data interface{}) error {
 	jsonFile, err := os.Open(filename)
@@ -185,10 +185,9 @@ func ParseTBSCertificate(cert *x509.Certificate) *x509.Certificate {
 		BasicConstraintsValid: cert.BasicConstraintsValid,
 		IsCA:                  cert.IsCA,
 		// only keep the first entry in the CRL distribution points
-		CRLDistributionPoints: cert.CRLDistributionPoints[:1],
-		SubjectKeyId:          cert.SubjectKeyId,
-		Issuer:                cert.Issuer,
-		PublicKey:             cert.PublicKey,
+		SubjectKeyId: cert.SubjectKeyId,
+		Issuer:       cert.Issuer,
+		PublicKey:    cert.PublicKey,
 	}
 }
 

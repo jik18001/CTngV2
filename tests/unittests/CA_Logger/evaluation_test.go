@@ -2,14 +2,10 @@ package main
 
 import (
 	"CTngV2/CA"
-	"CTngV2/crypto"
-	"CTngV2/definition"
 	"CTngV2/util"
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/json"
 	"fmt"
-	"log"
 	"reflect"
 	"testing"
 )
@@ -42,16 +38,6 @@ func Test2(t *testing.T) {
 		t.Fail()
 	}
 	var CTngExtension CA.CTngExtension
-	err = json.Unmarshal([]byte(cert.CRLDistributionPoints[1]), &CTngExtension)
-	if err != nil {
-		log.Fatalf("Failed to parse certificate: %v", err)
-	}
-	var sth_example definition.Gossip_object
-	sth_example = CTngExtension.STH
-	rsasig, err := crypto.RSASigFromString(sth_example.Signature[0])
-	if err != nil {
-		log.Fatalf("Failed to parse signature: %v", err)
-	}
-	fmt.Println(rsasig)
-
+	CTngExtension = CA.ParseCTngextension(cert)
+	fmt.Println(CTngExtension)
 }

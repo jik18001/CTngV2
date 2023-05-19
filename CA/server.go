@@ -26,7 +26,7 @@ import (
 
 const PROTOCOL = "http://"
 
-//bind CA context to the function
+// bind CA context to the function
 func bindCAContext(context *CAContext, fn func(context *CAContext, w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fn(context, w, r)
@@ -151,20 +151,21 @@ func receive_poi(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	// Get the STH of the logger
 	sth := c.STH_storage[poi.LoggerID]
 	//fmt.Println("sth: ", sth, c.STH_storage)
-	// Construct the CTng extension
-	extension := CTngExtension{
+	// Construct the logger info
+
+	Logger_info := LoggerInfo{
 		STH: sth,
 		POI: poi.ProofOfInclusion,
 	}
 	target_cert := c.CurrentCertificatePool.GetCertBySubjectKeyID(string(poi.SubjectKeyId))
 	if target_cert != nil {
 		fmt.Println(poi.SubjectKeyId)
-		target_cert = AddCTngExtension(target_cert, extension)
+		target_cert = UpdateCTngExtension(target_cert, Logger_info)
 		c.CurrentCertificatePool.UpdateCertBySubjectKeyID(string(poi.SubjectKeyId), target_cert)
 	}
 }
 
-//send a signed precert to a logger
+// send a signed precert to a logger
 func Send_Signed_PreCert_To_Logger(c *CAContext, precert *x509.Certificate, logger string) {
 	precert_json := Marshall_Signed_PreCert(precert)
 	//fmt.Println(precert_json)
@@ -199,20 +200,21 @@ func wipeSTHstorage(c *CAContext) {
 	}
 }
 
-func SignAllCerts(c *CAContext) []x509.Certificate {
+func SignAllCerts(c *CAContext) []*x509.Certificate {
 	root := c.Rootcert
 	priv := c.CA_crypto_config.SignSecretKey
-	certs := c.CurrentCertificatePool.GetCerts()
-	var signed_certs []x509.Certificate
-	for i := 0; i < len(certs); i++ {
-		cert := certs[i]
+	certs := c.CurrentCertificatePool.GetCertList()
+	tbscerts := UpdateAllforSigning(certs)
+	var signed_certs []*x509.Certificate
+	for i := 0; i < len(tbscerts); i++ {
+		cert := tbscerts[i]
 		pub := cert.PublicKey
 		rsaPub, ok := pub.(*rsa.PublicKey)
 		if !ok {
 			// handle the case where pub is not of type *rsa.PublicKey
 		}
-		signed_cert := Sign_certificate(&cert, root, false, rsaPub, &priv)
-		signed_certs = append(signed_certs, *signed_cert)
+		signed_cert := Sign_certificate(cert, root, false, rsaPub, &priv)
+		signed_certs = append(signed_certs, signed_cert)
 	}
 	return signed_certs
 }
@@ -256,7 +258,7 @@ func PeriodicTask(ctx *CAContext) {
 	ctx.CurrentKeyPool = privkeys
 	tbscerts := make([]x509.Certificate, 0)
 	for i := 0; i < len(certs); i++ {
-		tbscert := util.ParseTBSCertificate(certs[i])
+		tbscert := GetPrecertfromCert(certs[i])
 		tbscerts = append(tbscerts, *tbscert)
 	}
 	fmt.Println(len(certs))
