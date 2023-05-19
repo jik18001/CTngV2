@@ -270,7 +270,7 @@ func WriteConfigToFile(config interface{}, filepath string) {
 func (ctx *CAContext) SaveToStorage() {
 	path1 := ctx.StoragePath1
 	path2 := ctx.StoragePath2
-	var data1 []byte
+	data1 := [][]any{}
 	data2 := [][]any{}
 	//fmt.Println(path)
 	certs := ctx.CurrentCertificatePool.GetCerts()
@@ -280,7 +280,7 @@ func (ctx *CAContext) SaveToStorage() {
 	for _, cert := range signed_certs {
 		ext := ParseCTngextension(cert)
 		data1_json, _ := json.Marshal(ext)
-		data1 = data1_json
+		data1 = append(data1, []any{data1_json})
 		rid := GetRIDfromCert(cert)
 		util.SaveCertificateToDisk(cert.Raw, cert.Subject.CommonName+"_RID_"+strconv.Itoa(rid)+".crt")
 		util.SaveKeyToDisk(ctx.CurrentKeyPool[cert.Subject.CommonName], cert.Subject.CommonName+"_RID_"+strconv.Itoa(rid)+".key")

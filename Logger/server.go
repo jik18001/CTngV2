@@ -2,6 +2,7 @@ package Logger
 
 import (
 	"CTngV2/CA"
+	"CTngV2/crypto"
 	"CTngV2/definition"
 	"CTngV2/util"
 	"bytes"
@@ -19,7 +20,7 @@ import (
 
 const PROTOCOL = "http://"
 
-//bind Logger context to the function
+// bind Logger context to the function
 func bindLoggerContext(context *LoggerContext, fn func(context *LoggerContext, w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		fn(context, w, r)
@@ -248,6 +249,8 @@ func PeriodicTask(ctx *LoggerContext) {
 		}
 		ctx.Request_Count = 0
 		ctx.Request_Count_lock.Unlock()
+		// clear the cert pool
+		ctx.CurrentPrecertPool = crypto.NewCertPool()
 	}
 	time.AfterFunc(time.Duration(ctx.Logger_public_config.MMD-20)*time.Second, f1)
 }

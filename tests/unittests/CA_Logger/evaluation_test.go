@@ -24,8 +24,8 @@ func Test1(t *testing.T) {
 }
 
 func Test2(t *testing.T) {
-	certpath := "Testing Dummy 0_RID_1.crt"
-	keypath := "Testing Dummy 0_RID_1.key"
+	certpath := "Testing Dummy 2_RID_2.crt"
+	keypath := "Testing Dummy 2_RID_2.key"
 	_, err := tls.LoadX509KeyPair(certpath, keypath)
 	if err != nil {
 		fmt.Println("LoadX509KeyPair failed")
