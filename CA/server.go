@@ -2,6 +2,7 @@ package CA
 
 import (
 	//"CTng/crypto"
+	"CTngV2/crypto"
 	"CTngV2/definition"
 	"CTngV2/util"
 
@@ -254,7 +255,7 @@ func PeriodicTask(ctx *CAContext) {
 	isCA := false
 	// generate pre-certificates
 	//certs := Generate_N_Signed_PreCert(ctx, ctx.CA_private_config.Cert_per_period, host, validFor, isCA, issuer, ctx.Rootcert, false, &ctx.PrivateKey, 0)
-	certs, privkeys := Generate_N_Signed_PreCert_with_priv(ctx, ctx.CA_private_config.Cert_per_period, host, validFor, isCA, issuer, ctx.Rootcert, false, &ctx.PrivateKey, 0)
+	certs, privkeys := Generate_N_Signed_PreCert_with_priv(ctx, ctx.CA_private_config.Cert_per_period, host, validFor, isCA, issuer, ctx.Rootcert, false, &ctx.PrivateKey, ctx.CertCounter)
 	ctx.CurrentKeyPool = privkeys
 	tbscerts := make([]x509.Certificate, 0)
 	for i := 0; i < len(certs); i++ {
@@ -306,6 +307,7 @@ func PeriodicTask(ctx *CAContext) {
 		}
 		ctx.Request_Count = 0
 		ctx.Request_Count_lock.Unlock()
+		ctx.CurrentCertificatePool = crypto.NewCertPool()
 	}
 	time.AfterFunc(time.Duration(ctx.CA_public_config.MMD-20)*time.Second, f1)
 }
