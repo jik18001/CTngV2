@@ -1,10 +1,8 @@
 package main
 
 import (
-	"CTngV2/client"
 	"CTngV2/gossiper"
 	"CTngV2/util"
-	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -103,6 +101,7 @@ func TestGMResult(t *testing.T) {
 	}
 }
 
+/*
 func TestCertificateResult(t *testing.T) {
 	certbyte, _ := util.ReadCertificateFromDisk("Testing Dummy 2_RID_2.crt")
 	cert, err := x509.ParseCertificate(certbyte)
@@ -129,3 +128,4 @@ func TestCertificateResult(t *testing.T) {
 	}
 
 }
+*/

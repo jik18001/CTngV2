@@ -43,6 +43,7 @@ func StartMonitor(MID string) {
 	//wait for 60 seconds
 	fmt.Println("Delay 60 seconds to start monitor server")
 	time.Sleep(60 * time.Second)
+	ctx_monitor.Period_Offset = util.GetCurrentPeriod()
 	monitor.StartMonitorServer(ctx_monitor)
 }
 

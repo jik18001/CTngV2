@@ -382,7 +382,10 @@ func PeriodicTasks(c *MonitorContext) {
 		c.Clean_Conflicting_Object()
 		c.WipeStorage()
 		update, NUM := GenerateUpdate(c)
-		c.SaveStorage(util.GetCurrentPeriod(), update)
+		current, _ := strconv.Atoi(util.GetCurrentPeriod())
+		offsetint, _ := strconv.Atoi(c.Period_Offset)
+		PeriodIO := strconv.Itoa(current - offsetint)
+		c.SaveStorage(PeriodIO, update)
 		f2 := func() {
 			Send_POM_NUM_to_gossiper(c, NUM)
 		}
