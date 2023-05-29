@@ -1,6 +1,7 @@
 package monitor
 
 import (
+	"CTngV2/crypto"
 	"CTngV2/definition"
 	"CTngV2/util"
 	"bytes"
@@ -11,6 +12,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/bits-and-blooms/bitset"
 )
 
 func receiveGossip(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
@@ -114,7 +117,7 @@ func QueryLoggers(c *MonitorContext) {
 			if err != nil {
 				//log.Println(util.RED+"Query Logger Failed: "+err.Error(), util.RESET)
 				log.Println(util.RED+"Query Logger Failed, connection refused.", util.RESET)
-				AccuseEntity(c, logger)
+				//AccuseEntity(c, logger)
 				continue
 			}
 
@@ -123,13 +126,20 @@ func QueryLoggers(c *MonitorContext) {
 			err = json.Unmarshal(sthBody, &STH)
 			if err != nil {
 				log.Println(util.RED+err.Error(), util.RESET)
-				AccuseEntity(c, logger)
+				//AccuseEntity(c, logger)
 				continue
 			}
 			err = STH.Verify(c.Monitor_crypto_config)
 			if err != nil {
 				log.Println(util.RED+"STH signature verification failed", err.Error(), util.RESET)
-				AccuseEntity(c, logger)
+				f := func() {
+					_, ok := (*c.Storage_STH_FULL)[STH.GetID()]
+					if !Check_entity_pom(c, logger) && !ok {
+						AccuseEntity(c, logger)
+					}
+				}
+				time.AfterFunc(time.Duration(2*c.Monitor_public_config.Gossip_wait_time)*time.Second, f)
+				//AccuseEntity(c, logger)
 			} else {
 
 				Process_valid_object(c, STH)
@@ -155,14 +165,12 @@ func QueryAuthorities(c *MonitorContext) {
 			if err != nil {
 				//log.Println(util.RED+"Query CA failed: "+err.Error(), util.RESET)
 				log.Println(util.RED+"Query CA Failed, connection refused.", util.RESET)
-				AccuseEntity(c, CA)
 				continue
 			}
 
 			revBody, err := ioutil.ReadAll(revResp.Body)
 			if err != nil {
 				log.Println(util.RED+err.Error(), util.RESET)
-				AccuseEntity(c, CA)
 			}
 			//rev := string(revBody)
 			//fmt.Println("Revocation information from CA " + CA + ": " + rev + "\n")
@@ -170,14 +178,25 @@ func QueryAuthorities(c *MonitorContext) {
 			err = json.Unmarshal(revBody, &REV)
 			if err != nil {
 				log.Println(util.RED+err.Error(), util.RESET)
-				AccuseEntity(c, CA)
 				continue
 			}
 			//fmt.Println(c.Monitor_private_configPublic)
 			err = REV.Verify(c.Monitor_crypto_config)
 			if err != nil {
 				log.Println(util.RED+"Revocation information signature verification failed", err.Error(), util.RESET)
-				AccuseEntity(c, CA)
+				continue
+			}
+			SRH, DCRV := Get_SRH_and_DCRV(REV)
+			key := REV.Payload[0]
+			if !c.VerifySRH(SRH, &DCRV, key, REV.Period) {
+				fmt.Println("SRH verification failed")
+				f := func() {
+					_, ok := (*c.Storage_REV_FULL)[REV.GetID()]
+					if !Check_entity_pom(c, CA) && !ok {
+						AccuseEntity(c, CA)
+					}
+				}
+				time.AfterFunc(time.Duration(2*c.Monitor_public_config.Gossip_wait_time)*time.Second, f)
 			} else {
 				Process_valid_object(c, REV)
 			}
@@ -186,9 +205,9 @@ func QueryAuthorities(c *MonitorContext) {
 
 }
 
-//This function accuses the entity if the domain name is provided
-//It is called when the gossip object received is not valid, or the monitor didn't get response when querying the logger or the CA
-//Accused = Domain name of the accused entity (logger etc.)
+// This function accuses the entity if the domain name is provided
+// It is called when the gossip object received is not valid, or the monitor didn't get response when querying the logger or the CA
+// Accused = Domain name of the accused entity (logger etc.)
 func AccuseEntity(c *MonitorContext, Accused string) {
 	if Check_entity_pom(c, Accused) {
 		return
@@ -216,7 +235,7 @@ func AccuseEntity(c *MonitorContext, Accused string) {
 	Send_to_gossiper(c, accusation)
 }
 
-//Send the input gossip object to its gossiper
+// Send the input gossip object to its gossiper
 func Send_to_gossiper(c *MonitorContext, g definition.Gossip_object) {
 	// Convert gossip object to JSON
 	msg, err := json.Marshal(g)
@@ -264,8 +283,8 @@ func Send_POM_NUM_to_gossiper(c *MonitorContext, num definition.PoM_Counter) {
 
 }
 
-//this function takes the name of the entity as input and check if there is a POM against it
-//this should be invoked after the monitor receives the information from its loggers and CAs prior to threshold signning it
+// this function takes the name of the entity as input and check if there is a POM against it
+// this should be invoked after the monitor receives the information from its loggers and CAs prior to threshold signning it
 func Check_entity_pom(c *MonitorContext, Accused string) bool {
 	GID := definition.Gossip_ID{
 		Period:     util.GetCurrentPeriod(),
@@ -372,8 +391,8 @@ func PeriodicTasks(c *MonitorContext) {
 	time.AfterFunc(time.Duration(c.Monitor_public_config.MMD-20)*time.Second, f1)
 }
 
-//This function is called by handle_gossip in monitor_server.go under the server folder
-//It will be called if the gossip object is validated
+// This function is called by handle_gossip in monitor_server.go under the server folder
+// It will be called if the gossip object is validated
 func Process_valid_object(c *MonitorContext, g definition.Gossip_object) {
 	//This handles the STHS from querying loggers
 	if g.Type == definition.STH_INIT && IsLogger(c, g.Signer) {
@@ -391,4 +410,33 @@ func Process_valid_object(c *MonitorContext, g definition.Gossip_object) {
 		c.StoreObject(g)
 	}
 	return
+}
+
+func (ctx *MonitorContext) VerifySRH(srh string, dCRV *bitset.BitSet, CAID string, Period string) bool {
+	// find the corresponding CRV
+	CRV_old := ctx.Storage_CRV[CAID]
+	if CRV_old == nil {
+		CRV_old = dCRV
+	}
+	// verify the SRH
+	hashmsg1, _ := CRV_old.MarshalBinary()
+	hashmsg2, _ := dCRV.MarshalBinary()
+	hash1, _ := crypto.GenerateSHA256(hashmsg1)
+	hash2, _ := crypto.GenerateSHA256(hashmsg2)
+
+	localhash, _ := crypto.GenerateSHA256([]byte(Period + string(hash1) + string(hash2)))
+	// the localhash will be te message we used to verify the Signature on the SRH
+	// verify the signature
+	rsasig, err := crypto.RSASigFromString(srh)
+	if err != nil {
+		fmt.Println("Fail to convert the signature from the SRH to RSA signature")
+	}
+	ca_publickey := ctx.Monitor_crypto_config.SignPublicMap[rsasig.ID]
+	err = crypto.RSAVerify(localhash, rsasig, &ca_publickey)
+	if err != nil {
+		fmt.Println("Fail to verify the signature on the SRH")
+		return false
+	}
+	//fmt.Println("SRH verification success")
+	return true
 }

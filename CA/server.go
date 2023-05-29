@@ -141,14 +141,13 @@ func receive_sth(c *CAContext, w http.ResponseWriter, r *http.Request) {
 // receive POI from logger
 func receive_poi(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	// Unmarshal the request body into [][]byte
-	var poi POI
+	var poi ProofOfInclusion
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&poi)
 	if err != nil {
 		panic(err)
 	}
 	//fmt.Println("Logger ID in this poi: ", poi.LoggerID)
-	// Verify the POI
 	// Get the STH of the logger
 	sth := c.STH_storage[poi.LoggerID]
 	//fmt.Println("sth: ", sth, c.STH_storage)
@@ -156,11 +155,24 @@ func receive_poi(c *CAContext, w http.ResponseWriter, r *http.Request) {
 
 	Logger_info := LoggerInfo{
 		STH: sth,
-		POI: poi.ProofOfInclusion,
+		POI: poi,
+	}
+	var treeinfo definition.STH
+	err = json.Unmarshal([]byte(sth.Payload[1]), &treeinfo)
+	if err != nil {
+		panic(err)
 	}
 	target_cert := c.CurrentCertificatePool.GetCertBySubjectKeyID(string(poi.SubjectKeyId))
 	if target_cert != nil {
 		fmt.Println(poi.SubjectKeyId)
+		// verify POI before preceding
+		certlogged := util.ParseTBSCertificate(target_cert)
+		if VerifyPOI(treeinfo.RootHash, Logger_info.POI, *certlogged) == false {
+			fmt.Println("POI verification failed")
+			fmt.Println(Logger_info.POI)
+			fmt.Println("finsihed printing poi received")
+			return
+		}
 		target_cert = UpdateCTngExtension(target_cert, Logger_info)
 		c.CurrentCertificatePool.UpdateCertBySubjectKeyID(string(poi.SubjectKeyId), target_cert)
 	}

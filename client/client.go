@@ -1,9 +1,12 @@
 package client
 
 import (
+	"CTngV2/CA"
+	"CTngV2/Logger"
 	"CTngV2/crypto"
 	"CTngV2/definition"
 	"CTngV2/monitor"
+	"CTngV2/util"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
@@ -241,4 +244,64 @@ func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate, verify bool,
 		}
 	}
 	return true
+}
+
+func (ctx *ClientContext) VerifyCTngextension(cert *x509.Certificate) bool {
+	var CTngext CA.CTngExtension
+	CTngext = CA.ParseCTngextension(cert)
+	var total int
+	total = len(CTngext.LoggerInformation)
+	var faulty_logger int
+	faulty_logger = 0
+	Precert := util.ParseTBSCertificate(cert)
+	for _, loggerinfo := range CTngext.LoggerInformation {
+		err := loggerinfo.STH.Verify(ctx.Crypto)
+		if err != nil {
+			fmt.Println("Cert logger STH verification failed")
+			faulty_logger++
+		} else {
+			var treeinfo Logger.STH
+			err := json.Unmarshal([]byte(loggerinfo.STH.Payload[1]), &treeinfo)
+			if err != nil {
+				fmt.Println("sth unmarshal failed")
+				faulty_logger++
+			} else {
+				roothash := ctx.STH_database[loggerinfo.STH.Payload[0]+"@"+loggerinfo.STH.Period]
+				if roothash != treeinfo.RootHash {
+					fmt.Println("STH from cert logger does not match with the one in the database")
+					fmt.Println("STH from cert logger : ", treeinfo.RootHash)
+					fmt.Println("STH from database : ", roothash)
+					faulty_logger++
+				} else {
+					//fmt.Println("Loggerinfo.POI: ", loggerinfo.POI)
+					pass := Logger.VerifyPOI(treeinfo, loggerinfo.POI, *Precert)
+					if !pass {
+						fmt.Println("Cert logger POI verification failed")
+						computed := Logger.ComputeRoot(treeinfo, loggerinfo.POI, *Precert)
+						fmt.Println("Computed root: ", []byte(computed))
+						fmt.Println("STH root: ", []byte(treeinfo.RootHash))
+						faulty_logger++
+					}
+				}
+
+			}
+		}
+	}
+	if faulty_logger == total {
+		fmt.Println("All loggers are faulty")
+		return false
+	} else {
+		fmt.Println("total loggers : Faulty logger = ", total, " : ", faulty_logger)
+		fmt.Println("CTng Logger information verification passed, there exists at least one benign logger")
+	}
+
+	RID := CA.GetRIDfromCert(cert)
+	CRV_to_check := ctx.CRV_database[cert.Issuer.CommonName]
+	if CRV_to_check.Test(uint(RID)) {
+		fmt.Println("Certificate has been revoked")
+		return false
+	} else {
+		fmt.Println("Certificate has not been revoked")
+		return true
+	}
 }

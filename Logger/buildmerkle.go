@@ -18,7 +18,6 @@ type STH struct {
 	TreeSize  int
 }
 
-type RevocationID uint
 type Direction uint
 
 type MerkleNode struct {
@@ -28,7 +27,6 @@ type MerkleNode struct {
 	right        *MerkleNode
 	Poi          CA.ProofOfInclusion
 	Sth          definition.Gossip_object
-	rid          RevocationID
 	SubjectKeyId []byte
 	Issuer       string
 }
@@ -51,16 +49,27 @@ func VerifyPOI(sth STH, poi CA.ProofOfInclusion, cert x509.Certificate) bool {
 	return string(testHash) == string(sth.RootHash)
 }
 
+func ComputeRoot(sth STH, POI CA.ProofOfInclusion, cert x509.Certificate) string {
+	certBytes, _ := json.Marshal(cert)
+	testHash := hash(certBytes)
+	n := len(POI.SiblingHashes)
+	POI.SiblingHashes[n-1] = POI.NeighborHash
+	for i := n - 1; i >= 0; i-- {
+		testHash = doubleHash(POI.SiblingHashes[i], testHash)
+	}
+	return string(testHash)
+}
+
 func BuildMerkleTreeFromCerts(certs []x509.Certificate, ctx LoggerContext, periodNum int) (definition.Gossip_object, STH, []MerkleNode) {
 	n := len(certs)
 	nodes := make([]MerkleNode, n)
 	for i := 0; i < n; i++ {
 		certBytes, _ := json.Marshal(certs[i])
-		nodes[i] = MerkleNode{hash: hash(certBytes), rid: RevocationID(i), SubjectKeyId: certs[i].SubjectKeyId, Issuer: string(certs[i].Issuer.CommonName)}
+		nodes[i] = MerkleNode{hash: hash(certBytes), SubjectKeyId: certs[i].SubjectKeyId, Issuer: string(certs[i].Issuer.CommonName)}
 	}
 	if len(nodes)%2 == 1 {
 		certBytes, _ := json.Marshal(certs[n-1])
-		nodes = append(nodes, MerkleNode{hash: hash(certBytes), rid: RevocationID(n - 1)})
+		nodes = append(nodes, MerkleNode{hash: hash(certBytes)})
 	}
 	root, leafs := generateMerkleTree(nodes)
 	STH1 := STH{

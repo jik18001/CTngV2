@@ -184,10 +184,9 @@ func ParseTBSCertificate(cert *x509.Certificate) *x509.Certificate {
 		UnknownExtKeyUsage:    cert.UnknownExtKeyUsage,
 		BasicConstraintsValid: cert.BasicConstraintsValid,
 		IsCA:                  cert.IsCA,
-		// only keep the first entry in the CRL distribution points
-		SubjectKeyId: cert.SubjectKeyId,
-		Issuer:       cert.Issuer,
-		PublicKey:    cert.PublicKey,
+		SubjectKeyId:          cert.SubjectKeyId,
+		Issuer:                cert.Issuer,
+		PublicKey:             cert.PublicKey,
 	}
 }
 
