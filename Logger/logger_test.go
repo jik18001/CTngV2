@@ -6,6 +6,7 @@ import (
 	//"CTng/util"
 	//"bytes"
 
+	"CTngV2/definition"
 	"encoding/json"
 
 	//"net/http"
@@ -31,7 +32,9 @@ func TestMerkleTree(t *testing.T) {
 		"../tests/networktests/logger_testconfig/1/Logger_private_config.json",
 		"../tests/networktests/logger_testconfig/1/Logger_crypto_config.json",
 	)
-	_, sth, nodes := BuildMerkleTreeFromCerts(certs, *ctx, periodNum)
+	STH_G, _, nodes := BuildMerkleTreeFromCerts(certs, *ctx, periodNum)
+	var sth definition.STH
+	json.Unmarshal([]byte(STH_G.Payload[1]), &sth)
 	testExistsSubjectKeyId, _ := json.Marshal(2)
 	testCertExists := x509.Certificate{Version: 2, SubjectKeyId: testExistsSubjectKeyId}
 	for _, node := range nodes {

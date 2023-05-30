@@ -11,15 +11,7 @@ import (
 	"strconv"
 )
 
-type STH struct {
-	Signer    string
-	Timestamp string
-	RootHash  string
-	TreeSize  int
-}
-
 type Direction uint
-
 type MerkleNode struct {
 	hash         []byte
 	neighbor     *MerkleNode
@@ -38,7 +30,7 @@ func doubleHash(data1 []byte, data2 []byte) []byte {
 		return hash(append(data2, data1...))
 	}
 }
-func VerifyPOI(sth STH, poi CA.ProofOfInclusion, cert x509.Certificate) bool {
+func VerifyPOI(sth definition.STH, poi CA.ProofOfInclusion, cert x509.Certificate) bool {
 	certBytes, _ := json.Marshal(cert)
 	testHash := hash(certBytes)
 	n := len(poi.SiblingHashes)
@@ -49,7 +41,7 @@ func VerifyPOI(sth STH, poi CA.ProofOfInclusion, cert x509.Certificate) bool {
 	return string(testHash) == string(sth.RootHash)
 }
 
-func ComputeRoot(sth STH, POI CA.ProofOfInclusion, cert x509.Certificate) string {
+func ComputeRoot(sth definition.STH, POI CA.ProofOfInclusion, cert x509.Certificate) string {
 	certBytes, _ := json.Marshal(cert)
 	testHash := hash(certBytes)
 	n := len(POI.SiblingHashes)
@@ -60,7 +52,7 @@ func ComputeRoot(sth STH, POI CA.ProofOfInclusion, cert x509.Certificate) string
 	return string(testHash)
 }
 
-func BuildMerkleTreeFromCerts(certs []x509.Certificate, ctx LoggerContext, periodNum int) (definition.Gossip_object, STH, []MerkleNode) {
+func BuildMerkleTreeFromCerts(certs []x509.Certificate, ctx LoggerContext, periodNum int) (definition.Gossip_object, definition.STH, []MerkleNode) {
 	n := len(certs)
 	nodes := make([]MerkleNode, n)
 	for i := 0; i < n; i++ {
@@ -72,9 +64,10 @@ func BuildMerkleTreeFromCerts(certs []x509.Certificate, ctx LoggerContext, perio
 		nodes = append(nodes, MerkleNode{hash: hash(certBytes)})
 	}
 	root, leafs := generateMerkleTree(nodes)
-	STH1 := STH{
+	STH1 := definition.STH{
 		Signer:    string(ctx.Logger_private_config.Signer),
 		Timestamp: util.GetCurrentTimestamp(),
+		Period:    util.GetCurrentPeriod(),
 		RootHash:  string(root.hash),
 		TreeSize:  n,
 	}

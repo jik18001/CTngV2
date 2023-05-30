@@ -39,6 +39,7 @@ type Revocation struct {
 type STH struct {
 	Signer    string
 	Timestamp string
+	Period    string
 	RootHash  string
 	TreeSize  int
 }

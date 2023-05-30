@@ -157,22 +157,9 @@ func receive_poi(c *CAContext, w http.ResponseWriter, r *http.Request) {
 		STH: sth,
 		POI: poi,
 	}
-	var treeinfo definition.STH
-	err = json.Unmarshal([]byte(sth.Payload[1]), &treeinfo)
-	if err != nil {
-		panic(err)
-	}
 	target_cert := c.CurrentCertificatePool.GetCertBySubjectKeyID(string(poi.SubjectKeyId))
 	if target_cert != nil {
 		fmt.Println(poi.SubjectKeyId)
-		// verify POI before preceding
-		certlogged := util.ParseTBSCertificate(target_cert)
-		if VerifyPOI(treeinfo.RootHash, Logger_info.POI, *certlogged) == false {
-			fmt.Println("POI verification failed")
-			fmt.Println(Logger_info.POI)
-			fmt.Println("finsihed printing poi received")
-			return
-		}
 		target_cert = UpdateCTngExtension(target_cert, Logger_info)
 		c.CurrentCertificatePool.UpdateCertBySubjectKeyID(string(poi.SubjectKeyId), target_cert)
 	}

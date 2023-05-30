@@ -153,7 +153,7 @@ func Send_POI_to_CA(c *LoggerContext, poi CA.ProofOfInclusion, ca string) {
 	defer resp.Body.Close()
 }
 
-func Send_POIs_to_CAs(c *LoggerContext, MerkleNodes []MerkleNode, sth STH) {
+func Send_POIs_to_CAs(c *LoggerContext, MerkleNodes []MerkleNode, sth definition.STH) {
 	//iterate over the MerkleNodes
 	for i := 0; i < len(MerkleNodes); i++ {
 		// create POI, using merkle node.ProofofInclusion and node.SubjectKeyId

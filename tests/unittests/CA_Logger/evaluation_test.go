@@ -3,6 +3,7 @@ package main
 import (
 	"CTngV2/CA"
 	"CTngV2/Logger"
+	"CTngV2/definition"
 	"CTngV2/util"
 	"crypto/tls"
 	"crypto/x509"
@@ -42,7 +43,7 @@ func Test2(t *testing.T) {
 	var CTngExtension CA.CTngExtension
 	CTngExtension = CA.ParseCTngextension(cert)
 	fmt.Println(CTngExtension)
-	var treeinfo Logger.STH
+	var treeinfo definition.STH
 	json.Unmarshal([]byte(CTngExtension.LoggerInformation[0].STH.Payload[1]), &treeinfo)
 	fmt.Println([]byte(treeinfo.RootHash))
 	Precert := util.ParseTBSCertificate(cert)

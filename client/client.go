@@ -260,7 +260,7 @@ func (ctx *ClientContext) VerifyCTngextension(cert *x509.Certificate) bool {
 			fmt.Println("Cert logger STH verification failed")
 			faulty_logger++
 		} else {
-			var treeinfo Logger.STH
+			var treeinfo definition.STH
 			err := json.Unmarshal([]byte(loggerinfo.STH.Payload[1]), &treeinfo)
 			if err != nil {
 				fmt.Println("sth unmarshal failed")
