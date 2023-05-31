@@ -9,6 +9,8 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+
+	"github.com/bits-and-blooms/bitset"
 )
 
 type MonitorContext struct {
@@ -23,16 +25,19 @@ type MonitorContext struct {
 	Storage_STH_FULL           *definition.Gossip_Storage
 	Storage_REV_FULL           *definition.Gossip_Storage
 	Storage_NUM_FULL           *definition.PoM_Counter
+	Storage_CRV                map[string]*bitset.BitSet
 	// Utilize Storage directory: A folder for the files of each MMD.
 	// Folder should be set to the current MMD "Period" String upon initialization.
+	StorageFile_CRV  string
 	StorageDirectory string
 	StorageID        string
 	// The below could be used to prevent a Monitor from sending duplicate Accusations,
 	// Currently, if a monitor accuses two entities in the same Period, it will trigger a gossip PoM.
 	// Therefore, a monitor can only accuse once per Period. I believe this is a temporary solution.
-	Verbose bool
-	Client  *http.Client
-	Mode    int
+	Verbose       bool
+	Client        *http.Client
+	Mode          int
+	Period_Offset string
 }
 
 type Monitor_private_config struct {
@@ -93,7 +98,6 @@ func (c *MonitorContext) Clean_Conflicting_Object() {
 
 func (c *MonitorContext) SaveStorage(Period string, update ClientUpdate) error {
 	// should be string
-
 	// Create the storage directory, should be StorageDirectory/Period
 	newdir := c.StorageDirectory + "/Period_" + Period
 	util.CreateDir(newdir)
@@ -120,6 +124,12 @@ func (c *MonitorContext) SaveStorage(Period string, update ClientUpdate) error {
 		util.WriteData(accusation_path, storageList_accusation_pom)
 	*/
 	util.WriteData(clientUpdate_path, update)
+	//save CRV
+	var crvstorage = make(map[string][]byte)
+	for key, value := range c.Storage_CRV {
+		crvstorage[key], _ = value.MarshalBinary()
+	}
+	util.WriteData(c.StorageFile_CRV, crvstorage)
 	fmt.Println(util.BLUE, "File Storage Complete for Period: ", util.GetCurrentPeriod(), util.RESET)
 	return nil
 }
@@ -202,6 +212,7 @@ func (c *MonitorContext) StoreObject(o definition.Gossip_object) {
 		fmt.Println(util.BLUE, "STH_FULL Stored", util.RESET)
 	case definition.REV_FULL:
 		(*c.Storage_REV_FULL)[o.GetID()] = o
+
 		fmt.Println(util.BLUE, "REV_FULL Stored", util.RESET)
 	default:
 		(*c.Storage_TEMP)[o.GetID()] = o
@@ -209,14 +220,9 @@ func (c *MonitorContext) StoreObject(o definition.Gossip_object) {
 
 }
 
-//wipe all temp data
+// wipe all temp data
 func (c *MonitorContext) WipeStorage() {
 	for key := range *c.Storage_TEMP {
-		if key.Period != util.GetCurrentPeriod() {
-			delete(*c.Storage_ACCUSATION_POM, key)
-		}
-	}
-	for key := range *c.Storage_ACCUSATION_POM {
 		if key.Period != util.GetCurrentPeriod() {
 			delete(*c.Storage_ACCUSATION_POM, key)
 		}
@@ -242,6 +248,7 @@ func (c *MonitorContext) WipeStorage() {
 
 func (c *MonitorContext) InitializeMonitorStorage(filepath string) {
 	c.StorageDirectory = filepath + "/" + c.StorageID + "/"
+	c.StorageFile_CRV = filepath + "/" + c.StorageID + "/" + "CRV.json"
 }
 
 func (c *MonitorContext) CleanUpMonitorStorage() {
@@ -286,4 +293,19 @@ func InitializeMonitorContext(public_config_path string, private_config_path str
 		Mode:                       0,
 	}
 	return &ctx
+}
+
+func Get_SRH_and_DCRV(rev definition.Gossip_object) (string, bitset.BitSet) {
+	var revocation definition.Revocation
+	err := json.Unmarshal([]byte(rev.Payload[2]), &revocation)
+	if err != nil {
+		fmt.Println(err)
+	}
+	newSRH := revocation.SRH
+	var newDCRV bitset.BitSet
+	err = newDCRV.UnmarshalBinary(revocation.Delta_CRV)
+	if err != nil {
+		fmt.Println(err)
+	}
+	return newSRH, newDCRV
 }

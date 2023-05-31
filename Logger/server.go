@@ -140,7 +140,7 @@ func Send_STH_to_CA(c *LoggerContext, sth definition.Gossip_object, ca string) {
 }
 
 // Send one POI to CA
-func Send_POI_to_CA(c *LoggerContext, poi CA.POI, ca string) {
+func Send_POI_to_CA(c *LoggerContext, poi CA.ProofOfInclusion, ca string) {
 	var poi_json []byte
 	poi_json, err := json.Marshal(poi)
 	if err != nil {
@@ -153,27 +153,30 @@ func Send_POI_to_CA(c *LoggerContext, poi CA.POI, ca string) {
 	defer resp.Body.Close()
 }
 
-func Send_POIs_to_CAs(c *LoggerContext, MerkleNodes []MerkleNode) {
+func Send_POIs_to_CAs(c *LoggerContext, MerkleNodes []MerkleNode, sth definition.STH) {
 	//iterate over the MerkleNodes
 	for i := 0; i < len(MerkleNodes); i++ {
 		// create POI, using merkle node.ProofofInclusion and node.SubjectKeyId
 		if len(MerkleNodes[i].SubjectKeyId) != 0 {
 			//fmt.Println([]byte(MerkleNodes[i].SubjectKeyId))
-			var CAPOI CA.POI
-			CAPOI = CA.POI{
-				ProofOfInclusion: CA.ProofOfInclusion{
-					SiblingHashes: MerkleNodes[i].Poi.SiblingHashes,
-					NeighborHash:  MerkleNodes[i].Poi.NeighborHash,
-				},
-				SubjectKeyId: MerkleNodes[i].SubjectKeyId,
-				LoggerID:     c.Logger_private_config.Signer,
+			precert := c.CurrentPrecertPool.GetCertBySubjectKeyID(string(MerkleNodes[i].SubjectKeyId))
+			if VerifyPOI(sth, MerkleNodes[i].Poi, *precert) == false {
+				fmt.Println("POI verification failed")
+				return
+			}
+			var CAPOI CA.ProofOfInclusion
+			CAPOI = CA.ProofOfInclusion{
+				SiblingHashes: MerkleNodes[i].Poi.SiblingHashes,
+				NeighborHash:  MerkleNodes[i].Poi.NeighborHash,
+				SubjectKeyId:  MerkleNodes[i].SubjectKeyId,
+				LoggerID:      c.Logger_private_config.Signer,
 			}
 			var poi_json []byte
 			poi_json, err := json.Marshal(CAPOI)
 			if err != nil {
 				log.Fatalf("Failed to marshal POI: %v", err)
 			}
-			var newp CA.POI
+			var newp CA.ProofOfInclusion
 			err = json.Unmarshal(poi_json, &newp)
 			if err != nil {
 				log.Fatalf("Failed to unmarshal POI: %v", err)
@@ -227,7 +230,7 @@ func PeriodicTask(ctx *LoggerContext) {
 		period = strconv.Itoa(periodint)
 		// update STH
 		certlist := ctx.CurrentPrecertPool.GetCerts()
-		STH, _, POIs := BuildMerkleTreeFromCerts(certlist, *ctx, periodint)
+		STH, sth, POIs := BuildMerkleTreeFromCerts(certlist, *ctx, periodint)
 		// duplicate the STH for testing
 		certlist2 := ctx.CurrentPrecertPool.GetCerts()
 		certlist2 = append(certlist2, certlist2[0])
@@ -242,7 +245,7 @@ func PeriodicTask(ctx *LoggerContext) {
 			Send_STH_to_CA(ctx, STH, ctx.Logger_public_config.All_CA_URLs[i])
 		}
 		// send POI to the Issuer CA
-		Send_POIs_to_CAs(ctx, POIs)
+		Send_POIs_to_CAs(ctx, POIs, sth)
 		ctx.Request_Count_lock.Lock()
 		if ctx.Request_Count > 0 {
 			ctx.OnlineDuration = ctx.OnlineDuration + 1

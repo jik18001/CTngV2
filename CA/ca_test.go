@@ -69,11 +69,10 @@ func testPOIjson(t *testing.T) {
 	SiblingHashes := make([][]byte, 0)
 	SiblingHashes = append(SiblingHashes, []byte("1"))
 	NeighborHash := []byte("2")
-	newpoi := ProofOfInclusion{SiblingHashes, NeighborHash}
-	newPOI := POI{newpoi, []byte{1}, "localhost:9000"}
+	newPOI := ProofOfInclusion{SiblingHashes, NeighborHash, "localhost:9000", []byte("1")}
 	fmt.Println(newPOI)
 	poi_json, _ := json.Marshal(newPOI)
-	var newpoi2 POI
+	var newpoi2 ProofOfInclusion
 	json.Unmarshal(poi_json, &newpoi2)
 	fmt.Println(newpoi2)
 }
@@ -97,7 +96,7 @@ func TestCtngExtension(t *testing.T) {
 		Type:   definition.STH_INIT,
 		Signer: "localhost:3333",
 	}
-	poi := ProofOfInclusion{make([][]byte, 0), []byte("1")}
+	poi := ProofOfInclusion{make([][]byte, 0), []byte("1"), "localhost:9000", []byte("1")}
 	newloggerinfo := LoggerInfo{
 		STH: STH,
 		POI: poi,

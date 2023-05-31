@@ -4,8 +4,10 @@ import (
 	"CTngV2/crypto"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"crypto/x509/pkix"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/big"
@@ -199,4 +201,27 @@ func Unmarshall_Signed_PreCert(precert []byte) *x509.Certificate {
 		log.Fatalf("Failed to parse certificate: %v", err)
 	}
 	return cert
+}
+
+func hash(data []byte) []byte {
+	hash := sha256.Sum256(data)
+	return hash[:]
+}
+
+func doubleHash(data1 []byte, data2 []byte) []byte {
+	if data1[0] < data2[0] {
+		return hash(append(data1, data2...))
+	} else {
+		return hash(append(data2, data1...))
+	}
+}
+func VerifyPOI(roothash string, poi ProofOfInclusion, cert x509.Certificate) bool {
+	certBytes, _ := json.Marshal(cert)
+	testHash := hash(certBytes)
+	n := len(poi.SiblingHashes)
+	poi.SiblingHashes[n-1] = poi.NeighborHash
+	for i := n - 1; i >= 0; i-- {
+		testHash = doubleHash(poi.SiblingHashes[i], testHash)
+	}
+	return string(testHash) == roothash
 }

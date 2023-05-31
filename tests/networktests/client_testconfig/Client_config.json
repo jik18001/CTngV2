@@ -1,0 +1,13 @@
+{
+    "Monitor_URLs": [
+     "localhost:8180"
+    ],
+    "Client_URL":"localhost:6000",
+    "Port": "6000",
+    "MMD": 60,
+    "MRD": 60,
+    "STH_Storage_filepath": "client/STH_datbase.json",
+    "CRV_Storage_filepath2": "client/CRV_datbase.json",
+    "D1_Blacklist_filepath":"client/D1_datbase.json",
+	"D2_Blacklist_filepath":"client/D2_datbase.json"
+}
