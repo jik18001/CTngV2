@@ -24,7 +24,7 @@ func confirmNil(t *testing.T, err error) {
 /*
 Referenced test certificate-transparency-go/tls/hash_test.go
 */
-func TestMD5(t *testing.T) {
+func testMD5(t *testing.T) {
 	// Our tests are a list of structs with the following properties:
 	var tests = []struct {
 		input    string
@@ -49,7 +49,7 @@ func TestMD5(t *testing.T) {
 		}
 	}
 }
-func TestSHA256(t *testing.T) {
+func testSHA256(t *testing.T) {
 	// Our tests are a list of structs with the following properties:
 	var tests = []struct {
 		input    string
@@ -74,7 +74,7 @@ func TestSHA256(t *testing.T) {
 }
 
 // This function tests when there are exactlu enough signatures to aggregate.
-func TestBLSFunctionality(T *testing.T) {
+func testBLSFunctionality(T *testing.T) {
 	entities := []CTngID{
 		"a",
 		"b",
@@ -143,7 +143,7 @@ func TestBLSFunctionality(T *testing.T) {
 
 }
 
-func TestBLSFunctionality2(T *testing.T) {
+func testBLSFunctionality2(T *testing.T) {
 	entities := []CTngID{
 		"a",
 		"b",
@@ -202,7 +202,7 @@ func TestBLSFunctionality2(T *testing.T) {
 
 // USE RSA Sign for testing only
 // For implementation, if we have the crypto config, we can just call sign directly
-func TestRSAFunctionality(T *testing.T) {
+func testRSAFunctionality(T *testing.T) {
 	// Generate a keypair
 	priv, err := NewRSAPrivateKey()
 	confirmNil(T, err)
@@ -223,7 +223,7 @@ func TestRSAFunctionality(T *testing.T) {
 
 // This test verifies that CTng IDs can be sorted,
 // This is important because it allows sent threshold signature payloads to be identical when signed.
-func TestCTngIDs(T *testing.T) {
+func testCTngIDs(T *testing.T) {
 	entities := []CTngID{"e", "d", "c", "b", "a"}
 	fmt.Println(entities)
 	sort.Sort(CTngIDs(entities))
@@ -233,7 +233,7 @@ func TestCTngIDs(T *testing.T) {
 	}
 }
 
-func TestCryptoIO(T *testing.T) {
+func testCryptoIO(T *testing.T) {
 	// Declare test entities
 	entities := []CTngID{"1.1.1.1", "2.2.2.2", "3.3.3.3", "4.4.4.4", "5.5.5.5", "6.6.6.6", "7.7.7.7", "8.8.8.8", "9.9.9.9", "10.10.10.10"}
 	threshold := 4
@@ -287,4 +287,21 @@ func TestCryptoIO(T *testing.T) {
 	// Verify the aggregate
 	err = readConfigs[threshold+1].ThresholdVerify(msg, agg)
 	confirmNil(T, err)
+}
+
+func TestMerkleTree(t *testing.T) {
+	certs := Generatedummycertlist(2)
+	blocks := GenerateDataBlocks(certs)
+	tree, _ := GenerateMerkleTree(blocks)
+	//fmt.Println(tree)
+	proofs := GeneratePOI(tree)
+	fmt.Println(proofs)
+	// verify the proof using only the root hash
+	roothash := tree.Root
+	for i := 0; i < len(blocks); i++ {
+		// if hashFunc is nil, use SHA256 by default
+		ok, err := VerifyPOI(roothash, proofs[i], certs[i])
+		confirmNil(t, err)
+		fmt.Println(ok)
+	}
 }

@@ -19,7 +19,6 @@ import (
 	//"strings"
 	"bytes"
 	"crypto/rsa"
-	"io/ioutil"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -115,14 +114,10 @@ func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
 
 // receive STH from logger
 func receive_sth(c *CAContext, w http.ResponseWriter, r *http.Request) {
-	// Read the request body
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		panic(err)
-	}
 	// Unmarshal the request body into a STH
 	var gossip_sth definition.Gossip_object
-	err = json.Unmarshal(body, &gossip_sth)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&gossip_sth)
 	if err != nil {
 		panic(err)
 	}
@@ -147,6 +142,7 @@ func receive_poi(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Println("POI received: ", poi)
 	//fmt.Println("Logger ID in this poi: ", poi.LoggerID)
 	// Get the STH of the logger
 	sth := c.STH_storage[poi.LoggerID]
@@ -281,7 +277,7 @@ func PeriodicTask(ctx *CAContext) {
 			//ctngexts = GetCTngExtensions(&certlist[i])
 			//fmt.Println("CTng Extension for Cert", i, "is", ctngexts)
 		}
-		fmt.Println(certlist)
+		//fmt.Println(certlist)
 		// get current period
 		period := GetCurrentPeriod()
 		// convert string to int
