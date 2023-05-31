@@ -20,7 +20,7 @@ func StartCA(id string) {
 	path3 := pathPrefix + "/CA_crypto_config.json"
 	caContext := CA.InitializeCAContext(path1, path2, path3)
 	caContext.OnlineDuration = 0
-	caContext.MisbehaviorInterval = 2
+	caContext.MisbehaviorInterval = 8 // Every other period (i.e., 8 requests)
 	caContext.CA_Type = 3
 	CA.StartCA(caContext)
 }
@@ -32,7 +32,7 @@ func StartLogger(id string) {
 	path3 := pathPrefix + "/Logger_crypto_config.json"
 	loggerContext := Logger.InitializeLoggerContext(path1, path2, path3)
 	loggerContext.OnlineDuration = 0
-	loggerContext.MisbehaviorInterval = 2
+	loggerContext.MisbehaviorInterval = 8
 	loggerContext.Logger_Type = 3
 	Logger.StartLogger(loggerContext)
 }
