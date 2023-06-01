@@ -113,40 +113,48 @@ func QueryLoggers(c *MonitorContext) {
 			fmt.Println(util.RED, "There is a PoM against this Logger. Query will not be initiated", util.RESET)
 		} else {
 			fmt.Println(util.GREEN + "Querying Logger Initiated" + util.RESET)
-			sthResp, err := http.Get(PROTOCOL + logger + "/ctng/v2/get-sth/")
-			if err != nil {
+			sthResp, err1 := http.Get(PROTOCOL + logger + "/ctng/v2/get-sth/")
+			if err1 != nil {
 				//log.Println(util.RED+"Query Logger Failed: "+err.Error(), util.RESET)
 				log.Println(util.RED+"Query Logger Failed, connection refused.", util.RESET)
 				//AccuseEntity(c, logger)
 				continue
 			}
-
-			sthBody, err := ioutil.ReadAll(sthResp.Body)
+			sthBody, err2 := ioutil.ReadAll(sthResp.Body)
 			var STH definition.Gossip_object
-			err = json.Unmarshal(sthBody, &STH)
-			if err != nil {
-				log.Println(util.RED+err.Error(), util.RESET)
+			err2 = json.Unmarshal(sthBody, &STH)
+			if err2 != nil {
+				log.Println(util.RED+err2.Error(), util.RESET)
 				//AccuseEntity(c, logger)
 				continue
 			}
-			err = STH.Verify(c.Monitor_crypto_config)
-			if err != nil {
-				log.Println(util.RED+"STH signature verification failed", err.Error(), util.RESET)
-				f := func() {
-					_, ok := (*c.Storage_STH_FULL)[STH.GetID()]
-					if !Check_entity_pom(c, logger) && !ok {
-						AccuseEntity(c, logger)
-					}
-				}
-				time.AfterFunc(time.Duration(2*c.Monitor_public_config.Gossip_wait_time)*time.Second, f)
+			err3 := STH.Verify(c.Monitor_crypto_config)
+			if err3 != nil {
+				log.Println(util.RED+"STH signature verification failed", err3.Error(), util.RESET)
 				//AccuseEntity(c, logger)
+				continue
 			} else {
+				if err1 != nil || err2 != nil || err3 != nil {
+					f := func() {
+						STH_GID := definition.Gossip_ID{
+							Period:     util.GetCurrentPeriod(),
+							Type:       definition.STH_FULL,
+							Entity_URL: logger,
+						}
+						_, ok := (*c.Storage_STH_FULL)[STH_GID]
+						if Check_entity_pom(c, logger) == false && !ok {
+							AccuseEntity(c, logger)
+						}
+					}
+					time.AfterFunc(time.Duration(2*c.Monitor_public_config.Gossip_wait_time)*time.Second, f)
+				} else {
 
-				Process_valid_object(c, STH)
+					Process_valid_object(c, STH)
+				}
 			}
 		}
-	}
 
+	}
 }
 
 // Queries CAs for revocation information
@@ -161,38 +169,47 @@ func QueryAuthorities(c *MonitorContext) {
 			fmt.Println(util.RED, "There is a PoM against this CA. Query will not be initiated", util.RESET)
 		} else {
 			fmt.Println(util.GREEN + "Querying CA Initiated" + util.RESET)
-			revResp, err := http.Get(PROTOCOL + CA + "/ctng/v2/get-revocation/")
-			if err != nil {
+			revResp, err1 := http.Get(PROTOCOL + CA + "/ctng/v2/get-revocation/")
+			if err1 != nil {
 				//log.Println(util.RED+"Query CA failed: "+err.Error(), util.RESET)
 				log.Println(util.RED+"Query CA Failed, connection refused.", util.RESET)
 				continue
 			}
 
-			revBody, err := ioutil.ReadAll(revResp.Body)
-			if err != nil {
-				log.Println(util.RED+err.Error(), util.RESET)
+			revBody, err2 := ioutil.ReadAll(revResp.Body)
+			if err2 != nil {
+				log.Println(util.RED+err2.Error(), util.RESET)
 			}
 			//rev := string(revBody)
 			//fmt.Println("Revocation information from CA " + CA + ": " + rev + "\n")
 			var REV definition.Gossip_object
-			err = json.Unmarshal(revBody, &REV)
-			if err != nil {
-				log.Println(util.RED+err.Error(), util.RESET)
+			err3 := json.Unmarshal(revBody, &REV)
+			if err3 != nil {
+				log.Println(util.RED+err3.Error(), util.RESET)
 				continue
 			}
 			//fmt.Println(c.Monitor_private_configPublic)
-			err = REV.Verify(c.Monitor_crypto_config)
-			if err != nil {
-				log.Println(util.RED+"Revocation information signature verification failed", err.Error(), util.RESET)
+			err4 := REV.Verify(c.Monitor_crypto_config)
+			if err4 != nil {
+				log.Println(util.RED+"Revocation information signature verification failed", err4.Error(), util.RESET)
 				continue
 			}
 			SRH, DCRV := Get_SRH_and_DCRV(REV)
 			key := REV.Payload[0]
-			if !c.VerifySRH(SRH, &DCRV, key, REV.Period) {
+			pass := c.VerifySRH(SRH, &DCRV, key, REV.Period)
+			if !pass {
 				fmt.Println("SRH verification failed")
+				continue
+			}
+			if err1 != nil || err2 != nil || err3 != nil || err4 != nil || !pass {
 				f := func() {
-					_, ok := (*c.Storage_REV_FULL)[REV.GetID()]
-					if !Check_entity_pom(c, CA) && !ok {
+					REV_GID := definition.Gossip_ID{
+						Period:     util.GetCurrentPeriod(),
+						Type:       definition.REV_FULL,
+						Entity_URL: CA,
+					}
+					_, ok := (*c.Storage_REV_FULL)[REV_GID]
+					if Check_entity_pom(c, CA) == false && !ok {
 						AccuseEntity(c, CA)
 					}
 				}
