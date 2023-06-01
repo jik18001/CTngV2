@@ -32,16 +32,21 @@ func TestResults(t *testing.T) {
 	for i, gossiperLog := range gossiper_log_database {
 		fmt.Println("Beginning testing gossiper", i+1)
 
-		for j, gossiperLogEntry := range gossiperLog {
+		for _, gossiperLogEntry := range gossiperLog {
 			// Accusation for even periods
-			if j%2 == 0 {
-				if gossiperLogEntry.NUM_ACC_FULL != 2 || gossiperLogEntry.NUM_ACC_INIT != 2 {
-					t.Fail()
-				}
-			} else {
-				if gossiperLogEntry.NUM_ACC_FULL != 0 || gossiperLogEntry.NUM_ACC_INIT != 0 {
-					t.Fail()
-				}
+			// if j%2 == 0 {
+			// 	if gossiperLogEntry.NUM_ACC_FULL != 2 || gossiperLogEntry.NUM_ACC_INIT != 2 {
+			// 		t.Fail()
+			// 	}
+			// } else {
+			// 	if gossiperLogEntry.NUM_ACC_FULL != 0 || gossiperLogEntry.NUM_ACC_INIT != 0 {
+			// 		t.Fail()
+			// 	}
+			// }
+
+			// No accusations
+			if gossiperLogEntry.NUM_ACC_FULL != 0 || gossiperLogEntry.NUM_ACC_INIT != 0 {
+				t.Fail()
 			}
 		}
 	}
