@@ -212,7 +212,21 @@ func (c *MonitorContext) StoreObject(o definition.Gossip_object) {
 		fmt.Println(util.BLUE, "STH_FULL Stored", util.RESET)
 	case definition.REV_FULL:
 		(*c.Storage_REV_FULL)[o.GetID()] = o
-
+		SRH, DCRV := Get_SRH_and_DCRV(o)
+		key := o.Payload[0]
+		//verif REV_FULL
+		//verify SRH
+		if !c.VerifySRH(SRH, &DCRV, key, o.Period) {
+			fmt.Println("SRH verification failed")
+			return
+		}
+		//Update CRV
+		// look for CRV first
+		if _, ok := c.Storage_CRV[key]; !ok {
+			c.Storage_CRV[key] = &DCRV
+		} else {
+			c.Storage_CRV[key].SymmetricDifference(&DCRV)
+		}
 		fmt.Println(util.BLUE, "REV_FULL Stored", util.RESET)
 	default:
 		(*c.Storage_TEMP)[o.GetID()] = o
