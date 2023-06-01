@@ -107,27 +107,28 @@ func requestSTH(c *LoggerContext, w http.ResponseWriter, r *http.Request) {
 // receive precert from CA
 func receive_pre_cert(c *LoggerContext, w http.ResponseWriter, r *http.Request) {
 	// Unmarshal the request body into a precert
-	var precert *x509.Certificate
+	var cert_ca *x509.Certificate
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 		return
 	}
 	// Parse the DER-encoded certificate
-	precert = CA.Unmarshall_Signed_PreCert(body)
-	fmt.Println(precert.SubjectKeyId)
+	cert_ca = CA.Unmarshall_Signed_PreCert(body)
 	// remove signature
-	precert = util.ParseTBSCertificate(precert)
+	precert := util.ParseTBSCertificate(cert_ca)
+	fmt.Println(precert.SubjectKeyId)
 	// add to precert pool
+	c.CertPool_lock.Lock()
 	c.CurrentPrecertPool.AddCert(precert)
+	c.CertPool_lock.Unlock()
 }
 
 // send STH to CA
 func Send_STH_to_CA(c *LoggerContext, sth definition.Gossip_object, ca string) {
-	fmt.Println("Sending STH to CA ", ca)
-	var sth_json []byte
+	roohashsent, _ := definition.ExtractRootHash(sth)
+	fmt.Println("RootHash sent: ", roohashsent)
 	sth_json, err := json.Marshal(sth)
-	//fmt.Println(sth_json)
 	if err != nil {
 		log.Fatalf("Failed to marshal STH: %v", err)
 	}
@@ -140,12 +141,12 @@ func Send_STH_to_CA(c *LoggerContext, sth definition.Gossip_object, ca string) {
 }
 
 // Send one POI to CA
-func Send_POI_to_CA(c *LoggerContext, poi CA.ProofOfInclusion, ca string) {
-	var poi_json []byte
+func Send_POI_to_CA(c *LoggerContext, poi crypto.POI_for_transmission, ca string) {
 	poi_json, err := json.Marshal(poi)
 	if err != nil {
 		log.Fatalf("Failed to marshal POI: %v", err)
 	}
+	fmt.Println("POI sent: ", poi_json)
 	resp, err := c.Client.Post(PROTOCOL+ca+"/CA/receive-poi", "application/json", bytes.NewBuffer(poi_json))
 	if err != nil {
 		fmt.Println("Failed to send POI to CA: ", err)
@@ -153,39 +154,22 @@ func Send_POI_to_CA(c *LoggerContext, poi CA.ProofOfInclusion, ca string) {
 	defer resp.Body.Close()
 }
 
-func Send_POIs_to_CAs(c *LoggerContext, MerkleNodes []MerkleNode, sth definition.STH) {
-	//iterate over the MerkleNodes
-	for i := 0; i < len(MerkleNodes); i++ {
+func Send_POIs_to_CAs(c *LoggerContext, POIs []crypto.POI_for_transmission, roothash []byte) {
+	//iterate over the POIs
+	for i := 0; i < len(POIs); i++ {
 		// create POI, using merkle node.ProofofInclusion and node.SubjectKeyId
-		if len(MerkleNodes[i].SubjectKeyId) != 0 {
-			//fmt.Println([]byte(MerkleNodes[i].SubjectKeyId))
-			precert := c.CurrentPrecertPool.GetCertBySubjectKeyID(string(MerkleNodes[i].SubjectKeyId))
-			if VerifyPOI(sth, MerkleNodes[i].Poi, *precert) == false {
-				fmt.Println("POI verification failed")
+		if len(POIs[i].SubjectKeyId) != 0 {
+			//fmt.Println([]byte(POIs[i].SubjectKeyId))
+			precert := c.CurrentPrecertPool.GetCertBySubjectKeyID(string(POIs[i].SubjectKeyId))
+			pass, err := crypto.VerifyPOI(roothash, POIs[i].Poi, *precert)
+			if err != nil || pass == false {
+				fmt.Println("POI verification failed: ", err)
 				return
 			}
-			var CAPOI CA.ProofOfInclusion
-			CAPOI = CA.ProofOfInclusion{
-				SiblingHashes: MerkleNodes[i].Poi.SiblingHashes,
-				NeighborHash:  MerkleNodes[i].Poi.NeighborHash,
-				SubjectKeyId:  MerkleNodes[i].SubjectKeyId,
-				LoggerID:      c.Logger_private_config.Signer,
-			}
-			var poi_json []byte
-			poi_json, err := json.Marshal(CAPOI)
-			if err != nil {
-				log.Fatalf("Failed to marshal POI: %v", err)
-			}
-			var newp CA.ProofOfInclusion
-			err = json.Unmarshal(poi_json, &newp)
-			if err != nil {
-				log.Fatalf("Failed to unmarshal POI: %v", err)
-			}
-			fmt.Println([]byte(newp.SubjectKeyId))
 			// Get the Issuer CA
-			ca := MerkleNodes[i].Issuer
+			ca := POIs[i].Issuer
 			// send POI to CA
-			Send_POI_to_CA(c, CAPOI, ca)
+			Send_POI_to_CA(c, POIs[i], ca)
 			SaveToStorage(*c)
 		}
 	}
@@ -230,10 +214,13 @@ func PeriodicTask(ctx *LoggerContext) {
 		period = strconv.Itoa(periodint)
 		// update STH
 		certlist := ctx.CurrentPrecertPool.GetCerts()
+		fmt.Println("len of certlist: ", len(certlist))
+		//fmt.Println("certlist: ", certlist)
 		STH, sth, POIs := BuildMerkleTreeFromCerts(certlist, *ctx, periodint)
 		// duplicate the STH for testing
 		certlist2 := ctx.CurrentPrecertPool.GetCerts()
 		certlist2 = append(certlist2, certlist2[0])
+		fmt.Println("len of certlist2: ", len(certlist2))
 		STH_FAKE, _, _ := BuildMerkleTreeFromCerts(certlist2, *ctx, periodint)
 		//fmt.Println("STH: ", STH)
 		// update STH storage

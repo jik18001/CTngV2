@@ -2,7 +2,7 @@ package main
 
 import (
 	"CTngV2/CA"
-	"CTngV2/Logger"
+	"CTngV2/crypto"
 	"CTngV2/definition"
 	"CTngV2/util"
 	"crypto/tls"
@@ -27,8 +27,8 @@ func Test1(t *testing.T) {
 }
 
 func Test2(t *testing.T) {
-	certpath := "Testing Dummy 1_RID_1.crt"
-	keypath := "Testing Dummy 1_RID_1.key"
+	certpath := "Testing Dummy 2_RID_2.crt"
+	keypath := "Testing Dummy 2_RID_2.key"
 	_, err := tls.LoadX509KeyPair(certpath, keypath)
 	if err != nil {
 		fmt.Println("LoadX509KeyPair failed")
@@ -43,12 +43,17 @@ func Test2(t *testing.T) {
 	var CTngExtension CA.CTngExtension
 	CTngExtension = CA.ParseCTngextension(cert)
 	fmt.Println(CTngExtension)
-	var treeinfo definition.STH
-	json.Unmarshal([]byte(CTngExtension.LoggerInformation[0].STH.Payload[1]), &treeinfo)
+	STH := CTngExtension.LoggerInformation[0].STH
+	roothash1, _ := definition.ExtractRootHash(STH)
+	fmt.Println(roothash1)
+	POI := CTngExtension.LoggerInformation[0].POI.Poi
 	POI_json, _ := json.Marshal(CTngExtension.LoggerInformation[0].POI)
-	fmt.Println("POI given: ", POI_json)
-	fmt.Println("RootHash in Byte array given: ", []byte(treeinfo.RootHash))
-	Precert := util.ParseTBSCertificate(cert)
-	computed := Logger.ComputeRoot(treeinfo, CTngExtension.LoggerInformation[0].POI, *Precert)
-	fmt.Println("RootHash in Byte array computed: ", []byte(computed))
+	fmt.Println(POI_json)
+	precert := util.ParseTBSCertificate(cert)
+	pass, err := crypto.VerifyPOI(roothash1, POI, *precert)
+	if !pass {
+		fmt.Println("VerifyPOI failed")
+		fmt.Println(err)
+		t.Fail()
+	}
 }

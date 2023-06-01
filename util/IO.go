@@ -185,6 +185,7 @@ func ParseTBSCertificate(cert *x509.Certificate) *x509.Certificate {
 		BasicConstraintsValid: cert.BasicConstraintsValid,
 		IsCA:                  cert.IsCA,
 		SubjectKeyId:          cert.SubjectKeyId,
+		RawSubject:            cert.RawSubject,
 		Issuer:                cert.Issuer,
 		PublicKey:             cert.PublicKey,
 	}

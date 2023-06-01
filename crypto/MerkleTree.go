@@ -12,7 +12,23 @@ type Certblock struct {
 }
 
 func (c *Certblock) Serialize() ([]byte, error) {
+	//This is an oversimplification of the serialization process for just demonstration purposes
+	// In reality, the serialization process is much more complicated
+	// in CTng extension, we need to extract the TBS certificate and serialize it
+	// However the CA will sign the whole certificate with the CTng extension, which means the TBS certificate field the CA signed is not the same as the TBS certificate field the logger logged
+	return c.Content.RawSubject, nil
+}
+
+/*
+func (c *Certblock) Serialize() ([]byte, error) {
 	return c.Content.Raw, nil
+}*/
+
+type POI_for_transmission struct {
+	Poi          *merkletree.Proof `json:"poi,omitempty"`
+	SubjectKeyId []byte            `json:"subjectKeyId,omitempty"`
+	Issuer       string            `json:"issuer,omitempty"`
+	LoggerID     string            `json:"loggerID,omitempty"`
 }
 
 func Generatedummycertlist(size int) (certs []x509.Certificate) {

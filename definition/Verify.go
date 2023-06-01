@@ -3,6 +3,8 @@ package definition
 import (
 	"CTngV2/crypto"
 	"CTngV2/util"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	//"strings"
@@ -35,7 +37,7 @@ func Verify_CON(g Gossip_object, c *crypto.CryptoConfig) error {
 	return errors.New("Message Signature Mismatch" + fmt.Sprint(sigerr1) + fmt.Sprint(sigerr2))
 }
 
-//verifies signature fragments match with payload
+// verifies signature fragments match with payload
 func Verify_PayloadFrag(g Gossip_object, c *crypto.CryptoConfig) error {
 	if g.Signature[0] != "" && g.Payload[0] != "" {
 		sig, _ := crypto.SigFragmentFromString(g.Signature[0])
@@ -49,7 +51,7 @@ func Verify_PayloadFrag(g Gossip_object, c *crypto.CryptoConfig) error {
 	}
 }
 
-//verifies threshold signatures match payload
+// verifies threshold signatures match payload
 func Verify_PayloadThreshold(g Gossip_object, c *crypto.CryptoConfig) error {
 	if g.Signature[0] != "" && g.Payload[0] != "" {
 		sig, _ := crypto.ThresholdSigFromString(g.Signature[0])
@@ -77,10 +79,10 @@ func Verify_RSAPayload(g Gossip_object, c *crypto.CryptoConfig) error {
 	}
 }
 
-//Verifies Gossip object based on the type:
-//STH and Revocations use RSA
-//Trusted information Fragments use BLS SigFragments
-//PoMs use Threshold signatures
+// Verifies Gossip object based on the type:
+// STH and Revocations use RSA
+// Trusted information Fragments use BLS SigFragments
+// PoMs use Threshold signatures
 func (g Gossip_object) Verify(c *crypto.CryptoConfig) error {
 	// If everything Verified correctly, we return nil
 	switch g.Type {
@@ -143,4 +145,26 @@ func Verify_NUM_FULL(n PoM_Counter, c *crypto.CryptoConfig) error {
 	sig, _ := crypto.ThresholdSigFromString(n.Signature)
 	return c.ThresholdVerify(n.ACC_FULL_Counter+n.CON_FULL_Counter+n.Period, sig)
 
+}
+
+func ExtractRootHash(gossipSTH Gossip_object) ([]byte, error) {
+	payload1 := gossipSTH.Payload[1]
+
+	sthBytes, err := hex.DecodeString(payload1)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode STH payload: %v", err)
+	}
+
+	var STH1 STH
+	err = json.Unmarshal(sthBytes, &STH1)
+	if err != nil {
+		return nil, fmt.Errorf("failed to unmarshal STH: %v", err)
+	}
+
+	roothash, err := hex.DecodeString(STH1.RootHash)
+	if err != nil {
+		return nil, fmt.Errorf("failed to decode root hash: %v", err)
+	}
+
+	return roothash, nil
 }

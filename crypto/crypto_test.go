@@ -290,7 +290,7 @@ func testCryptoIO(T *testing.T) {
 }
 
 func TestMerkleTree(t *testing.T) {
-	certs := Generatedummycertlist(2)
+	certs := Generatedummycertlist(7)
 	blocks := GenerateDataBlocks(certs)
 	tree, _ := GenerateMerkleTree(blocks)
 	//fmt.Println(tree)

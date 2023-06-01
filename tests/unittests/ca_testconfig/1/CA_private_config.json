@@ -16,5 +16,5 @@
    "localhost:8082",
    "localhost:8083"
   ],
-  "Cert_per_period": 1
+  "Cert_per_period": 2
  }

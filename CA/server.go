@@ -136,7 +136,7 @@ func receive_sth(c *CAContext, w http.ResponseWriter, r *http.Request) {
 // receive POI from logger
 func receive_poi(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	// Unmarshal the request body into [][]byte
-	var poi ProofOfInclusion
+	var poi crypto.POI_for_transmission
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(&poi)
 	if err != nil {

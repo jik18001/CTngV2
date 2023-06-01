@@ -1,6 +1,7 @@
 package CA
 
 import (
+	"CTngV2/crypto"
 	"CTngV2/definition"
 	"CTngV2/util"
 	"crypto/x509"
@@ -65,18 +66,6 @@ func testCertMarshal(t *testing.T) {
 	fmt.Println(cert)
 }
 
-func testPOIjson(t *testing.T) {
-	SiblingHashes := make([][]byte, 0)
-	SiblingHashes = append(SiblingHashes, []byte("1"))
-	NeighborHash := []byte("2")
-	newPOI := ProofOfInclusion{SiblingHashes, NeighborHash, "localhost:9000", []byte("1")}
-	fmt.Println(newPOI)
-	poi_json, _ := json.Marshal(newPOI)
-	var newpoi2 ProofOfInclusion
-	json.Unmarshal(poi_json, &newpoi2)
-	fmt.Println(newpoi2)
-}
-
 func TestCtngExtension(t *testing.T) {
 	ctx := InitializeCAContext("testFiles/ca_testconfig/1/CA_public_config.json", "testFiles/ca_testconfig/1/CA_private_config.json", "testFiles/ca_testconfig/1/CA_crypto_config.json")
 	issuer := Generate_Issuer(ctx.CA_private_config.Signer)
@@ -96,7 +85,9 @@ func TestCtngExtension(t *testing.T) {
 		Type:   definition.STH_INIT,
 		Signer: "localhost:3333",
 	}
-	poi := ProofOfInclusion{make([][]byte, 0), []byte("1"), "localhost:9000", []byte("1")}
+	poi := crypto.POI_for_transmission{
+		SubjectKeyId: cert_to_sign.SubjectKeyId,
+	}
 	newloggerinfo := LoggerInfo{
 		STH: STH,
 		POI: poi,

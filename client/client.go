@@ -2,7 +2,6 @@ package client
 
 import (
 	"CTngV2/CA"
-	"CTngV2/Logger"
 	"CTngV2/crypto"
 	"CTngV2/definition"
 	"CTngV2/monitor"
@@ -274,12 +273,9 @@ func (ctx *ClientContext) VerifyCTngextension(cert *x509.Certificate) bool {
 					faulty_logger++
 				} else {
 					//fmt.Println("Loggerinfo.POI: ", loggerinfo.POI)
-					pass := Logger.VerifyPOI(treeinfo, loggerinfo.POI, *Precert)
-					if !pass {
+					pass, err := crypto.VerifyPOI([]byte(roothash), loggerinfo.POI.Poi, *Precert)
+					if !pass || err != nil {
 						fmt.Println("Cert logger POI verification failed")
-						computed := Logger.ComputeRoot(treeinfo, loggerinfo.POI, *Precert)
-						fmt.Println("Computed root: ", []byte(computed))
-						fmt.Println("STH root: ", []byte(treeinfo.RootHash))
 						faulty_logger++
 					}
 				}

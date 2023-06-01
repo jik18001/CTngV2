@@ -48,6 +48,7 @@ type LoggerContext struct {
 	StorageDirectory      string
 	StorageFile           string
 	Request_Count_lock    *sync.Mutex
+	CertPool_lock         *sync.Mutex
 	StoragePath           string
 }
 
@@ -55,7 +56,7 @@ type PrecertStorage struct {
 	PrecertPools map[string]*crypto.CertPool
 }
 
-//check if an item is in a list
+// check if an item is in a list
 func inList(item string, list []string) bool {
 	for _, i := range list {
 		if i == item {
@@ -116,6 +117,7 @@ func InitializeLoggerContext(public_config_path string, private_config_file_path
 		STH_storage_fake:      make(map[string]definition.Gossip_object),
 		MisbehaviorInterval:   0,
 		Request_Count_lock:    &sync.Mutex{},
+		CertPool_lock:         &sync.Mutex{},
 	}
 	// Initialize http client
 	tr := &http.Transport{}

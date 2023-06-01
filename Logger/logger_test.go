@@ -1,30 +1,23 @@
 package Logger
 
 import (
-
-	//"CTng/crypto"
-	//"CTng/util"
-	//"bytes"
-
+	"CTngV2/crypto"
 	"CTngV2/definition"
-	"encoding/json"
-
-	//"net/http"
-
+	"CTngV2/util"
 	"crypto/x509"
-	"log"
+	"crypto/x509/pkix"
+	"encoding/json"
+	"fmt"
+	"strconv"
 	"testing"
-	//"strings"
-	//"strconv"
-	//"github.com/gorilla/mux"
 )
 
-func TestMerkleTree(t *testing.T) {
+func TestMerkle(t *testing.T) {
 	certs := make([]x509.Certificate, 0)
-	for i := 0; i < 1; i++ {
-		subjectKeyIdBytes, _ := json.Marshal(i)
+	for i := 0; i < 2; i++ {
+		subjectKeyIdBytes := []byte(strconv.Itoa(i))
 		certs = append(certs, x509.Certificate{
-			Version: i, SubjectKeyId: subjectKeyIdBytes,
+			SubjectKeyId: subjectKeyIdBytes,
 		})
 	}
 	periodNum := 0
@@ -32,22 +25,71 @@ func TestMerkleTree(t *testing.T) {
 		"../tests/networktests/logger_testconfig/1/Logger_private_config.json",
 		"../tests/networktests/logger_testconfig/1/Logger_crypto_config.json",
 	)
-	STH_G, _, nodes := BuildMerkleTreeFromCerts(certs, *ctx, periodNum)
-	var sth definition.STH
-	json.Unmarshal([]byte(STH_G.Payload[1]), &sth)
-	testExistsSubjectKeyId, _ := json.Marshal(2)
-	testCertExists := x509.Certificate{Version: 2, SubjectKeyId: testExistsSubjectKeyId}
-	for _, node := range nodes {
-		if string(node.SubjectKeyId) == string(testExistsSubjectKeyId) {
-			if !(VerifyPOI(sth, node.Poi, testCertExists)) {
-				log.Fatal("Expected certificate does not exist")
-				t.Fail()
+	// Verify the root hash
+	STH_G, rootHash, leaves := BuildMerkleTreeFromCerts(certs, *ctx, periodNum)
+	rootfromSTH, _ := definition.ExtractRootHash(STH_G)
+	if string(rootHash) != string(rootfromSTH) {
+		t.Errorf("Root hash is not correct")
+	}
+	testExistsSubjectKeyId := []byte("1")
+	testExistsCert := x509.Certificate{
+		SubjectKeyId: testExistsSubjectKeyId,
+	}
+	testNotExistsSubjectKeyId := []byte("4")
+	testNotExistsCert := x509.Certificate{
+		SubjectKeyId: testNotExistsSubjectKeyId,
+	}
+	counter := 0
+	// Verify the POI
+	// try encode and decode the leaves to see whether the POI is correct
+	encodedleaves, _ := json.Marshal(leaves)
+	var decodedleaves []crypto.POI_for_transmission
+	json.Unmarshal(encodedleaves, &decodedleaves)
+	for _, POI := range decodedleaves {
+		if string(POI.SubjectKeyId) == string(testExistsSubjectKeyId) {
+			pass, err := crypto.VerifyPOI(rootHash, POI.Poi, testExistsCert)
+			if pass != true || err != nil {
+				t.Errorf("POI is not correct")
+			} else {
+				counter++
+			}
+		}
+		if string(POI.SubjectKeyId) == string(testNotExistsSubjectKeyId) {
+			pass, err := crypto.VerifyPOI(rootHash, POI.Poi, testNotExistsCert)
+			if pass != false || err == nil {
+				t.Errorf("POI is correct but it should not be")
 			}
 		}
 	}
-	testCertDoesNotExist := x509.Certificate{Version: 32, SubjectKeyId: testExistsSubjectKeyId}
-	if VerifyPOI(sth, nodes[0].Poi, testCertDoesNotExist) {
-		log.Fatal("Not existent certificate passed verification")
-		t.Fail()
+	if counter != 1 {
+		t.Errorf("Merkle tree is not working correctly")
+	}
+}
+
+func TestCertPoolMerk(t *testing.T) {
+	certs := make([]x509.Certificate, 0)
+	for i := 0; i < 2; i++ {
+		rawsubject := []byte(strconv.Itoa(i))
+		subjectKeyIdBytes := []byte(strconv.Itoa(i))
+		certs = append(certs, x509.Certificate{
+			SubjectKeyId: subjectKeyIdBytes,
+			RawSubject:   rawsubject,
+			Issuer: pkix.Name{
+				CommonName: "CA 1",
+			},
+		})
+	}
+	ctx := InitializeLoggerContext("../tests/networktests/logger_testconfig/1/Logger_public_config.json",
+		"../tests/networktests/logger_testconfig/1/Logger_private_config.json",
+		"../tests/networktests/logger_testconfig/1/Logger_crypto_config.json",
+	)
+	for _, cert := range certs {
+		precert := util.ParseTBSCertificate(&cert)
+		ctx.CurrentPrecertPool.AddCert(precert)
+	}
+	fmt.Println(len(ctx.CurrentPrecertPool.GetCerts()))
+	certs_from_pool := ctx.CurrentPrecertPool.GetCerts()
+	for _, cert := range certs_from_pool {
+		fmt.Println(cert.Issuer)
 	}
 }

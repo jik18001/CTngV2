@@ -6,6 +6,8 @@ package crypto
 import (
 	//"CTng/gossip"
 	"encoding/pem"
+	"fmt"
+
 	//"encoding/json"
 	"crypto/x509"
 )
@@ -85,6 +87,7 @@ func (s *CertPool) AddCert(cert *x509.Certificate) {
 
 	// Check that the certificate isn't being added twice.
 	if s.contains(cert) {
+		fmt.Println("cert already in pool")
 		return
 	}
 
