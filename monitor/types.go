@@ -101,28 +101,8 @@ func (c *MonitorContext) SaveStorage(Period string, update ClientUpdate) error {
 	// Create the storage directory, should be StorageDirectory/Period
 	newdir := c.StorageDirectory + "/Period_" + Period
 	util.CreateDir(newdir)
-	// Create the storage files
-	/*
-		sth_path := newdir + "/STH_FULL_at_Period_" + definition.GetCurrentPeriod() + ".json"
-		rev_path := newdir + "/REV_FULL_at_Period_" + definition.GetCurrentPeriod() + ".json"
-		conflict_path := newdir + "/CON_FULL_at_Period_" + definition.GetCurrentPeriod() + ".json"
-		accusation_path := newdir + "/ACC_PoM_at_Period_" + definition.GetCurrentPeriod() + ".json"
-	*/
 	clientUpdate_path := newdir + "/ClientUpdate.json"
-	/*
-		util.CreateFile(sth_path)
-		util.CreateFile(rev_path)
-		util.CreateFile(conflict_path)
-		util.CreateFile(accusation_path)
-	*/
 	util.CreateFile(clientUpdate_path)
-	// Write the storage files
-	/*
-		util.WriteData(sth_path, storageList_sth_full)
-		util.WriteData(rev_path, storageList_rev_full)
-		util.WriteData(conflict_path, storageList_conflict_pom)
-		util.WriteData(accusation_path, storageList_accusation_pom)
-	*/
 	util.WriteData(clientUpdate_path, update)
 	//save CRV
 	var crvstorage = make(map[string][]byte)
@@ -303,6 +283,7 @@ func InitializeMonitorContext(public_config_path string, private_config_path str
 		Storage_STH_FULL:           storage_sth_full,
 		Storage_REV_FULL:           storage_rev_full,
 		Storage_NUM_FULL:           &definition.PoM_Counter{},
+		Storage_CRV:                make(map[string]*bitset.BitSet),
 		StorageID:                  storageID,
 		Mode:                       0,
 	}

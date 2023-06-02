@@ -148,7 +148,6 @@ func QueryLoggers(c *MonitorContext) {
 					}
 					time.AfterFunc(time.Duration(2*c.Monitor_public_config.Gossip_wait_time)*time.Second, f)
 				} else {
-
 					Process_valid_object(c, STH)
 				}
 			}
