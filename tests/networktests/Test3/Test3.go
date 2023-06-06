@@ -74,21 +74,20 @@ func StartGossiper(id string) {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("usage: go run test3.go <ca|logger|monitor|gossiper> <id>")
+		fmt.Println("Usage: go run Test1.go <CA|Logger|Monitor|Gossiper> <ID>")
 		os.Exit(1)
 	}
-
 	switch os.Args[1] {
-	case "ca":
+	case "CA":
 		StartCA(os.Args[2])
-	case "logger":
+	case "Logger":
 		StartLogger(os.Args[2])
-	case "monitor":
+	case "Monitor":
 		StartMonitor(os.Args[2])
-	case "gossiper":
+	case "Gossiper":
 		StartGossiper(os.Args[2])
 	default:
-		fmt.Println("usage: go run test3.go <ca|logger|monitor|gossiper> <id>")
+		fmt.Println("Usage: go run Test1.go <CA|Logger|Monitor|Gossiper> <ID>")
 		os.Exit(1)
 	}
 }
