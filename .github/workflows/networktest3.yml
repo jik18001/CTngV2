@@ -1,4 +1,4 @@
-name: 'Run Network Test 2'
+name: 'Run Network Test 3'
  
 on:
   workflow_dispatch:
@@ -17,9 +17,9 @@ jobs:
         with:
           go-version: '1.19.x'
 
-      - name: Run Network Test 2 
+      - name: Run Network Test 3 
         run: |
-          cd tests/networktests/Test2
+          cd tests/networktests/Test3
           go run Test2.go CA 1 &
           go run Test2.go Logger 1 &
           go run Test2.go Monitor 1 &
