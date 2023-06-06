@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-// Always unresponsive CA and logger
+// Sometimes unresponsive CA
 
 func StartCA(id string) {
 	pathPrefix := "../ca_testconfig/" + id
@@ -20,8 +20,8 @@ func StartCA(id string) {
 	path3 := pathPrefix + "/CA_crypto_config.json"
 	caContext := CA.InitializeCAContext(path1, path2, path3)
 	caContext.OnlineDuration = 0
-	caContext.MisbehaviorInterval = 2
-	caContext.CA_Type = 2
+	caContext.MisbehaviorInterval = 8 // Every other period (i.e., 8 requests)
+	caContext.CA_Type = 3
 	CA.StartCA(caContext)
 }
 
@@ -31,9 +31,9 @@ func StartLogger(id string) {
 	path2 := pathPrefix + "/Logger_private_config.json"
 	path3 := pathPrefix + "/Logger_crypto_config.json"
 	loggerContext := Logger.InitializeLoggerContext(path1, path2, path3)
-	loggerContext.OnlineDuration = 0
-	loggerContext.MisbehaviorInterval = 2
-	loggerContext.Logger_Type = 2
+	// loggerContext.OnlineDuration = 0
+	// loggerContext.MisbehaviorInterval = 2
+	// loggerContext.Logger_Type = 3
 	Logger.StartLogger(loggerContext)
 }
 
@@ -62,9 +62,6 @@ func StartGossiper(id string) {
 	path2 := pathPrefix + "/Gossiper_private_config.json"
 	path3 := pathPrefix + "/Gossiper_crypto_config.json"
 	gossiperContext := gossiper.InitializeGossiperContext(path1, path2, path3, id)
-
-	// TODO: Make some gossipers malicious
-
 	gossiperContext.StorageDirectory = "gossiper_testdata/" + gossiperContext.StorageID + "/"
 	gossiperContext.StorageFile = "gossiper_testdata.json"
 	gossiperContext.CleanUpGossiperStorage()
@@ -79,7 +76,7 @@ func StartGossiper(id string) {
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("usage: go run test5.go <ca|logger|monitor|gossiper> <id>")
+		fmt.Println("usage: go run test4.go <ca|logger|monitor|gossiper> <id>")
 		os.Exit(1)
 	}
 
@@ -93,7 +90,7 @@ func main() {
 	case "gossiper":
 		StartGossiper(os.Args[2])
 	default:
-		fmt.Println("usage: go run test5.go <ca|logger|monitor|gossiper> <id>")
+		fmt.Println("usage: go run test4.go <ca|logger|monitor|gossiper> <id>")
 		os.Exit(1)
 	}
 }

@@ -33,8 +33,9 @@ func TestResults(t *testing.T) {
 		fmt.Println("Beginning testing gossiper", i+1)
 
 		for _, gossiperLogEntry := range gossiperLog {
-			// Accusation for every period
-			if gossiperLogEntry.NUM_ACC_FULL != 2 || gossiperLogEntry.NUM_ACC_INIT != 2 {
+			// No accusations
+			if gossiperLogEntry.NUM_ACC_FULL != 0 || gossiperLogEntry.NUM_ACC_INIT != 0 {
+				fmt.Println("Gossiper", i+1, "has accusations")
 				t.Fail()
 			}
 		}
