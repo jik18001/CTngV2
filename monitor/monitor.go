@@ -117,43 +117,30 @@ func QueryLoggers(c *MonitorContext) {
 			if err1 != nil {
 				//log.Println(util.RED+"Query Logger Failed: "+err.Error(), util.RESET)
 				log.Println(util.RED+"Query Logger Failed, connection refused.", util.RESET)
-				//AccuseEntity(c, logger)
-				continue
-			}
-			sthBody, err2 := ioutil.ReadAll(sthResp.Body)
-			var STH definition.Gossip_object
-			err2 = json.Unmarshal(sthBody, &STH)
-			if err2 != nil {
-				log.Println(util.RED+err2.Error(), util.RESET)
-				//AccuseEntity(c, logger)
-				continue
-			}
-			err3 := STH.Verify(c.Monitor_crypto_config)
-			if err3 != nil {
-				log.Println(util.RED+"STH signature verification failed", err3.Error(), util.RESET)
-				//AccuseEntity(c, logger)
-				continue
+				Wait_then_accuse(c, logger, "logger")
+				return
 			} else {
-				if err1 != nil || err2 != nil || err3 != nil {
-					f := func() {
-						STH_GID := definition.Gossip_ID{
-							Period:     util.GetCurrentPeriod(),
-							Type:       definition.STH_FULL,
-							Entity_URL: logger,
-						}
-						_, ok := (*c.Storage_STH_FULL)[STH_GID]
-						if Check_entity_pom(c, logger) == false && !ok {
-							AccuseEntity(c, logger)
-						}
-					}
-					time.AfterFunc(time.Duration(2*c.Monitor_public_config.Gossip_wait_time)*time.Second, f)
+				sthBody, err2 := ioutil.ReadAll(sthResp.Body)
+				var STH definition.Gossip_object
+				err2 = json.Unmarshal(sthBody, &STH)
+				if err2 != nil {
+					log.Println(util.RED+err2.Error(), util.RESET)
+					Wait_then_accuse(c, logger, "logger")
+					return
 				} else {
-					Process_valid_object(c, STH)
+					err3 := STH.Verify(c.Monitor_crypto_config)
+					if err3 != nil {
+						log.Println(util.RED+"STH signature verification failed", err3.Error(), util.RESET)
+						Wait_then_accuse(c, logger, "logger")
+						return
+					} else {
+						Process_valid_object(c, STH)
+					}
 				}
 			}
 		}
-
 	}
+
 }
 
 // Queries CAs for revocation information
@@ -172,49 +159,41 @@ func QueryAuthorities(c *MonitorContext) {
 			if err1 != nil {
 				//log.Println(util.RED+"Query CA failed: "+err.Error(), util.RESET)
 				log.Println(util.RED+"Query CA Failed, connection refused.", util.RESET)
+				Wait_then_accuse(c, CA, "ca")
 				continue
-			}
-
-			revBody, err2 := ioutil.ReadAll(revResp.Body)
-			if err2 != nil {
-				log.Println(util.RED+err2.Error(), util.RESET)
-			}
-			//rev := string(revBody)
-			//fmt.Println("Revocation information from CA " + CA + ": " + rev + "\n")
-			var REV definition.Gossip_object
-			err3 := json.Unmarshal(revBody, &REV)
-			if err3 != nil {
-				log.Println(util.RED+err3.Error(), util.RESET)
-				continue
-			}
-			//fmt.Println(c.Monitor_private_configPublic)
-			err4 := REV.Verify(c.Monitor_crypto_config)
-			if err4 != nil {
-				log.Println(util.RED+"Revocation information signature verification failed", err4.Error(), util.RESET)
-				continue
-			}
-			SRH, DCRV := Get_SRH_and_DCRV(REV)
-			key := REV.Payload[0]
-			pass := c.VerifySRH(SRH, &DCRV, key, REV.Period)
-			if !pass {
-				fmt.Println("SRH verification failed")
-				continue
-			}
-			if err1 != nil || err2 != nil || err3 != nil || err4 != nil || !pass {
-				f := func() {
-					REV_GID := definition.Gossip_ID{
-						Period:     util.GetCurrentPeriod(),
-						Type:       definition.REV_FULL,
-						Entity_URL: CA,
-					}
-					_, ok := (*c.Storage_REV_FULL)[REV_GID]
-					if Check_entity_pom(c, CA) == false && !ok {
-						AccuseEntity(c, CA)
+			} else {
+				revBody, err2 := ioutil.ReadAll(revResp.Body)
+				if err2 != nil {
+					log.Println(util.RED+err2.Error(), util.RESET)
+					Wait_then_accuse(c, CA, "ca")
+					return
+				} else {
+					var REV definition.Gossip_object
+					err3 := json.Unmarshal(revBody, &REV)
+					if err3 != nil {
+						log.Println(util.RED+err3.Error(), util.RESET)
+						Wait_then_accuse(c, CA, "ca")
+						return
+					} else {
+						err4 := REV.Verify(c.Monitor_crypto_config)
+						if err4 != nil {
+							log.Println(util.RED+"Revocation information signature verification failed", err4.Error(), util.RESET)
+							Wait_then_accuse(c, CA, "ca")
+							return
+						} else {
+							SRH, DCRV := Get_SRH_and_DCRV(REV)
+							key := REV.Payload[0]
+							pass := c.VerifySRH(SRH, &DCRV, key, REV.Period)
+							if !pass {
+								fmt.Println("SRH verification failed")
+								Wait_then_accuse(c, CA, "ca")
+								return
+							} else {
+								Process_valid_object(c, REV)
+							}
+						}
 					}
 				}
-				time.AfterFunc(time.Duration(2*c.Monitor_public_config.Gossip_wait_time)*time.Second, f)
-			} else {
-				Process_valid_object(c, REV)
 			}
 		}
 	}
@@ -249,6 +228,32 @@ func AccuseEntity(c *MonitorContext, Accused string) {
 	}
 	//fmt.Println(util.BLUE+"New accusation from ",accusation.Signer, c.Monitor_crypto_Monitor_private_configSignaturePublicMap[signature.ID], "generated, Sending to gossiper"+util.RESET)
 	Send_to_gossiper(c, accusation)
+}
+
+func Wait_then_accuse(c *MonitorContext, Accused string, Entity_type string) {
+	var GID definition.Gossip_ID
+	var ok bool
+	f := func() {
+		if Entity_type == "logger" {
+			GID = definition.Gossip_ID{
+				Period:     util.GetCurrentPeriod(),
+				Type:       definition.STH_FULL,
+				Entity_URL: Accused,
+			}
+			_, ok = (*c.Storage_STH_FULL)[GID]
+		} else if Entity_type == "ca" {
+			GID = definition.Gossip_ID{
+				Period:     util.GetCurrentPeriod(),
+				Type:       definition.REV_FULL,
+				Entity_URL: Accused,
+			}
+			_, ok = (*c.Storage_REV_FULL)[GID]
+		}
+		if Check_entity_pom(c, Accused) == false && !ok {
+			AccuseEntity(c, Accused)
+		}
+	}
+	time.AfterFunc(time.Duration(2*c.Monitor_public_config.Gossip_wait_time)*time.Second, f)
 }
 
 // Send the input gossip object to its gossiper
