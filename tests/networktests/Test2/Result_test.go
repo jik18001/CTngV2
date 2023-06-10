@@ -17,7 +17,7 @@ func testgossipobjectnum(entry gossiper.Gossiper_log_entry, Periodoffset int) bo
 		return false
 	}
 	if entry.NUM_REV_FULL != 0 {
-		fmt.Println("Number of REV_FULL is ", entry.NUM_ACC_FULL, "but should be 0.")
+		fmt.Println("Number of REV_FULL is ", entry.NUM_REV_FULL, "but should be 0.")
 		return false
 	}
 	if entry.NUM_ACC_INIT != 0 {

@@ -73,7 +73,7 @@ func Generate_Revocation(c *CAContext, Period string, REV_type int) definition.G
 		if err != nil {
 			panic(err)
 		}
-		m2.Set(1)
+		m2.Set(1 + uint(c.OnlineDuration))
 		hashmsgdelta, err = m2.MarshalBinary()
 		if err != nil {
 			panic(err)

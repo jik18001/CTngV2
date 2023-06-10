@@ -16,11 +16,11 @@ func testgossipobjectnum(entry gossiper.Gossiper_log_entry, Periodoffset int) bo
 		return false
 	}
 	if entry.NUM_STH_FRAG != 2 {
-		fmt.Println("Number of NUM_FRAG is ", entry.NUM_STH_FRAG, "but should be 2.")
+		fmt.Println("Number of STH_FRAG is ", entry.NUM_STH_FRAG, "but should be 2.")
 		return false
 	}
 	if entry.NUM_STH_FULL != 1 {
-		fmt.Println("Number of NUM_FULL is ", entry.NUM_STH_FULL, "but should be 1.")
+		fmt.Println("Number of STH_FULL is ", entry.NUM_STH_FULL, "but should be 1.")
 		return false
 	}
 	if entry.NUM_REV_INIT != 1 {
