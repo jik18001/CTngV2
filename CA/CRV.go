@@ -22,8 +22,8 @@ type Revocation struct {
 
 func CRV_init() *CRV {
 	CRV := new(CRV)
-	CRV.CRV_pre_update = bitset.New(700)
-	CRV.CRV_current = bitset.New(700)
+	CRV.CRV_pre_update = bitset.New(10)
+	CRV.CRV_current = bitset.New(10)
 	CRV.CRV_cache = make(map[string]*bitset.BitSet)
 	return CRV
 }
