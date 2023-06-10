@@ -5,6 +5,7 @@ import (
 	"CTngV2/crypto"
 	"CTngV2/definition"
 	"CTngV2/util"
+	"reflect"
 
 	//"bytes"
 	"encoding/json"
@@ -292,6 +293,7 @@ func PeriodicTask(ctx *CAContext) {
 		fake_rev := Generate_Revocation(ctx, period, 1)
 		ctx.REV_storage[period] = rev
 		ctx.REV_storage_fake[period] = fake_rev
+		fmt.Println("Fake REV = Real REV? ", reflect.DeepEqual(ctx.REV_storage[period].Payload, ctx.REV_storage_fake[period].Payload))
 		//fmt.Println(ctx.REV_storage_fake[period].Verify(ctx.CA_crypto_config))
 		//fmt.Println(ctx.REV_storage[period].Verify(ctx.CA_crypto_config))
 		fmt.Println("CA Finished Generating Revocation for next period")
