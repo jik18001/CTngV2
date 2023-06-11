@@ -416,7 +416,7 @@ func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_obje
 			panic("dstendpoint is empty")
 		}
 		resp, err := http.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
-		fmt.Println("Sending data to", url+dstendpoint)
+		//fmt.Println("Sending data to", url+dstendpoint)
 		if err != nil {
 			if strings.Contains(err.Error(), "Client.Timeout") ||
 				strings.Contains(err.Error(), "connection refused") {
