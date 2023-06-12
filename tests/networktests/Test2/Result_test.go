@@ -40,6 +40,35 @@ func testgossipobjectnum(entry gossiper.Gossiper_log_entry, Periodoffset int) bo
 
 }
 
+func testfirstgossipobjectnum(entry gossiper.Gossiper_log_entry) bool {
+	if entry.NUM_STH_FULL != 1 {
+		fmt.Println("Number of NUM_FULL is ", entry.NUM_STH_FULL, "but should be 1.")
+		return false
+	}
+	if entry.NUM_REV_FULL != 1 {
+		fmt.Println("Number of REV_FULL is ", entry.NUM_REV_FULL, "but should be 1.")
+		return false
+	}
+	if entry.NUM_ACC_INIT != 0 {
+		fmt.Println("Number of ACC_INIT is ", entry.NUM_ACC_INIT, "but should be 0.")
+		return false
+	}
+	if entry.NUM_ACC_FRAG != 0 {
+		fmt.Println("Number of ACC_FRAG is ", entry.NUM_ACC_FRAG, "but should be 0.")
+		return false
+	}
+	if entry.NUM_ACC_FULL != 0 {
+		fmt.Println("Number of ACC_FULL is ", entry.NUM_ACC_FULL, "but should be 0.")
+		return false
+	}
+	if entry.NUM_CON_FULL != 0 {
+		fmt.Println("Number of CON_FULL is ", entry.NUM_POM_FULL, "but should be 0.")
+		return false
+	}
+	return true
+
+}
+
 func testfirstglogentry(entry gossiper.Gossiper_log_entry) bool {
 	if entry.NUM_POM_INIT != 0 {
 		fmt.Println("Number of NUM_POM_INIT is ", entry.NUM_POM_INIT, "but should be 0.")
@@ -53,7 +82,7 @@ func testfirstglogentry(entry gossiper.Gossiper_log_entry) bool {
 		fmt.Println("Number of NUM_POM_FULL is ", entry.NUM_POM_FULL, "but should be 0.")
 		return false
 	}
-	return testgossipobjectnum(entry, 0)
+	return testfirstgossipobjectnum(entry)
 }
 func testotherglogentry(entry gossiper.Gossiper_log_entry, Periodoffset int) bool {
 	if entry.NUM_POM_INIT != 1 {

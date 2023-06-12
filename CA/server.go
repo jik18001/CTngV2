@@ -66,7 +66,7 @@ func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
 		return
 	case 1:
 		//split-world CA
-		if c.Request_Count%c.MisbehaviorInterval == 0 {
+		if c.Request_Count%c.MisbehaviorInterval == 0 && c.OnlineDuration == 1 {
 			json.NewEncoder(w).Encode(c.REV_storage_fake[Period])
 			fmt.Println("Fake REV sent")
 			return
