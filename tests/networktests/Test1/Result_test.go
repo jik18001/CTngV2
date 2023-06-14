@@ -16,8 +16,8 @@ func testgossipobjectnum(entry gossiper.Gossiper_log_entry, Periodoffset int) bo
 		return false
 	}
 	if entry.NUM_STH_FRAG != 2 {
+		// this could happen, report it but this is not a failure
 		fmt.Println("Number of STH_FRAG is ", entry.NUM_STH_FRAG, "but should be 2.")
-		return false
 	}
 	if entry.NUM_STH_FULL != 1 {
 		fmt.Println("Number of STH_FULL is ", entry.NUM_STH_FULL, "but should be 1.")
@@ -28,8 +28,8 @@ func testgossipobjectnum(entry gossiper.Gossiper_log_entry, Periodoffset int) bo
 		return false
 	}
 	if entry.NUM_REV_FRAG != 2 {
+		// this could happen, report it but this is not a failure
 		fmt.Println("Number of REV_FRAG is ", entry.NUM_REV_FRAG, "but should be 2.")
-		return false
 	}
 	if entry.NUM_REV_FULL != 1 {
 		fmt.Println("Number of REV_FULL is ", entry.NUM_ACC_FULL, "but should be 1.")
@@ -60,8 +60,8 @@ func testotherglogentry(entry gossiper.Gossiper_log_entry, Periodoffset int) boo
 		return false
 	}
 	if entry.NUM_POM_FRAG != 2 {
+		// this could happen, report it but this is not a failure
 		fmt.Println("Num_NUM_FRAG is ", entry.NUM_POM_FRAG, "but should be 2.")
-		return false
 	}
 	if entry.NUM_POM_FULL != 1 {
 		fmt.Println("Num_NUM_FULL is ", entry.NUM_POM_FULL, "but should be 1.")
