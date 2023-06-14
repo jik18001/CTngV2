@@ -1,0 +1,73 @@
+{
+  "STHs": [
+    {
+      "application": "CTng",
+      "period": "22",
+      "type": "http://ctng.uconn.edu/301",
+      "signer": "",
+      "signers": [
+        "localhost:8082",
+        "localhost:8083"
+      ],
+      "signature": [
+        "{\"sign\":\"b425fc0bbd4622cb54c1e71163ac651d8457a6f7fe70b1c90c37e1ca5069a3557930bda5a2b7146e3d183a06b5dba116\", \"ids\":[\"localhost:8082\",\"localhost:8083\"]}",
+        ""
+      ],
+      "timestamp": "2023-06-14T14:22:05Z",
+      "crypto_scheme": "bls",
+      "payload": [
+        "localhost:9000",
+        "7b225369676e6572223a226c6f63616c686f73743a39303030222c2254696d657374616d70223a22323032332d30362d31345431343a32313a34305a222c22506572696f64223a223231222c22526f6f7448617368223a2230383438363333396339386435663165326663366238643039356661633062623362653763396535346636326439333039613435633062356638336335396631222c225472656553697a65223a327d",
+        ""
+      ]
+    }
+  ],
+  "REVs": [
+    {
+      "application": "CTng",
+      "period": "22",
+      "type": "http://ctng.uconn.edu/302",
+      "signer": "",
+      "signers": [
+        "localhost:8082",
+        "localhost:8080"
+      ],
+      "signature": [
+        "{\"sign\":\"19cfbcd9a8af685a5f5eec8c8aea7073f33a9055adc2c0452674a1cba9f1138f857ca2bd4d2aa0d9dc99767791f43e0f\", \"ids\":[\"localhost:8080\",\"localhost:8082\"]}",
+        ""
+      ],
+      "timestamp": "2023-06-14T14:22:05Z",
+      "crypto_scheme": "bls",
+      "payload": [
+        "localhost:9100",
+        "CRV",
+        "{\"Period\":\"22\",\"Delta_CRV\":\"AAAAAAAAAAoAAAAAAAAAAA==\",\"SRH\":\"{\\\"sig\\\":\\\"b3b941248a80b5c8967b8807343fdf0d3b8c9beb85b3d645f2105b34eeb3bf3d0078a14289fc6ab52fb144b14792e41afb589eee296679fd9a00840aca78e2c295f3f54417d4fa7728c3abca5a42d825c789d985c3dd47834d71fdc182a4e9d30c627685a17363ba364c368d4215ec1488a671ec0e1fe947a1d54bb3dfa19f0f04d043c082554bfe2ae5118515d5d0bf1e2496d9e4bb55f90a3a40764a0fa078757c8c71164dea8f81ea7d92d5238aa8e87e84fae334dff8724da90a70473c562f8357088bbf04f4ab97c98edf7e540af4edca7465f1e0d1ce3d6c1ea682b9e56969d27eab5ac363f1eee373a0da29db5f89990c4ca79cc72d998e53b8dbe1fc\\\",\\\"id\\\":\\\"localhost:9100\\\"}\"}"
+      ]
+    }
+  ],
+  "ACCs": [],
+  "CONs": [],
+  "NUM": {
+    "type": "http://ctng.uconn.edu/105",
+    "ACC_FULL_Counter": "0",
+    "CON_FULL_Counter": "0",
+    "period": "22",
+    "signer_monitor": "localhost:8182",
+    "crypto_scheme": "rsa",
+    "signature": "{\"sig\":\"8d0553e8142238b514575b0896f5c73e79bfbd96e2a8616a884416312a7b7ef0dea033d242c1845e80348f4c0309584be6d9c9903c12925dd78f9b589100192ee2102e2c4a0082957bb9be2baf39bd6bb95bceb4327e555bdac8567f026c2a0541bc7c4b465bfff31e98ccf74e1c34ee5f03b5c2df3a81c02e0e80ea47c41993f1359d3699046d87bcf1630a7370b7924b4ef8d2dd5bfad577c9c06c7961da4e65e79630247280a1539a58e293bb383f1ed44df923bc762bf749effc4351c7bee3b07ffa2d5e80bb409cc95e47302184cd01e75a03028f932793070921a4d393db2c087d0b847b145d4dd2acb2c7160d99f700dc01b6ced17e09432be6d5767a\",\"id\":\"localhost:8182\"}"
+  },
+  "NUM_FULL": {
+    "type": "http://ctng.uconn.edu/305",
+    "ACC_FULL_Counter": "0",
+    "CON_FULL_Counter": "0",
+    "period": "21",
+    "signers": [
+      "localhost:8083",
+      "localhost:8081"
+    ],
+    "crypto_scheme": "bls",
+    "signature": "{\"sign\":\"9ff3749a60a75269528d7305729fa8bcadeff238e0c5135d529dad77d4662c3b2c3f87977c3429931c7fe918a63f6312\", \"ids\":[\"localhost:8081\",\"localhost:8083\"]}"
+  },
+  "MonitorID": "localhost:8182",
+  "Period": "22"
+}
