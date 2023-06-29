@@ -85,27 +85,6 @@ func handle_gossip(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Gossip object Processed.", http.StatusOK)
 }
 
-func handle_num_full(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
-	// Get the number of full objects stored.
-	var num_full definition.PoM_Counter
-	err := json.NewDecoder(r.Body).Decode(&num_full)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	}
-	// Verify the object is valid.
-	/*
-		err = num_full.Verify(c.Monitor_crypto_config)
-		if err != nil {
-			fmt.Println("Recieved invalid NUM_FULL from " + util.GetSenderURL(r) + ".")
-			http.Error(w, err.Error(), http.StatusOK)
-			return
-		}
-	*/
-	// Check for duplicate object.
-	c.Storage_NUM_FULL = &num_full
-	http.Error(w, "NUM_FULL Processed.", http.StatusOK)
-}
-
 func QueryLoggers(c *MonitorContext) {
 	for _, logger := range c.Monitor_private_config.Logger_URLs {
 		// var today = time.Now().UTC().Format(time.RFC3339)[0:10]
@@ -286,25 +265,6 @@ func Send_to_gossiper(c *MonitorContext, g definition.Gossip_object) {
 
 }
 
-func Send_POM_NUM_to_gossiper(c *MonitorContext, num definition.PoM_Counter) {
-	// Convert gossip object to JSON
-	msg, err := json.Marshal(num)
-	if err != nil {
-		fmt.Println(err)
-	}
-	// Send the gossip object to the gossiper.
-	resp, postErr := c.Client.Post(PROTOCOL+c.Monitor_private_config.Gossiper_URL+"/gossip/num_init", "application/json", bytes.NewBuffer(msg))
-	if postErr != nil {
-		fmt.Println(util.RED+"Error sending object to Gossiper: ", postErr.Error(), util.RESET)
-	} else {
-		// Close the response, mentioned by http.Post
-		// Alernatively, we could return the response from this function.
-		defer resp.Body.Close()
-		fmt.Println(util.BLUE+"Sent PoM_NUM to Gossiper, Recieved "+resp.Status, util.RESET)
-	}
-
-}
-
 // this function takes the name of the entity as input and check if there is a POM against it
 // this should be invoked after the monitor receives the information from its loggers and CAs prior to threshold signning it
 func Check_entity_pom(c *MonitorContext, Accused string) bool {
@@ -319,7 +279,7 @@ func Check_entity_pom(c *MonitorContext, Accused string) bool {
 	}
 	GID2 := definition.Gossip_ID{
 		Period:     "0",
-		Type:       definition.CON_FULL,
+		Type:       definition.CON_INIT,
 		Entity_URL: Accused,
 	}
 	if _, ok := (*c.Storage_CONFLICT_POM)[GID2]; ok {
@@ -347,7 +307,7 @@ func IsAuthority(c *MonitorContext, authURL string) bool {
 	return false
 }
 
-func GenerateUpdate(c *MonitorContext) (ClientUpdate, definition.PoM_Counter) {
+func GenerateUpdate(c *MonitorContext) ClientUpdate {
 	storageList_conflict_pom := []definition.Gossip_object{}
 	storageList_accusation_pom := []definition.Gossip_object{}
 	storageList_sth_full := []definition.Gossip_object{}
@@ -364,29 +324,15 @@ func GenerateUpdate(c *MonitorContext) (ClientUpdate, definition.PoM_Counter) {
 	for _, gossipObject := range *c.Storage_REV_FULL {
 		storageList_rev_full = append(storageList_rev_full, gossipObject)
 	}
-	num_acc_full := strconv.Itoa(len(storageList_accusation_pom))
-	num_com_full := strconv.Itoa(len(storageList_conflict_pom))
-	NUM := definition.PoM_Counter{
-		Type:             definition.NUM_INIT,
-		ACC_FULL_Counter: num_acc_full,
-		CON_FULL_Counter: num_com_full,
-		Period:           util.GetCurrentPeriod(),
-		Signer_Monitor:   c.Monitor_crypto_config.SelfID.String(),
-		Crypto_Scheme:    "rsa",
-	}
-	signature, _ := c.Monitor_crypto_config.Sign([]byte(NUM.ACC_FULL_Counter + NUM.CON_FULL_Counter + NUM.Period + NUM.Signer_Monitor))
-	NUM.Signature = signature.String()
 	CTupdate := ClientUpdate{
 		STHs:      storageList_sth_full,
 		REVs:      storageList_rev_full,
 		ACCs:      storageList_accusation_pom,
 		CONs:      storageList_conflict_pom,
 		MonitorID: c.Monitor_crypto_config.SelfID.String(),
-		NUM:       NUM,
-		NUM_FULL:  *c.Storage_NUM_FULL,
 		Period:    util.GetCurrentPeriod(),
 	}
-	return CTupdate, NUM
+	return CTupdate
 }
 
 func PeriodicTasks(c *MonitorContext) {
@@ -403,15 +349,11 @@ func PeriodicTasks(c *MonitorContext) {
 	f1 := func() {
 		c.Clean_Conflicting_Object()
 		c.WipeStorage()
-		update, NUM := GenerateUpdate(c)
+		update := GenerateUpdate(c)
 		current, _ := strconv.Atoi(util.GetCurrentPeriod())
 		offsetint, _ := strconv.Atoi(c.Period_Offset)
 		PeriodIO := strconv.Itoa(current - offsetint)
 		c.SaveStorage(PeriodIO, update)
-		f2 := func() {
-			Send_POM_NUM_to_gossiper(c, NUM)
-		}
-		time.AfterFunc(time.Duration(20)*time.Second, f2)
 	}
 	time.AfterFunc(time.Duration(c.Monitor_public_config.MMD-20)*time.Second, f1)
 }
@@ -431,7 +373,7 @@ func Process_valid_object(c *MonitorContext, g definition.Gossip_object) {
 		Send_to_gossiper(c, g)
 	}
 	//this handles processed gossip object from the gossiper, verfications will be added when if needed
-	if g.Type == definition.ACC_FULL || g.Type == definition.CON_FULL || g.Type == definition.STH_FULL || g.Type == definition.REV_FULL {
+	if g.Type == definition.ACC_FULL || g.Type == definition.CON_INIT || g.Type == definition.STH_FULL || g.Type == definition.REV_FULL {
 		c.StoreObject(g)
 	}
 	return

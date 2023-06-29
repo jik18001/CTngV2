@@ -39,34 +39,9 @@ func testgossipobjectnum(entry gossiper.Gossiper_log_entry, Periodoffset int) bo
 }
 
 func testfirstglogentry(entry gossiper.Gossiper_log_entry) bool {
-	if entry.NUM_POM_INIT != 0 {
-		fmt.Println("Number of NUM_POM_INIT is ", entry.NUM_POM_INIT, "but should be 0.")
-		return false
-	}
-	if entry.NUM_POM_FRAG != 0 {
-		fmt.Println("Number of NUM_POM_FRAG is ", entry.NUM_POM_FRAG, "but should be 0.")
-		return false
-	}
-	if entry.NUM_POM_FULL != 0 {
-		fmt.Println("Number of NUM_POM_FULL is ", entry.NUM_POM_FULL, "but should be 0.")
-		return false
-	}
 	return testgossipobjectnum(entry, 0)
 }
 func testotherglogentry(entry gossiper.Gossiper_log_entry, Periodoffset int) bool {
-	if entry.NUM_POM_INIT != 1 {
-		// if number of unique NUM_POMs is not 1, then some monitors are cheating
-		fmt.Println("Number of unique NUM_POMs is", entry.NUM_POM_INIT, "but should be 1. note: if number of unique NUM_POMs is not 1, then at least one monitor is cheating")
-		return false
-	}
-	if entry.NUM_POM_FRAG != 2 {
-		// this could happen, report it but this is not a failure
-		fmt.Println("Num_NUM_FRAG is ", entry.NUM_POM_FRAG, "but should be 2.")
-	}
-	if entry.NUM_POM_FULL != 1 {
-		fmt.Println("Num_NUM_FULL is ", entry.NUM_POM_FULL, "but should be 1.")
-		return false
-	}
 	return testgossipobjectnum(entry, Periodoffset)
 }
 func TestGMResult(t *testing.T) {

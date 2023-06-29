@@ -19,8 +19,6 @@ type ClientUpdate struct {
 	REVs      []definition.Gossip_object
 	ACCs      []definition.Gossip_object
 	CONs      []definition.Gossip_object
-	NUM       definition.PoM_Counter
-	NUM_FULL  definition.PoM_Counter
 	MonitorID string
 	//Period here means the update period, the client udpate object can contain more information than just the period
 	Period string

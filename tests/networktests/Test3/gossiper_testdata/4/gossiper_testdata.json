@@ -1,0 +1,44 @@
+{
+  "32": {
+    "period": 32,
+    "num_sth_init": 0,
+    "num_rev_init": 0,
+    "num_acc_init": 2,
+    "num_con_init": 0,
+    "num_sth_frag": 0,
+    "num_rev_frag": 0,
+    "num_acc_frag": 4,
+    "num_sth_full": 0,
+    "num_rev_full": 0,
+    "num_acc_full": 2,
+    "num_blacklist_perm": 2
+  },
+  "33": {
+    "period": 33,
+    "num_sth_init": 0,
+    "num_rev_init": 0,
+    "num_acc_init": 0,
+    "num_con_init": 0,
+    "num_sth_frag": 0,
+    "num_rev_frag": 0,
+    "num_acc_frag": 0,
+    "num_sth_full": 0,
+    "num_rev_full": 0,
+    "num_acc_full": 0,
+    "num_blacklist_perm": 2
+  },
+  "34": {
+    "period": 34,
+    "num_sth_init": 0,
+    "num_rev_init": 0,
+    "num_acc_init": 0,
+    "num_con_init": 0,
+    "num_sth_frag": 0,
+    "num_rev_frag": 0,
+    "num_acc_frag": 0,
+    "num_sth_full": 0,
+    "num_rev_full": 0,
+    "num_acc_full": 0,
+    "num_blacklist_perm": 2
+  }
+}

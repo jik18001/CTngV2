@@ -43,14 +43,9 @@ func test_Store_Duplicate_Malicious(t *testing.T) {
 		Crypto_Scheme: "1",
 		Payload:       [3]string{"1", "2", "2"},
 	}
-	NUM_INIT_1 := definition.PoM_Counter{
-		Period: "1",
-		Type:   definition.NUM_INIT,
-	}
 	ctx_g1 := InitializeGossiperContext("testFiles/gossiper_testconfig/1/Gossiper_public_config.json", "testFiles/gossiper_testconfig/1/Gossiper_private_config.json", "testFiles/gossiper_testconfig/1/Gossiper_crypto_config.json", "1")
 	STH_FRAG_1 := ctx_g1.Generate_Gossip_Object_FRAG(STH_INIT_1)
 	ctx_g1.Store(STH_INIT_1)
-	ctx_g1.Store(NUM_INIT_1)
 	ctx_g1.Store(STH_FRAG_1)
 	num, err := ctx_g1.GetItemCount(STH_FRAG_1.GetID(), definition.STH_FRAG)
 	if err != nil {
@@ -58,13 +53,11 @@ func test_Store_Duplicate_Malicious(t *testing.T) {
 	}
 	r1, _ := ctx_g1.IsDuplicate(STH_INIT_1)
 	r2, _ := ctx_g1.IsDuplicate(STH_INIT_2)
-	r3, _ := ctx_g1.IsDuplicate(NUM_INIT_1)
 	r4 := num == 1
 	r5 := ctx_g1.IsMalicious(STH_INIT_2)
 	r6 := ctx_g1.IsMalicious(STH_INIT_1)
 	pf("r1", r1)
 	pf("!r2", !r2)
-	pf("r3", r3)
 	pf("r4", r4)
 	pf("r5", r5)
 	pf("!r6", !r6)
@@ -81,10 +74,8 @@ func testBlacklist(t *testing.T) {
 	}
 	ctx_g1.Store(CON_INIT_1)
 	r1 := ctx_g1.InBlacklistPerm(CON_INIT_1.Payload[0])
-	r2 := ctx_g1.InBlacklistTemp(CON_INIT_1.Payload[0])
 	r3 := ctx_g1.InBlacklist(CON_INIT_1.Payload[0])
 	pf("!r1", !r1)
-	pf("r2", r2)
 	pf("r3", r3)
 }
 
@@ -112,9 +103,8 @@ func testFRAG(t *testing.T) {
 		Payload:       [3]string{"1", "2", "2"},
 	}
 	ctx_g1 := InitializeGossiperContext("testFiles/gossiper_testconfig/1/Gossiper_public_config.json", "testFiles/gossiper_testconfig/1/Gossiper_private_config.json", "testFiles/gossiper_testconfig/1/Gossiper_crypto_config.json", "1")
-	CON_1 := ctx_g1.Generate_CON_INIT(STH_INIT_1, STH_INIT_2)
-	CON_FRAG_1 := ctx_g1.Generate_Gossip_Object_FRAG(CON_1)
-	Handle_Gossip_object(ctx_g1, CON_FRAG_1)
+	Handle_Gossip_object(ctx_g1, STH_INIT_1)
+	Handle_Gossip_object(ctx_g1, STH_INIT_2)
 	//ctx_g1.log_Gossiper_data()
 	//fmt.Println(ctx_g1.Gossiper_log)
 
@@ -170,7 +160,7 @@ func testSTH_handler(t *testing.T) {
 	f := func() {
 		//ctx_g1.log_Gossiper_data()
 		fmt.Println(ctx_g1.Gossiper_log)
-		fmt.Println(ctx_g1.Gossip_object_storage.CON_FRAG)
+		fmt.Println(ctx_g1.Gossip_object_storage.CON_INIT)
 		return
 	}
 	time.AfterFunc(8*time.Second, f)
@@ -247,7 +237,7 @@ func testCONhandler(t *testing.T) {
 
 }
 
-func TestFragHandler(t *testing.T) {
+func testFragHandler(t *testing.T) {
 	// Create a channel that will receive a message after 10 seconds
 	done := make(chan bool, 1)
 	go func() {
@@ -297,34 +287,4 @@ func TestFragHandler(t *testing.T) {
 		t.Errorf("test timed out after 10 seconds")
 		return
 	}
-}
-
-func testNUMHandler(t *testing.T) {
-	ctx_g1 := InitializeGossiperContext("testFiles/gossiper_testconfig/1/Gossiper_public_config.json", "testFiles/gossiper_testconfig/1/Gossiper_private_config.json", "testFiles/gossiper_testconfig/1/Gossiper_crypto_config.json", "1")
-	ctx_g2 := InitializeGossiperContext("testFiles/gossiper_testconfig/2/Gossiper_public_config.json", "testFiles/gossiper_testconfig/2/Gossiper_private_config.json", "testFiles/gossiper_testconfig/2/Gossiper_crypto_config.json", "2")
-	NUM_INIT_1 := definition.PoM_Counter{
-		Type:             definition.NUM_INIT,
-		Signer_Monitor:   "1",
-		ACC_FULL_Counter: "1",
-		CON_FULL_Counter: "1",
-		Period:           "1",
-		Crypto_Scheme:    "RSA",
-		Signature:        "1",
-	}
-	NUM_INIT_2 := definition.PoM_Counter{
-		Type:             definition.NUM_INIT,
-		Signer_Monitor:   "2",
-		ACC_FULL_Counter: "1",
-		CON_FULL_Counter: "1",
-		Period:           "1",
-		Crypto_Scheme:    "RSA",
-		Signature:        "2",
-	}
-	NUM_FRAG_2 := ctx_g2.Generate_NUM_FRAG(NUM_INIT_2)
-	Handle_PoM_Counter(ctx_g1, NUM_INIT_1)
-	Handle_PoM_Counter(ctx_g1, NUM_INIT_2)
-	Handle_PoM_Counter(ctx_g1, NUM_FRAG_2)
-	ctx_g1.Save()
-	fmt.Println(ctx_g1.Gossiper_log)
-
 }

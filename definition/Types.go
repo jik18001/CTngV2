@@ -18,6 +18,7 @@ type Gossip_object struct {
 	Payload       [3]string `json:"payload,omitempty"`
 }
 
+/*
 type PoM_Counter struct {
 	Type             string   `json:"type"`
 	ACC_FULL_Counter string   `json:"ACC_FULL_Counter"`
@@ -28,7 +29,7 @@ type PoM_Counter struct {
 	Signers          []string `json:"signers,omitempty"`
 	Crypto_Scheme    string   `json:"crypto_scheme"`
 	Signature        string   `json:"signature,omitempty"`
-}
+}*/
 
 type Revocation struct {
 	Period    string
@@ -53,17 +54,12 @@ const (
 	REV_INIT = "http://ctng.uconn.edu/102"
 	ACC_INIT = "http://ctng.uconn.edu/103"
 	CON_INIT = "http://ctng.uconn.edu/104"
-	NUM_INIT = "http://ctng.uconn.edu/105"
 	STH_FRAG = "http://ctng.uconn.edu/201"
 	REV_FRAG = "http://ctng.uconn.edu/202"
 	ACC_FRAG = "http://ctng.uconn.edu/203"
-	CON_FRAG = "http://ctng.uconn.edu/204"
-	NUM_FRAG = "http://ctng.uconn.edu/205"
 	STH_FULL = "http://ctng.uconn.edu/301"
 	REV_FULL = "http://ctng.uconn.edu/302"
 	ACC_FULL = "http://ctng.uconn.edu/303"
-	CON_FULL = "http://ctng.uconn.edu/304"
-	NUM_FULL = "http://ctng.uconn.edu/305"
 )
 
 type Gossip_Storage map[Gossip_ID]Gossip_object
@@ -94,16 +90,12 @@ func (g Gossip_object) GetTargetType() string {
 		return REV_FRAG
 	case ACC_INIT:
 		return ACC_FRAG
-	case CON_INIT:
-		return CON_FRAG
 	case STH_FRAG:
 		return STH_FULL
 	case REV_FRAG:
 		return REV_FULL
 	case ACC_FRAG:
 		return ACC_FULL
-	case CON_FRAG:
-		return CON_FULL
 	default:
 		return ""
 	}
@@ -116,9 +108,12 @@ func (g Gossip_object) Get_CON_ID() uint32 {
 	int1 := binary.BigEndian.Uint32(hash1)
 	return int1
 }
+
+/*
 func (p PoM_Counter) GetID() string {
 	return p.ACC_FULL_Counter + p.CON_FULL_Counter + p.Period
 }
+*/
 
 //Payload specifications for different types of gossip object
 
@@ -153,28 +148,18 @@ func TypeString(t string) string {
 		return "ACC_INIT"
 	case CON_INIT:
 		return "CON_INIT"
-	case NUM_INIT:
-		return "NUM_INIT"
 	case STH_FRAG:
 		return "STH_FRAG"
 	case REV_FRAG:
 		return "REV_FRAG"
 	case ACC_FRAG:
 		return "ACC_FRAG"
-	case CON_FRAG:
-		return "CON_FRAG"
-	case NUM_FRAG:
-		return "NUM_FRAG"
 	case STH_FULL:
 		return "STH_FULL"
 	case REV_FULL:
 		return "REV_FULL"
 	case ACC_FULL:
 		return "ACC_FULL"
-	case CON_FULL:
-		return "CON_FULL"
-	case NUM_FULL:
-		return "NUM_FULL"
 	default:
 		return "UNKNOWN"
 	}

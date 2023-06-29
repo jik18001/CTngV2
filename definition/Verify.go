@@ -100,51 +100,15 @@ func (g Gossip_object) Verify(c *crypto.CryptoConfig) error {
 		return Verify_PayloadFrag(g, c)
 	case ACC_FRAG:
 		return Verify_PayloadFrag(g, c)
-	case CON_FRAG:
-		return Verify_PayloadFrag(g, c)
 	case STH_FULL:
 		return Verify_PayloadThreshold(g, c)
 	case REV_FULL:
 		return Verify_PayloadThreshold(g, c)
 	case ACC_FULL:
 		return Verify_PayloadThreshold(g, c)
-	case CON_FULL:
-		return Verify_PayloadThreshold(g, c)
 	default:
 		return errors.New(Invalid_Type)
 	}
-}
-
-func (p PoM_Counter) Verify(c *crypto.CryptoConfig) error {
-	switch p.Type {
-	case NUM_INIT:
-		return Verify_NUM_INIT(p, c)
-	case NUM_FRAG:
-		return Verify_NUM_FRAG(p, c)
-	case NUM_FULL:
-		return Verify_NUM_FULL(p, c)
-	default:
-		return errors.New(Invalid_Type)
-	}
-}
-
-func Verify_NUM_INIT(n PoM_Counter, c *crypto.CryptoConfig) error {
-	// Verify that the signature is valid
-	sig, _ := crypto.RSASigFromString(n.Signature)
-	return c.Verify([]byte(n.ACC_FULL_Counter+n.CON_FULL_Counter+n.Period+n.Signer_Monitor), sig)
-}
-
-func Verify_NUM_FRAG(n PoM_Counter, c *crypto.CryptoConfig) error {
-	// Verify that the signature is valid
-	sig, _ := crypto.SigFragmentFromString(n.Signature)
-	return c.FragmentVerify(n.ACC_FULL_Counter+n.CON_FULL_Counter+n.Period, sig)
-}
-
-func Verify_NUM_FULL(n PoM_Counter, c *crypto.CryptoConfig) error {
-	// Verify that the signature is valid
-	sig, _ := crypto.ThresholdSigFromString(n.Signature)
-	return c.ThresholdVerify(n.ACC_FULL_Counter+n.CON_FULL_Counter+n.Period, sig)
-
 }
 
 func ExtractRootHash(gossipSTH Gossip_object) ([]byte, error) {

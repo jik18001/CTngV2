@@ -17,11 +17,9 @@ func InitializeGossipObjectStorage() *Gossip_object_storage {
 		STH_FRAG:      make(map[definition.Gossip_ID][]definition.Gossip_object),
 		REV_FRAG:      make(map[definition.Gossip_ID][]definition.Gossip_object),
 		ACC_FRAG:      make(map[definition.Gossip_ID][]definition.Gossip_object),
-		CON_FRAG:      make(map[definition.Gossip_ID][]definition.Gossip_object),
 		STH_FULL:      make(map[definition.Gossip_ID]definition.Gossip_object),
 		REV_FULL:      make(map[definition.Gossip_ID]definition.Gossip_object),
 		ACC_FULL:      make(map[definition.Gossip_ID]definition.Gossip_object),
-		CON_FULL:      make(map[definition.Gossip_ID]definition.Gossip_object),
 		STH_INIT_LOCK: sync.RWMutex{},
 		REV_INIT_LOCK: sync.RWMutex{},
 		ACC_INIT_LOCK: sync.RWMutex{},
@@ -29,31 +27,16 @@ func InitializeGossipObjectStorage() *Gossip_object_storage {
 		STH_FRAG_LOCK: sync.RWMutex{},
 		REV_FRAG_LOCK: sync.RWMutex{},
 		ACC_FRAG_LOCK: sync.RWMutex{},
-		CON_FRAG_LOCK: sync.RWMutex{},
 		STH_FULL_LOCK: sync.RWMutex{},
 		REV_FULL_LOCK: sync.RWMutex{},
 		ACC_FULL_LOCK: sync.RWMutex{},
-		CON_FULL_LOCK: sync.RWMutex{},
 	}
 }
 
 func InitializeGossipBlacklist() *Gossip_blacklist {
 	return &Gossip_blacklist{
-		BLACKLIST_TEMP:      make(map[string]bool),
 		BLACKLIST_PERM:      make(map[string]bool),
-		BLACKLIST_TEMP_LOCK: sync.RWMutex{},
 		BLACKLIST_PERM_LOCK: sync.RWMutex{},
-	}
-}
-
-func InitializeGossipPoMCounter() *Gossip_PoM_Counter {
-	return &Gossip_PoM_Counter{
-		NUM_INIT:      make(map[string][]string),
-		NUM_FRAG:      make([]definition.PoM_Counter, 0),
-		NUM_FULL:      false,
-		NUM_INIT_LOCK: sync.RWMutex{},
-		NUM_FRAG_LOCK: sync.RWMutex{},
-		NUM_FULL_LOCK: sync.RWMutex{},
 	}
 }
 
@@ -74,7 +57,6 @@ func InitializeGossiperContext(public_config_path string, private_config_path st
 		Gossiper_crypto_config:  crypto,
 		Gossip_object_storage:   InitializeGossipObjectStorage(),
 		Gossip_blacklist:        InitializeGossipBlacklist(),
-		Gossip_PoM_Counter:      InitializeGossipPoMCounter(),
 		Gossiper_log:            InitializeGossiperLog(),
 		StorageID:               storageID,
 		StorageFile:             storageID + ".json",

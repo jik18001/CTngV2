@@ -24,7 +24,7 @@ type MonitorContext struct {
 	Storage_ACCUSATION_POM     *definition.Gossip_Storage
 	Storage_STH_FULL           *definition.Gossip_Storage
 	Storage_REV_FULL           *definition.Gossip_Storage
-	Storage_NUM_FULL           *definition.PoM_Counter
+	Storage_NUM_FULL           *definition.Gossip_object
 	Storage_CRV                map[string]*bitset.BitSet
 	// Utilize Storage directory: A folder for the files of each MMD.
 	// Folder should be set to the current MMD "Period" String upon initialization.
@@ -59,7 +59,7 @@ type Monitor_public_config struct {
 
 func (c *MonitorContext) GetObjectNumber(objtype string) int {
 	switch objtype {
-	case definition.CON_FULL:
+	case definition.CON_INIT:
 		return len(*c.Storage_CONFLICT_POM)
 	case definition.ACC_FULL:
 		return len(*c.Storage_ACCUSATION_POM)
@@ -75,7 +75,7 @@ func (c *MonitorContext) Clean_Conflicting_Object() {
 	for key := range *c.Storage_STH_FULL {
 		GID = definition.Gossip_ID{
 			Period:     "0",
-			Type:       definition.CON_FULL,
+			Type:       definition.CON_INIT,
 			Entity_URL: key.Entity_URL,
 		}
 		if _, ok := (*c.Storage_CONFLICT_POM)[GID]; ok {
@@ -86,7 +86,7 @@ func (c *MonitorContext) Clean_Conflicting_Object() {
 	for key := range *c.Storage_REV_FULL {
 		GID = definition.Gossip_ID{
 			Period:     "0",
-			Type:       definition.CON_FULL,
+			Type:       definition.CON_INIT,
 			Entity_URL: key.Entity_URL,
 		}
 		if _, ok := (*c.Storage_CONFLICT_POM)[GID]; ok {
@@ -125,7 +125,7 @@ func (c *MonitorContext) LoadOneStorage(name string, filepath string) error {
 		return err
 	}
 	switch name {
-	case definition.CON_FULL:
+	case definition.CON_INIT:
 		for _, gossipObject := range storageList {
 			(*c.Storage_CONFLICT_POM)[gossipObject.GetID()] = gossipObject
 		}
@@ -148,7 +148,7 @@ func (c *MonitorContext) LoadOneStorage(name string, filepath string) error {
 func (c *MonitorContext) GetObject(id definition.Gossip_ID) definition.Gossip_object {
 	GType := id.Type
 	switch GType {
-	case definition.CON_FULL:
+	case definition.CON_INIT:
 		obj := (*c.Storage_CONFLICT_POM)[id]
 		return obj
 	case definition.ACC_FULL:
@@ -179,7 +179,7 @@ func (c *MonitorContext) IsDuplicate(g definition.Gossip_object) bool {
 
 func (c *MonitorContext) StoreObject(o definition.Gossip_object) {
 	switch o.Type {
-	case definition.CON_FULL:
+	case definition.CON_INIT:
 		(*c.Storage_CONFLICT_POM)[o.GetID()] = o
 		(*c.Storage_CONFLICT_POM_DELTA)[o.GetID()] = o
 		fmt.Println(util.BLUE, "CONFLICT_POM Stored", util.RESET)
@@ -216,11 +216,12 @@ func (c *MonitorContext) StoreObject(o definition.Gossip_object) {
 
 // wipe all temp data
 func (c *MonitorContext) WipeStorage() {
-	for key := range *c.Storage_TEMP {
-		if key.Period != util.GetCurrentPeriod() {
-			delete(*c.Storage_ACCUSATION_POM, key)
-		}
-	}
+	/*
+		for key := range *c.Storage_TEMP {
+			if key.Period != util.GetCurrentPeriod() {
+				delete(*c.Storage_ACCUSATION_POM, key)
+			}
+		}*/
 	for key := range *c.Storage_CONFLICT_POM_DELTA {
 		if key.Period != util.GetCurrentPeriod() {
 			delete(*c.Storage_CONFLICT_POM_DELTA, key)
@@ -282,7 +283,7 @@ func InitializeMonitorContext(public_config_path string, private_config_path str
 		Storage_ACCUSATION_POM:     storage_accusation_pom,
 		Storage_STH_FULL:           storage_sth_full,
 		Storage_REV_FULL:           storage_rev_full,
-		Storage_NUM_FULL:           &definition.PoM_Counter{},
+		Storage_NUM_FULL:           &definition.Gossip_object{},
 		Storage_CRV:                make(map[string]*bitset.BitSet),
 		StorageID:                  storageID,
 		Mode:                       0,

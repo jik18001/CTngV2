@@ -34,8 +34,8 @@ func TestResults(t *testing.T) {
 
 		for _, gossiperLogEntry := range gossiperLog {
 			// No accusations
-			if gossiperLogEntry.NUM_ACC_FULL != 2 || gossiperLogEntry.NUM_ACC_INIT != 2 {
-				fmt.Println("Gossiper", i+1, "has accusations with init ", gossiperLogEntry.NUM_ACC_INIT, " and full ", gossiperLogEntry.NUM_ACC_FULL)
+			if gossiperLogEntry.NUM_BLACKLIST_PERM != 2 {
+				fmt.Println("Gossiper", i+1, "Period", gossiperLogEntry.Period, "has", gossiperLogEntry.NUM_BLACKLIST_PERM, "PoM_accusations, expected 2")
 				t.Fail()
 			}
 		}

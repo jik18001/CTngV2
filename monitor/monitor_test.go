@@ -74,10 +74,10 @@ func testPrepareClientupdate(t *testing.T) {
 func testLoadStorage(t *testing.T) {
 	// TODO
 	ctx_monitor_1 := InitializeMonitorContext("../Gen/monitor_testconfig/1/Monitor_public_config.json", "../Gen/monitor_testconfig/1/Monitor_private_config.json", "../Gen/monitor_testconfig/1/Monitor_crypto_config.json", "1")
-	ctx_monitor_1.LoadOneStorage(definition.CON_FULL, "../testserver/POM_TSS.json")
+	//ctx_monitor_1.LoadOneStorage(definition.CON_INIT, "../testserver/POM_TSS.json")
 	ctx_monitor_1.LoadOneStorage(definition.STH_FULL, "../testserver/REV_TSS.json")
 	ctx_monitor_1.LoadOneStorage(definition.REV_FULL, "../testserver/STH_TSS.json")
-	fmt.Println(ctx_monitor_1.GetObjectNumber(definition.CON_FULL))
+	//fmt.Println(ctx_monitor_1.GetObjectNumber(definition.CON_FULL))
 	fmt.Println(ctx_monitor_1.GetObjectNumber(definition.STH_FULL))
 	fmt.Println(ctx_monitor_1.GetObjectNumber(definition.REV_FULL))
 }
@@ -85,7 +85,7 @@ func testLoadStorage(t *testing.T) {
 func testSaveStorage(t *testing.T) {
 	// TODO
 	ctx_monitor_1 := InitializeMonitorContext("../Gen/monitor_testconfig/1/Monitor_public_config.json", "../Gen/monitor_testconfig/1/Monitor_private_config.json", "../Gen/monitor_testconfig/1/Monitor_crypto_config.json", "1")
-	ctx_monitor_1.LoadOneStorage(definition.CON_FULL, "../testserver/POM_TSS.json")
+	//ctx_monitor_1.LoadOneStorage(definition.CON_FULL, "../testserver/POM_TSS.json")
 	ctx_monitor_1.LoadOneStorage(definition.STH_FULL, "../testserver/REV_TSS.json")
 	ctx_monitor_1.LoadOneStorage(definition.REV_FULL, "../testserver/STH_TSS.json")
 	ctx_monitor_1.InitializeMonitorStorage("../testserver")
