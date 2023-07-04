@@ -34,9 +34,6 @@ func handleRequests(c *GossiperContext) {
 	gorillaRouter.HandleFunc("/gossip/sth_frag", bindContext(c, Gossip_object_handler)).Methods("POST")
 	gorillaRouter.HandleFunc("/gossip/rev_frag", bindContext(c, Gossip_object_handler)).Methods("POST")
 	gorillaRouter.HandleFunc("/gossip/acc_frag", bindContext(c, Gossip_object_handler)).Methods("POST")
-	gorillaRouter.HandleFunc("/gossip/sth_full", bindContext(c, Gossip_object_handler)).Methods("POST")
-	gorillaRouter.HandleFunc("/gossip/rev_full", bindContext(c, Gossip_object_handler)).Methods("POST")
-	gorillaRouter.HandleFunc("/gossip/acc_full", bindContext(c, Gossip_object_handler)).Methods("POST")
 	// Start the HTTP server.
 	http.Handle("/", gorillaRouter)
 	fmt.Println(util.BLUE+"Listening on port:", c.Gossiper_private_config.Port, util.RESET)
@@ -90,8 +87,6 @@ func Handle_Gossip_object(c *GossiperContext, gossip_obj definition.Gossip_objec
 		Handle_CON_INIT(c, gossip_obj)
 	case definition.STH_FRAG, definition.REV_FRAG, definition.ACC_FRAG:
 		Handle_OBJ_FRAG(c, gossip_obj)
-	case definition.STH_FULL, definition.REV_FULL, definition.ACC_FULL:
-		Handle_OBJ_FULL(c, gossip_obj)
 	}
 }
 
@@ -182,14 +177,11 @@ func Handle_ACC_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 	}
 	// if not malicious, we store the object
 	c.Store(gossip_obj)
-	f := func() {
-		if c.InBlacklist(gossip_obj.Payload[0]) {
-			return
-		}
-		ACC_FRAG := c.Generate_Gossip_Object_FRAG(gossip_obj)
-		Handle_Gossip_object(c, ACC_FRAG)
+	if c.InBlacklist(gossip_obj.Payload[0]) {
+		return
 	}
-	time.AfterFunc(time.Duration(c.Gossiper_public_config.Gossip_wait_time)*time.Second, f)
+	ACC_FRAG := c.Generate_Gossip_Object_FRAG(gossip_obj)
+	Handle_Gossip_object(c, ACC_FRAG)
 	return
 }
 
