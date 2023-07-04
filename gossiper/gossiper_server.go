@@ -87,6 +87,8 @@ func Handle_Gossip_object(c *GossiperContext, gossip_obj definition.Gossip_objec
 		Handle_CON_INIT(c, gossip_obj)
 	case definition.STH_FRAG, definition.REV_FRAG, definition.ACC_FRAG:
 		Handle_OBJ_FRAG(c, gossip_obj)
+	case definition.STH_FULL, definition.REV_FULL, definition.ACC_FULL:
+		Handle_OBJ_FULL(c, gossip_obj)
 	}
 }
 
