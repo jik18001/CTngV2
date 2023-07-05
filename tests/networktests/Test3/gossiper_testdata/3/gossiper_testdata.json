@@ -1,9 +1,10 @@
 {
-  "32": {
-    "period": 32,
+  "29": {
+    "period": 29,
+    "converge_time": "05.651",
     "num_sth_init": 0,
     "num_rev_init": 0,
-    "num_acc_init": 2,
+    "num_acc_init": 0,
     "num_con_init": 0,
     "num_sth_frag": 0,
     "num_rev_frag": 0,
@@ -13,8 +14,9 @@
     "num_acc_full": 2,
     "num_blacklist_perm": 2
   },
-  "33": {
-    "period": 33,
+  "30": {
+    "period": 30,
+    "converge_time": "05.651",
     "num_sth_init": 0,
     "num_rev_init": 0,
     "num_acc_init": 0,
@@ -27,8 +29,9 @@
     "num_acc_full": 0,
     "num_blacklist_perm": 2
   },
-  "34": {
-    "period": 34,
+  "31": {
+    "period": 31,
+    "converge_time": "05.651",
     "num_sth_init": 0,
     "num_rev_init": 0,
     "num_acc_init": 0,

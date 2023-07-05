@@ -16,6 +16,7 @@ import (
 	"github.com/bits-and-blooms/bitset"
 )
 
+/*
 func receiveGossip(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
 	// Post request, parse sent object.
 	body, err := ioutil.ReadAll(r.Body)
@@ -36,7 +37,7 @@ func receiveGossip(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-}
+}*/
 
 func handle_gossip_from_gossiper(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
 	var gossip_obj definition.Gossip_object
@@ -51,10 +52,17 @@ func handle_gossip_from_gossiper(c *MonitorContext, w http.ResponseWriter, r *ht
 		// processDuplicateObject(c, gossip_obj, stored_obj)
 		return
 	} else {
-		fmt.Println("Recieved new, valid", definition.TypeString(gossip_obj.Type), "from gossiper.")
-		Process_valid_object(c, gossip_obj)
+		fmt.Println("received new, valid", definition.TypeString(gossip_obj.Type), "from gossiper.")
+		switch gossip_obj.Type {
+		case definition.STH_INIT, definition.REV_INIT:
+			c.StoreObject(gossip_obj)
+		default:
+			Process_valid_object(c, gossip_obj)
+		}
 	}
 }
+
+/*
 func handle_gossip(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
 	// Parse sent object.
 	// Converts JSON passed in the body of a POST to a Gossip_object.
@@ -66,7 +74,7 @@ func handle_gossip(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
 	// Verify the object is valid.
 	err = gossip_obj.Verify(c.Monitor_crypto_config)
 	if err != nil {
-		fmt.Println("Recieved invalid object from " + util.GetSenderURL(r) + ".")
+		fmt.Println("received invalid object from " + util.GetSenderURL(r) + ".")
 		AccuseEntity(c, gossip_obj.Signer)
 		http.Error(w, err.Error(), http.StatusOK)
 		return
@@ -79,11 +87,12 @@ func handle_gossip(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
 		// processDuplicateObject(c, gossip_obj, stored_obj)
 		return
 	} else {
-		fmt.Println("Recieved new, valid", gossip_obj.Type, ".")
+		fmt.Println("received new, valid", gossip_obj.Type, ".")
 		Process_valid_object(c, gossip_obj)
 	}
 	http.Error(w, "Gossip object Processed.", http.StatusOK)
 }
+*/
 
 func QueryLoggers(c *MonitorContext) {
 	for _, logger := range c.Monitor_private_config.Logger_URLs {
@@ -177,7 +186,6 @@ func QueryAuthorities(c *MonitorContext) {
 			}
 		}
 	}
-
 }
 
 // This function accuses the entity if the domain name is provided
@@ -217,23 +225,23 @@ func Wait_then_accuse(c *MonitorContext, Accused string, Entity_type string) {
 		if Entity_type == "logger" {
 			GID = definition.Gossip_ID{
 				Period:     util.GetCurrentPeriod(),
-				Type:       definition.STH_FULL,
+				Type:       definition.STH_INIT,
 				Entity_URL: Accused,
 			}
-			_, ok = (*c.Storage_STH_FULL)[GID]
+			_, ok = (*c.Storage_TEMP)[GID]
 		} else if Entity_type == "ca" {
 			GID = definition.Gossip_ID{
 				Period:     util.GetCurrentPeriod(),
-				Type:       definition.REV_FULL,
+				Type:       definition.REV_INIT,
 				Entity_URL: Accused,
 			}
-			_, ok = (*c.Storage_REV_FULL)[GID]
+			_, ok = (*c.Storage_TEMP)[GID]
 		}
 		if Check_entity_pom(c, Accused) == false && !ok {
 			AccuseEntity(c, Accused)
 		}
 	}
-	time.AfterFunc(time.Duration(2*c.Monitor_public_config.Gossip_wait_time)*time.Second, f)
+	time.AfterFunc(time.Duration(c.Monitor_public_config.Gossip_wait_time)*time.Second, f)
 }
 
 // Send the input gossip object to its gossiper
@@ -260,7 +268,7 @@ func Send_to_gossiper(c *MonitorContext, g definition.Gossip_object) {
 		// Close the response, mentioned by http.Post
 		// Alernatively, we could return the response from this function.
 		defer resp.Body.Close()
-		fmt.Println(util.BLUE+"Sent", definition.TypeString(g.Type), "to Gossiper, Recieved "+resp.Status, util.RESET)
+		fmt.Println(util.BLUE+"Sent", definition.TypeString(g.Type), "to Gossiper, received "+resp.Status, util.RESET)
 	}
 
 }
@@ -308,16 +316,8 @@ func IsAuthority(c *MonitorContext, authURL string) bool {
 }
 
 func GenerateUpdate(c *MonitorContext) ClientUpdate {
-	storageList_conflict_pom := []definition.Gossip_object{}
-	storageList_accusation_pom := []definition.Gossip_object{}
 	storageList_sth_full := []definition.Gossip_object{}
 	storageList_rev_full := []definition.Gossip_object{}
-	for _, gossipObject := range *c.Storage_CONFLICT_POM_DELTA {
-		storageList_conflict_pom = append(storageList_conflict_pom, gossipObject)
-	}
-	for _, gossipObject := range *c.Storage_ACCUSATION_POM {
-		storageList_accusation_pom = append(storageList_accusation_pom, gossipObject)
-	}
 	for _, gossipObject := range *c.Storage_STH_FULL {
 		storageList_sth_full = append(storageList_sth_full, gossipObject)
 	}
@@ -327,8 +327,6 @@ func GenerateUpdate(c *MonitorContext) ClientUpdate {
 	CTupdate := ClientUpdate{
 		STHs:      storageList_sth_full,
 		REVs:      storageList_rev_full,
-		ACCs:      storageList_accusation_pom,
-		CONs:      storageList_conflict_pom,
 		MonitorID: c.Monitor_crypto_config.SelfID.String(),
 		Period:    util.GetCurrentPeriod(),
 	}

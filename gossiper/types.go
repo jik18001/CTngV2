@@ -3,8 +3,10 @@ package gossiper
 import (
 	"CTngV2/crypto"
 	"CTngV2/definition"
+	"math/rand"
 	"net/http"
 	"sync"
+	"time"
 )
 
 type Gossiper_public_config struct {
@@ -58,27 +60,38 @@ type GossiperContext struct {
 	Gossip_object_storage *Gossip_object_storage
 	Gossip_blacklist      *Gossip_blacklist
 	Gossiper_log          *Gossiper_log
+	Converge_time         string
 	//File I/O
 	StorageID        string
 	StorageFile      string
 	StorageDirectory string
 	Client           *http.Client
 	Verbose          bool
+	//For Testing only
+	Total_Logger int
+	Total_CA     int
+	Min_latency  int
+	Max_latency  int
 }
 
 type Gossiper_log_entry struct {
-	Period             int `json:"period"` // Period of the log
-	NUM_STH_INIT       int `json:"num_sth_init"`
-	NUM_REV_INIT       int `json:"num_rev_init"`
-	NUM_ACC_INIT       int `json:"num_acc_init"`
-	NUM_CON_INIT       int `json:"num_con_init"`
-	NUM_STH_FRAG       int `json:"num_sth_frag"`
-	NUM_REV_FRAG       int `json:"num_rev_frag"`
-	NUM_ACC_FRAG       int `json:"num_acc_frag"`
-	NUM_STH_FULL       int `json:"num_sth_full"`
-	NUM_REV_FULL       int `json:"num_rev_full"`
-	NUM_ACC_FULL       int `json:"num_acc_full"`
-	NUM_BLACKLIST_PERM int `json:"num_blacklist_perm"`
+	Period             int    `json:"period"` // Period of the log
+	Converge_time      string `json:"converge_time"`
+	NUM_STH_INIT       int    `json:"num_sth_init"`
+	NUM_REV_INIT       int    `json:"num_rev_init"`
+	NUM_ACC_INIT       int    `json:"num_acc_init"`
+	NUM_CON_INIT       int    `json:"num_con_init"`
+	NUM_STH_FRAG       int    `json:"num_sth_frag"`
+	NUM_REV_FRAG       int    `json:"num_rev_frag"`
+	NUM_ACC_FRAG       int    `json:"num_acc_frag"`
+	NUM_STH_FULL       int    `json:"num_sth_full"`
+	NUM_REV_FULL       int    `json:"num_rev_full"`
+	NUM_ACC_FULL       int    `json:"num_acc_full"`
+	NUM_BLACKLIST_PERM int    `json:"num_blacklist_perm"`
 }
 
 type Gossiper_log map[int]Gossiper_log_entry
+
+func (ctx *GossiperContext) ComputeRandomlatency() time.Duration {
+	return time.Duration((ctx.Min_latency + rand.Intn(ctx.Max_latency-ctx.Min_latency))) * time.Millisecond
+}

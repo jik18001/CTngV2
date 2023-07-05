@@ -98,11 +98,14 @@ func IsOwner(ownerURL string, parsedURL string) bool {
 
 func GetCurrentMinute() string {
 	timerfc := time.Now().UTC().Format(time.RFC3339)
-	Miniutes, err := strconv.Atoi(timerfc[14:16])
-	Periodnum := strconv.Itoa(Miniutes)
-	if err != nil {
-	}
-	return Periodnum
+	return timerfc[14:16]
+}
+
+func GetCurrentSecond() string {
+	currentTime := time.Now().UTC()
+	// Extract the seconds with millisecond precision
+	seconds := currentTime.Format("05.000")
+	return seconds
 }
 
 // set it to be the same as GetCurrentMinute() for now
@@ -115,6 +118,7 @@ func Getwaitingtime(MMD int) int {
 	timerfc := time.Now().UTC().Format(time.RFC3339)
 	Seconds, err := strconv.Atoi(timerfc[17:19])
 	if err != nil {
+		panic(err)
 	}
 	Seconds = MMD - Seconds
 	return Seconds

@@ -175,40 +175,6 @@ func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate, verify bool,
 		ctx.STH_database[key] = newrecord
 	}
 	ctx.STH_DB_RWLock.Unlock()
-	ctx.D1_Blacklist_DB_RWLock.Lock()
-	for _, d1pom := range update.ACCs {
-		//verify D1POM_FULL
-		if verify {
-			err := d1pom.Verify(ctx.Crypto)
-			if err != nil {
-				fmt.Println("d1pom verification failed")
-				return false
-			}
-		}
-		//Update D1POM
-		// look for D1POM first
-		key := d1pom.Payload[0] + "@" + d1pom.Period
-		ctx.D1_Blacklist_database[key] = true
-	}
-	ctx.D1_Blacklist_DB_RWLock.Unlock()
-	ctx.D2_Blacklist_DB_RWLock.Lock()
-	for _, d2pom := range update.CONs {
-		//verify D2POM_FULL
-		if verify {
-			err := d2pom.Verify(ctx.Crypto)
-			if err != nil {
-				fmt.Println("d2pom verification failed")
-				return false
-			}
-		}
-		//Update D2POM
-		// look for D2POM first
-		key := d2pom.Payload[0]
-		if _, ok := ctx.D2_Blacklist_database[key]; !ok {
-			ctx.D2_Blacklist_database[key] = d2pom.Period
-		}
-	}
-	ctx.D2_Blacklist_DB_RWLock.Unlock()
 	// now verify and store monitor integrity data
 	// first verify the signature on the monitor integrity data
 	if verify {

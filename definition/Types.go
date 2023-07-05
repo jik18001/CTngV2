@@ -1,10 +1,5 @@
 package definition
 
-import (
-	"CTngV2/crypto"
-	"encoding/binary"
-)
-
 type Gossip_object struct {
 	Application string    `json:"application"`
 	Period      string    `json:"period"`
@@ -99,14 +94,6 @@ func (g Gossip_object) GetTargetType() string {
 	default:
 		return ""
 	}
-}
-
-// This function is used to make sure all gossipers sign on the same
-func (g Gossip_object) Get_CON_ID() uint32 {
-	hashmsg1 := g.Payload[0] + g.Payload[1] + g.Payload[2]
-	hash1, _ := crypto.GenerateSHA256([]byte(hashmsg1))
-	int1 := binary.BigEndian.Uint32(hash1)
-	return int1
 }
 
 /*

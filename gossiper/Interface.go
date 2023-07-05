@@ -36,6 +36,7 @@ func (ctx *GossiperContext) Save() {
 	Period, _ := strconv.Atoi(util.GetCurrentPeriod())
 	g_log_entry := Gossiper_log_entry{
 		Period:             Period,
+		Converge_time:      ctx.Converge_time,
 		NUM_STH_INIT:       len(ctx.Gossip_object_storage.STH_INIT),
 		NUM_REV_INIT:       len(ctx.Gossip_object_storage.REV_INIT),
 		NUM_ACC_INIT:       len(ctx.Gossip_object_storage.ACC_INIT),
@@ -412,6 +413,19 @@ func (ctx GossiperContext) GetItem(ID any, TargetType string) any {
 
 	}
 	return nil
+}
+
+func (ctx GossiperContext) IsConvergent() bool {
+	ctx.Gossip_object_storage.REV_FULL_LOCK.RLock()
+	defer ctx.Gossip_object_storage.REV_FULL_LOCK.RUnlock()
+	ctx.Gossip_object_storage.STH_FULL_LOCK.RLock()
+	defer ctx.Gossip_object_storage.STH_FULL_LOCK.RUnlock()
+	count1 := len(ctx.Gossip_object_storage.REV_FULL)
+	count2 := len(ctx.Gossip_object_storage.STH_FULL)
+	if count1 == ctx.Total_CA && count2 == ctx.Total_Logger {
+		return true
+	}
+	return false
 }
 
 func (ctx GossiperContext) IsMalicious(obj definition.Gossip_object) bool {

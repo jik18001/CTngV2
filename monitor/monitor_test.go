@@ -44,6 +44,7 @@ func (c *ClientMock) BadRequest(req *http.Request) (*http.Request, error) {
 	return &http.Request{Body: ioutil.NopCloser(bytes.NewBuffer(b))}, nil
 }
 
+/*
 func testReceiveGossip(t *testing.T) {
 	monitorContext := MonitorContext{}
 	req, _ := (&ClientMock{}).GoodRequest(&http.Request{})
@@ -59,7 +60,7 @@ func testPanicOnBadReceiveGossip(t *testing.T) {
 	receiveGossip(&monitorContext, nil, req)
 
 	t.Errorf("Expected panic")
-}
+}*/
 
 func testPrepareClientupdate(t *testing.T) {
 	// TODO

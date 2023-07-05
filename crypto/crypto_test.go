@@ -40,7 +40,7 @@ func testMD5(t *testing.T) {
 		// When taking the hash, we cast the value to a byte array.
 		got, err := GenerateMD5(([]byte)(test.input))
 		if err != nil {
-			t.Errorf("Error recieved: %s", err.Error())
+			t.Errorf("Error received: %s", err.Error())
 		}
 		//When printing/visually reading a hash, we encode it to a string with hex.EncodeToString
 		if hex.EncodeToString(got) != (test.expected) {

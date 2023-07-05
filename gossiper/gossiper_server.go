@@ -118,6 +118,8 @@ func Handle_STH_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 	c.Store(gossip_obj)
 	// we send the object to the gossipers
 	c.Send_to_Gossipers(gossip_obj)
+	// also send to the monitor
+	c.Send_to_Monitor(gossip_obj)
 	// wait and sign the object
 	f := func() {
 		if c.InBlacklist(gossip_obj.Payload[0]) {
@@ -154,6 +156,8 @@ func Handle_REV_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 	// we send the object to the gossipers
 	c.Store(gossip_obj)
 	c.Send_to_Gossipers(gossip_obj)
+	// also send to the monitor
+	c.Send_to_Monitor(gossip_obj)
 	// wait and sign the object
 	f := func() {
 		if c.InBlacklist(gossip_obj.Payload[0]) {
@@ -217,7 +221,7 @@ func Handle_OBJ_FRAG(c *GossiperContext, gossip_obj definition.Gossip_object) {
 	case definition.STH_FRAG, definition.REV_FRAG, definition.ACC_FRAG:
 		itemcount = c.Read_and_Store_If_Needed(gossip_obj)
 	}
-	fmt.Println(itemcount)
+	//fmt.Println(itemcount)
 	if itemcount == c.Gossiper_crypto_config.Threshold-1 {
 		itemlist := c.GetObjectList(gossip_obj.GetID(), gossip_obj.Type)
 		target_type := gossip_obj.GetTargetType()
@@ -240,6 +244,11 @@ func Handle_OBJ_FULL(c *GossiperContext, gossip_obj definition.Gossip_object) {
 		c.Store(gossip_obj)
 		c.Send_to_Monitor(gossip_obj)
 	}
+	if c.IsConvergent() {
+		c.Converge_time = util.GetCurrentSecond()
+		fmt.Println(util.BLUE, "Converge time: ", c.Converge_time, util.RESET)
+	}
+
 	return
 }
 
@@ -319,7 +328,7 @@ func (c *GossiperContext) Send_to_Monitor(obj any) {
 	fmt.Println(util.BLUE+"Sending ", objtype, " to owner", util.RESET)
 	switch obj.(type) {
 	case definition.Gossip_object:
-		endpoint = "/monitor/recieve-gossip-from-gossiper"
+		endpoint = "/monitor/receive-gossip-from-gossiper"
 	}
 	// Send the gossip object to the owner.
 	resp, postErr := c.Client.Post("http://"+c.Gossiper_private_config.Owner_URL+endpoint, "application/json", bytes.NewBuffer(msg))

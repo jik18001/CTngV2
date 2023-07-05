@@ -56,6 +56,8 @@ func StartGossiper(GID string) {
 	ctx_gossiper.StorageDirectory = "gossiper_testdata/" + ctx_gossiper.StorageID + "/"
 	ctx_gossiper.StorageFile = "gossiper_testdata.json"
 	ctx_gossiper.CleanUpGossiperStorage()
+	ctx_gossiper.Total_Logger = 1
+	ctx_gossiper.Total_CA = 1
 	// create the storage directory if not exist
 	util.CreateDir(ctx_gossiper.StorageDirectory)
 	// create the storage file if not exist

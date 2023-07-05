@@ -23,8 +23,8 @@ func handleMonitorRequests(c *MonitorContext) {
 	gorillaRouter := mux.NewRouter().StrictSlash(true)
 	// POST functions
 	gorillaRouter.HandleFunc("/monitor/get-update", bindMonitorContext(c, requestupdate)).Methods("GET")
-	gorillaRouter.HandleFunc("/monitor/recieve-gossip", bindMonitorContext(c, handle_gossip)).Methods("POST")
-	gorillaRouter.HandleFunc("/monitor/recieve-gossip-from-gossiper", bindMonitorContext(c, handle_gossip_from_gossiper)).Methods("POST")
+	//gorillaRouter.HandleFunc("/monitor/receive-gossip", bindMonitorContext(c, handle_gossip)).Methods("POST")
+	gorillaRouter.HandleFunc("/monitor/receive-gossip-from-gossiper", bindMonitorContext(c, handle_gossip_from_gossiper)).Methods("POST")
 	// Start the HTTP server.
 	http.Handle("/", gorillaRouter)
 	// Listen on port set by config until server is stopped.
