@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"encoding/pem"
 	"math"
+	"math/rand"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -126,4 +127,8 @@ func Getwaitingtime(MMD int) int {
 
 func GetCurrentTimestamp() string {
 	return time.Now().UTC().Format(time.RFC3339)
+}
+
+func GetRandomLatency(min int, max int) int {
+	return min + rand.Intn(max-min)
 }

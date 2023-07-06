@@ -33,10 +33,12 @@ type MonitorContext struct {
 	// The below could be used to prevent a Monitor from sending duplicate Accusations,
 	// Currently, if a monitor accuses two entities in the same Period, it will trigger a gossip PoM.
 	// Therefore, a monitor can only accuse once per Period. I believe this is a temporary solution.
-	Verbose       bool
-	Client        *http.Client
-	Mode          int
-	Period_Offset string
+	Verbose bool
+	Client  *http.Client
+	//for testing purposes only
+	Mode                   int
+	Period_Offset          string
+	Clockdrift_miliseconds int
 }
 
 type Monitor_private_config struct {

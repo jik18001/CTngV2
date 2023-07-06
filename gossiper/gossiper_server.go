@@ -44,6 +44,8 @@ func handleRequests(c *GossiperContext) {
 }
 
 func Gossip_object_handler(c *GossiperContext, w http.ResponseWriter, r *http.Request) {
+	// add a random delay to simulate network delay, bounded by lower and upper bounds
+	//time.Sleep(time.Duration(util.GetRandomLatency(c.Min_latency, c.Max_latency)) * time.Millisecond)
 	var gossip_obj definition.Gossip_object
 	err := json.NewDecoder(r.Body).Decode(&gossip_obj)
 	if err != nil {
@@ -260,6 +262,7 @@ func (c *GossiperContext) Send_to_Gossipers(obj any) error {
 	return errors.New("Type not supported")
 }
 
+/*
 func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_object) error {
 	//time.Sleep(100 * time.Millisecond)
 	msg, err := json.Marshal(gossip_obj)
@@ -316,7 +319,65 @@ func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_obje
 	}
 	return nil
 }
+*/
 
+func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_object) error {
+	msg, err := json.Marshal(gossip_obj)
+	if err != nil {
+		panic(err)
+	}
+	dstendpoint := ""
+	switch gossip_obj.Type {
+	case definition.STH_INIT:
+		dstendpoint = "/gossip/sth_init"
+	case definition.REV_INIT:
+		dstendpoint = "/gossip/rev_init"
+	case definition.ACC_INIT:
+		dstendpoint = "/gossip/acc_init"
+	case definition.CON_INIT:
+		dstendpoint = "/gossip/con_init"
+	case definition.STH_FRAG:
+		dstendpoint = "/gossip/sth_frag"
+	case definition.REV_FRAG:
+		dstendpoint = "/gossip/rev_frag"
+	case definition.ACC_FRAG:
+		dstendpoint = "/gossip/acc_frag"
+	case definition.STH_FULL:
+		dstendpoint = "/gossip/sth_full"
+	case definition.REV_FULL:
+		dstendpoint = "/gossip/rev_full"
+	case definition.ACC_FULL:
+		dstendpoint = "/gossip/acc_full"
+	}
+	for _, url := range c.Gossiper_private_config.Connected_Gossipers {
+		go func(url, dstendpoint string) {
+			time.Sleep(time.Duration(util.GetRandomLatency(c.Min_latency, c.Max_latency)) * time.Millisecond) // Delay before sending
+
+			resp, err := http.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
+			if err != nil {
+				if strings.Contains(err.Error(), "Client.Timeout") ||
+					strings.Contains(err.Error(), "connection refused") {
+					fmt.Println(util.RED + "Connection failed to " + url + "." + " Error message: " + err.Error() + util.RESET)
+					// Don't accuse gossipers for inactivity.
+					// defer Accuse(c, url)
+				} else {
+					fmt.Println(util.RED + err.Error() + " sending to " + url + "." + util.RESET)
+				}
+				return
+			}
+
+			defer func() {
+				if resp != nil && resp.Body != nil {
+					resp.Body.Close()
+				}
+			}()
+
+			//fmt.Println("Response from server:", resp.Status)
+		}(url, dstendpoint)
+	}
+
+	return nil
+}
 func (c *GossiperContext) Send_to_Monitor(obj any) {
 	// Convert gossip object to JSON
 	msg, err := json.Marshal(obj)

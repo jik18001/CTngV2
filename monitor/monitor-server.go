@@ -37,6 +37,7 @@ func StartMonitorServer(c *MonitorContext) {
 		fmt.Println("Waiting for ", time_wait, " seconds")
 		time.Sleep(time.Duration(time_wait) * time.Second)
 	}
+	time.Sleep(time.Duration(c.Clockdrift_miliseconds) * time.Millisecond)
 	tr := &http.Transport{}
 	c.Client = &http.Client{
 		Transport: tr,

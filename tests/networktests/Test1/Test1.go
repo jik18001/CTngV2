@@ -8,6 +8,7 @@ import (
 	"CTngV2/util"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -44,6 +45,8 @@ func StartMonitor(MID string) {
 	fmt.Println("Delay 60 seconds to start monitor server")
 	time.Sleep(60 * time.Second)
 	ctx_monitor.Period_Offset = util.GetCurrentPeriod()
+	MID_int, _ := strconv.Atoi(MID)
+	ctx_monitor.Clockdrift_miliseconds = 200 * MID_int
 	monitor.StartMonitorServer(ctx_monitor)
 }
 
@@ -58,6 +61,8 @@ func StartGossiper(GID string) {
 	ctx_gossiper.CleanUpGossiperStorage()
 	ctx_gossiper.Total_Logger = 1
 	ctx_gossiper.Total_CA = 1
+	ctx_gossiper.Min_latency = 20
+	ctx_gossiper.Max_latency = 500
 	// create the storage directory if not exist
 	util.CreateDir(ctx_gossiper.StorageDirectory)
 	// create the storage file if not exist
