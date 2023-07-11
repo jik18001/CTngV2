@@ -1,4 +1,4 @@
-name: 'Conflicting Logger & CA'
+name: 'Conflicting CA & Logger'
  
 on:
   workflow_dispatch:
