@@ -31,9 +31,9 @@ func TestResults(t *testing.T) {
 
 	for i, gossiperLog := range gossiper_log_database {
 		fmt.Println("Beginning testing gossiper", i+1)
-		for _, gossiperLogEntry := range gossiperLog {
+		for j, gossiperLogEntry := range gossiperLog {
 			// No accusations
-			if (gossiperLogEntry.NUM_STH_FULL != 1 || gossiperLogEntry.NUM_REV_FULL != 1) && i == 0 {
+			if (gossiperLogEntry.NUM_STH_FULL != 1 || gossiperLogEntry.NUM_REV_FULL != 1) && j == 0 {
 				fmt.Println("Gossiper", i+1, "Period", gossiperLogEntry.Period, "has", gossiperLogEntry.NUM_STH_FULL, "STH_FULL, expected 1")
 				fmt.Println("Gossiper", i+1, "Period", gossiperLogEntry.Period, "has", gossiperLogEntry.NUM_REV_FULL, "REV_FULL, expected 1")
 				t.Fail()
