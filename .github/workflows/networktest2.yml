@@ -1,4 +1,4 @@
-name: 'Run Network Test 2: Conflicting Logger & CA'
+name: 'Conflicting Logger & CA'
  
 on:
   workflow_dispatch:
