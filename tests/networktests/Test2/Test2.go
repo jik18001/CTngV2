@@ -8,6 +8,7 @@ import (
 	"CTngV2/util"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 )
 
@@ -49,6 +50,9 @@ func StartMonitor(MID string) {
 	//wait for 60 seconds
 	fmt.Println("Delay 60 seconds to start monitor server")
 	time.Sleep(60 * time.Second)
+	MID_int, _ := strconv.Atoi(MID)
+	ctx_monitor.Clockdrift_miliseconds = 200 * MID_int
+	ctx_monitor.Maxdrift_miliseconds = 200 * MID_int * ctx_monitor.Monitor_crypto_config.N
 	monitor.StartMonitorServer(ctx_monitor)
 }
 
@@ -60,6 +64,8 @@ func StartGossiper(GID string) {
 	ctx_gossiper := gossiper.InitializeGossiperContext(path_1, path_2, path_3, GID)
 	ctx_gossiper.StorageDirectory = "gossiper_testdata/" + ctx_gossiper.StorageID + "/"
 	ctx_gossiper.StorageFile = "gossiper_testdata.json"
+	ctx_gossiper.Min_latency = 20
+	ctx_gossiper.Max_latency = 500
 	ctx_gossiper.CleanUpGossiperStorage()
 	// create the storage directory if not exist
 	util.CreateDir(ctx_gossiper.StorageDirectory)

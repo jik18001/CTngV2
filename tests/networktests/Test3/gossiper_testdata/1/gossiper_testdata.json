@@ -1,7 +1,22 @@
 {
-  "29": {
-    "period": 29,
-    "converge_time": "05.649",
+  "47": {
+    "period": 47,
+    "converge_time": "",
+    "num_sth_init": 1,
+    "num_rev_init": 1,
+    "num_acc_init": 0,
+    "num_con_init": 0,
+    "num_sth_frag": 2,
+    "num_rev_frag": 2,
+    "num_acc_frag": 0,
+    "num_sth_full": 1,
+    "num_rev_full": 1,
+    "num_acc_full": 0,
+    "num_blacklist_perm": 0
+  },
+  "48": {
+    "period": 48,
+    "converge_time": "07.930",
     "num_sth_init": 0,
     "num_rev_init": 0,
     "num_acc_init": 2,
@@ -14,24 +29,9 @@
     "num_acc_full": 2,
     "num_blacklist_perm": 2
   },
-  "30": {
-    "period": 30,
-    "converge_time": "05.649",
-    "num_sth_init": 0,
-    "num_rev_init": 0,
-    "num_acc_init": 0,
-    "num_con_init": 0,
-    "num_sth_frag": 0,
-    "num_rev_frag": 0,
-    "num_acc_frag": 0,
-    "num_sth_full": 0,
-    "num_rev_full": 0,
-    "num_acc_full": 0,
-    "num_blacklist_perm": 2
-  },
-  "31": {
-    "period": 31,
-    "converge_time": "05.649",
+  "49": {
+    "period": 49,
+    "converge_time": "07.930",
     "num_sth_init": 0,
     "num_rev_init": 0,
     "num_acc_init": 0,

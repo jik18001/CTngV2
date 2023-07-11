@@ -1,7 +1,7 @@
 {
-  "43": {
-    "period": 43,
-    "converge_time": "05.939",
+  "55": {
+    "period": 55,
+    "converge_time": "07.300",
     "num_sth_init": 1,
     "num_rev_init": 1,
     "num_acc_init": 0,
@@ -14,9 +14,9 @@
     "num_acc_full": 0,
     "num_blacklist_perm": 0
   },
-  "44": {
-    "period": 44,
-    "converge_time": "06.143",
+  "56": {
+    "period": 56,
+    "converge_time": "07.587",
     "num_sth_init": 1,
     "num_rev_init": 1,
     "num_acc_init": 0,
@@ -29,9 +29,9 @@
     "num_acc_full": 0,
     "num_blacklist_perm": 0
   },
-  "45": {
-    "period": 45,
-    "converge_time": "06.020",
+  "57": {
+    "period": 57,
+    "converge_time": "07.445",
     "num_sth_init": 1,
     "num_rev_init": 1,
     "num_acc_init": 0,

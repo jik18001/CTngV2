@@ -47,6 +47,7 @@ func StartMonitor(MID string) {
 	ctx_monitor.Period_Offset = util.GetCurrentPeriod()
 	MID_int, _ := strconv.Atoi(MID)
 	ctx_monitor.Clockdrift_miliseconds = 200 * MID_int
+	ctx_monitor.Maxdrift_miliseconds = 200 * MID_int * ctx_monitor.Monitor_crypto_config.N
 	monitor.StartMonitorServer(ctx_monitor)
 }
 

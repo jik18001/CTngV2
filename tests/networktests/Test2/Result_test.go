@@ -13,7 +13,7 @@ import (
 
 func testgossipobjectnum(entry gossiper.Gossiper_log_entry, Periodoffset int) bool {
 	if entry.NUM_STH_FULL != 0 {
-		fmt.Println("Number of NUM_FULL is ", entry.NUM_STH_FULL, "but should be 0.")
+		fmt.Println("Number of STH_FULL is ", entry.NUM_STH_FULL, "but should be 0.")
 		return false
 	}
 	if entry.NUM_REV_FULL != 0 {
@@ -42,7 +42,7 @@ func testgossipobjectnum(entry gossiper.Gossiper_log_entry, Periodoffset int) bo
 
 func testfirstgossipobjectnum(entry gossiper.Gossiper_log_entry) bool {
 	if entry.NUM_STH_FULL != 1 {
-		fmt.Println("Number of NUM_FULL is ", entry.NUM_STH_FULL, "but should be 1.")
+		fmt.Println("Number of STH_FULL is ", entry.NUM_STH_FULL, "but should be 1.")
 		return false
 	}
 	if entry.NUM_REV_FULL != 1 {

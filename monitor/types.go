@@ -39,6 +39,7 @@ type MonitorContext struct {
 	Mode                   int
 	Period_Offset          string
 	Clockdrift_miliseconds int
+	Maxdrift_miliseconds   int
 }
 
 type Monitor_private_config struct {

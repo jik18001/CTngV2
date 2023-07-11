@@ -342,8 +342,11 @@ func PeriodicTasks(c *MonitorContext) {
 	}
 	time.AfterFunc(time.Duration(c.Monitor_public_config.MMD)*time.Second, f)
 	// Run the periodic tasks.
-	QueryLoggers(c)
-	QueryAuthorities(c)
+	tasks := func() {
+		QueryLoggers(c)
+		QueryAuthorities(c)
+	}
+	time.AfterFunc(time.Duration(c.Maxdrift_miliseconds)*time.Millisecond, tasks)
 	f1 := func() {
 		c.Clean_Conflicting_Object()
 		c.WipeStorage()

@@ -38,7 +38,7 @@ func TestResults(t *testing.T) {
 				fmt.Println("Gossiper", i+1, "Period", gossiperLogEntry.Period, "has", gossiperLogEntry.NUM_REV_FULL, "REV_FULL, expected 1")
 				t.Fail()
 			}
-			if gossiperLogEntry.NUM_BLACKLIST_PERM != 2 && i != 0 {
+			if gossiperLogEntry.NUM_BLACKLIST_PERM != 2 && j != 0 {
 				fmt.Println("Gossiper", i+1, "Period", gossiperLogEntry.Period, "has", gossiperLogEntry.NUM_BLACKLIST_PERM, "PoM_accusations, expected 2")
 				t.Fail()
 			}
