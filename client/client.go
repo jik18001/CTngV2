@@ -175,12 +175,6 @@ func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate, verify bool,
 		ctx.STH_database[key] = newrecord
 	}
 	ctx.STH_DB_RWLock.Unlock()
-	// now verify and store monitor integrity data
-	// first verify the signature on the monitor integrity data
-	if verify {
-	}
-	// verify the Monitor Integrity data for the previous period against the NUM_FULL received in this period
-	// if the verification fails, then the monitor is not honest
 	return true
 }
 

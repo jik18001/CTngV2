@@ -27,11 +27,10 @@ type ClientContext struct {
 	Crypto              *crypto.CryptoConfig
 	Current_Monitor_URL string
 	// the databases are shared resources and should be protected with mutex
-	STH_database              map[string]string         // key = entity_ID + @ + Period, content = RootHash
-	CRV_database              map[string]*bitset.BitSet // key = entity_ID, content = CRV
-	Monitor_Interity_database map[string]string         // key = Period, content = NUM_ACC_FULL + "@" + NUM_CON_FULL
-	STH_DB_RWLock             *sync.RWMutex
-	CRV_DB_RWLock             *sync.RWMutex
+	STH_database  map[string]string         // key = entity_ID + @ + Period, content = RootHash
+	CRV_database  map[string]*bitset.BitSet // key = entity_ID, content = CRV
+	STH_DB_RWLock *sync.RWMutex
+	CRV_DB_RWLock *sync.RWMutex
 	// Don't need lock for monitor integerity DB because it is only checked once per period
 	Config_filepath string
 	Crypto_filepath string
@@ -103,7 +102,6 @@ func (ctx *ClientContext) InitializeClientContext() {
 	// initialize the databases
 	ctx.STH_database = make(map[string]string)
 	ctx.CRV_database = make(map[string]*bitset.BitSet)
-	ctx.Monitor_Interity_database = make(map[string]string)
 	// load the databases
 	if err != nil {
 		log.Fatal(err)

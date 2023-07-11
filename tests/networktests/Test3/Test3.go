@@ -17,7 +17,8 @@ func StartCA(CID string) {
 	path_2 := path_prefix + "/CA_private_config.json"
 	path_3 := path_prefix + "/CA_crypto_config.json"
 	ctx_ca := CA.InitializeCAContext(path_1, path_2, path_3)
-	ctx_ca.CA_Type = 2
+	ctx_ca.CA_Type = 3
+	ctx_ca.MisbehaviorInterval = 2
 	CA.StartCA(ctx_ca)
 }
 
@@ -27,7 +28,8 @@ func StartLogger(LID string) {
 	path_2 := path_prefix + "/Logger_private_config.json"
 	path_3 := path_prefix + "/Logger_crypto_config.json"
 	ctx_logger := Logger.InitializeLoggerContext(path_1, path_2, path_3)
-	ctx_logger.Logger_Type = 2
+	ctx_logger.Logger_Type = 3
+	ctx_logger.MisbehaviorInterval = 2
 	Logger.StartLogger(ctx_logger)
 }
 

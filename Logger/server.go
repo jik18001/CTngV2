@@ -69,7 +69,7 @@ func requestSTH(c *LoggerContext, w http.ResponseWriter, r *http.Request) {
 		return
 	case 3:
 		// sometimes unresponsive logger
-		if c.Request_Count%c.MisbehaviorInterval == 0 {
+		if c.Request_Count%c.MisbehaviorInterval == 0 || c.OnlineDuration == 1 {
 			// misbehave
 			return
 		} else {

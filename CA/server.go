@@ -80,7 +80,7 @@ func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
 		return
 	case 3:
 		//sometimes unresponsive CA
-		if c.Request_Count%c.MisbehaviorInterval == 0 {
+		if c.Request_Count%c.MisbehaviorInterval == 0 || c.OnlineDuration == 1 {
 			return
 		} else {
 			json.NewEncoder(w).Encode(c.REV_storage[Period])
