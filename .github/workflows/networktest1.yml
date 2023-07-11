@@ -1,4 +1,4 @@
-name: 'Run Network Test 1'
+name: 'Run Network Test 1: Normal CA & Logger'
  
 on:
   push:
