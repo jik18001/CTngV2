@@ -1,4 +1,4 @@
-name: 'Run Network Test 3:Non-Responsive Logger&CA'
+name: 'Non-Responsive CA & Logger'
  
 on:
   workflow_dispatch:
