@@ -21,6 +21,7 @@ func StartCA(CID string) {
 	ctx_ca.OnlineDuration = 0
 	ctx_ca.MisbehaviorInterval = 2
 	ctx_ca.CA_Type = 1
+	ctx_ca.Maxlatency = 500
 	CA.StartCA(ctx_ca)
 }
 
@@ -33,6 +34,7 @@ func StartLogger(LID string) {
 	ctx_logger.OnlineDuration = 0
 	ctx_logger.MisbehaviorInterval = 2
 	ctx_logger.Logger_Type = 1
+	ctx_logger.Maxlatency = 500
 	Logger.StartLogger(ctx_logger)
 }
 
@@ -65,7 +67,7 @@ func StartGossiper(GID string) {
 	ctx_gossiper.StorageDirectory = "gossiper_testdata/" + ctx_gossiper.StorageID + "/"
 	ctx_gossiper.StorageFile = "gossiper_testdata.json"
 	ctx_gossiper.Min_latency = 20
-	ctx_gossiper.Max_latency = 500
+	ctx_gossiper.Max_latency = 250
 	ctx_gossiper.CleanUpGossiperStorage()
 	// create the storage directory if not exist
 	util.CreateDir(ctx_gossiper.StorageDirectory)

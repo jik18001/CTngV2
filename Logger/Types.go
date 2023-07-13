@@ -50,6 +50,7 @@ type LoggerContext struct {
 	Request_Count_lock    *sync.Mutex
 	CertPool_lock         *sync.Mutex
 	StoragePath           string
+	Maxlatency            int
 }
 
 type PrecertStorage struct {

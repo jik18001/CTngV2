@@ -41,6 +41,7 @@ type CAContext struct {
 	StoragePath2           string
 	STH_storage            map[string]definition.Gossip_object //store the STH by LID
 	Request_Count_lock     *sync.Mutex
+	Maxlatency             int
 }
 
 type CA_public_config struct {
