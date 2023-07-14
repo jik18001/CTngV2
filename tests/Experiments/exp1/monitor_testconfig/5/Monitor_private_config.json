@@ -1,0 +1,12 @@
+{
+  "CA_URLs": [
+   "localhost:9100"
+  ],
+  "Logger_URLs": [
+   "localhost:9000"
+  ],
+  "Signer": "localhost:8184",
+  "Gossiper_URL": "localhost:8084",
+  "Inbound_gossiper_port": "8084",
+  "Port": "8184"
+ }

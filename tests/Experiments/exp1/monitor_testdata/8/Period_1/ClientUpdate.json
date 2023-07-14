@@ -1,0 +1,50 @@
+{
+  "STHs": [
+    {
+      "application": "CTng",
+      "period": "48",
+      "type": "http://ctng.uconn.edu/301",
+      "signer": "",
+      "signers": [
+        "localhost:8087",
+        "localhost:8080"
+      ],
+      "signature": [
+        "{\"sign\":\"ace3903784bec239f7fd360fb778f0232d756f0acc028e9113d7cc8c60903f8789d51056b9543f4ccffd720008895c84\", \"ids\":[\"localhost:8080\",\"localhost:8087\"]}",
+        ""
+      ],
+      "timestamp": "2023-07-14T01:48:06Z",
+      "crypto_scheme": "bls",
+      "payload": [
+        "localhost:9000",
+        "7b225369676e6572223a226c6f63616c686f73743a39303030222c2254696d657374616d70223a22323032332d30372d31345430313a34373a34305a222c22506572696f64223a223437222c22526f6f7448617368223a2266313132313365336636386666366462393637623631626466646137643530613933383933613738623963353130646261623332393665393737376166303634222c225472656553697a65223a327d",
+        ""
+      ]
+    }
+  ],
+  "REVs": [
+    {
+      "application": "CTng",
+      "period": "48",
+      "type": "http://ctng.uconn.edu/302",
+      "signer": "",
+      "signers": [
+        "localhost:8087",
+        "localhost:8082"
+      ],
+      "signature": [
+        "{\"sign\":\"ae9c48ba4a5b5c815f04318660425db18468c76ef05bd0dfec56f7cc61107c89f2379b7076bf54ec89c4c1e8278cb896\", \"ids\":[\"localhost:8082\",\"localhost:8087\"]}",
+        ""
+      ],
+      "timestamp": "2023-07-14T01:48:06Z",
+      "crypto_scheme": "bls",
+      "payload": [
+        "localhost:9100",
+        "CRV",
+        "{\"Period\":\"48\",\"Delta_CRV\":\"AAAAAAAAAAoAAAAAAAAAAA==\",\"SRH\":\"{\\\"sig\\\":\\\"8014887225d70a47b0f8c6cdad83991b09d8b2dacfaf8b5c3677314530a84f5f9a3092b3ae6c3e386e3d4a478007ea9ce540d2feb4079e6c55e06c9a7e3208d8baa95360f22f67b294dbaf5103f868297615f3120672496e13bd7cb3e6efb20f684dc05c89271f80a302201b25e60d7b223414681de2af3c6a5e6a91e4c7c9f33abef6d1edb42fdd8683dcabe8394e01295b815be823f56e2eb87e068ddace7dcdc905db9c3de46bf5f73db5e7e60a7020690cfd567a3068d971ee2e61a4a3b9dc8f2d04ccfb5081f7fc2bee0e386c80d438cbad497f67376567aae49e902456a1cdcd5df4ac9b9d815e853cd045fc49ba7f7374905eac4fa3e43489442f72a2\\\",\\\"id\\\":\\\"localhost:9100\\\"}\"}"
+      ]
+    }
+  ],
+  "MonitorID": "localhost:8187",
+  "Period": "48"
+}

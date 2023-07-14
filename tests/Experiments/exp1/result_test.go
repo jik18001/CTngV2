@@ -77,7 +77,6 @@ func TestGMResult(t *testing.T) {
 				t.Fail()
 			}
 		}
-
 		for j := 0; j < len(gossiper_log_map_1_list); j++ {
 			convergetime, _ := strconv.ParseFloat(gossiper_log_map_1_list[j].Converge_time, 64)
 			//fmt.Println("Converge time is ", convergetime)
@@ -92,36 +91,7 @@ func TestGMResult(t *testing.T) {
 		}
 	}
 	AverageConvergeTime = AverageConvergeTime / datacount
-	fmt.Println("Average Converge Time is ", AverageConvergeTime)
-	fmt.Println("Max Converge Time is ", MaxConvergeTime)
-	fmt.Println("Min Converge Time is ", MinConvergeTime)
+	fmt.Println("MinConvergeTime is ", MinConvergeTime)
+	fmt.Println("AverageConvergeTime is ", AverageConvergeTime)
+	fmt.Println("MaxConvergeTime is ", MaxConvergeTime)
 }
-
-/*
-func TestCertificateResult(t *testing.T) {
-	certbyte, _ := util.ReadCertificateFromDisk("Testing Dummy 2_RID_2.crt")
-	cert, err := x509.ParseCertificate(certbyte)
-	if err != nil {
-		fmt.Println("Error parsing certificate")
-		t.Fail()
-	}
-	ctx := &client.ClientContext{
-		Status:          "NEW",
-		Config_filepath: "../client_testconfig/Client_config.json",
-		Crypto_filepath: "../client_testconfig/Client_crypto_config.json",
-		Config:          &client.ClientConfig{},
-	}
-	ctx.InitializeClientContext()
-	update_1 := ctx.LoadUpdate("monitor_testdata/1/Period_28/ClientUpdate.json")
-	update_2 := ctx.LoadUpdate("monitor_testdata/1/Period_29/ClientUpdate.json")
-	update_3 := ctx.LoadUpdate("monitor_testdata/1/Period_30/ClientUpdate.json")
-	ctx.HandleUpdate(update_1, true, true)
-	ctx.HandleUpdate(update_2, true, true)
-	ctx.HandleUpdate(update_3, true, true)
-	if !ctx.VerifyCTngextension(cert) {
-		fmt.Println("Certificate verification failed")
-		//t.Fail()
-	}
-
-}
-*/
