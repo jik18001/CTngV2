@@ -1,9 +1,7 @@
 {
   "CA_URLs": [
-   "localhost:9100"
   ],
   "Logger_URLs": [
-   "localhost:9000"
   ],
   "Signer": "localhost:8186",
   "Gossiper_URL": "localhost:8086",
