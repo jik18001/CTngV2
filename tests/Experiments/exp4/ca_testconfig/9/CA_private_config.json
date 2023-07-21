@@ -1,0 +1,32 @@
+{
+  "Signer": "localhost:9108",
+  "Port": "9108",
+  "Loggerlist": [
+   "localhost:9008"
+  ],
+  "Monitorlist": [
+   "localhost:8180",
+   "localhost:8181",
+   "localhost:8182",
+   "localhost:8183",
+   "localhost:8184",
+   "localhost:8185",
+   "localhost:8186",
+   "localhost:8187",
+   "localhost:8188",
+   "localhost:8189"
+  ],
+  "Gossiperlist": [
+   "localhost:8080",
+   "localhost:8081",
+   "localhost:8082",
+   "localhost:8083",
+   "localhost:8084",
+   "localhost:8085",
+   "localhost:8086",
+   "localhost:8087",
+   "localhost:8088",
+   "localhost:8089"
+  ],
+  "Cert_per_period": 2
+ }
