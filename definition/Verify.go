@@ -107,6 +107,7 @@ func (g Gossip_object) Verify(c *crypto.CryptoConfig) error {
 	case ACC_FULL:
 		return Verify_PayloadThreshold(g, c)
 	default:
+		fmt.Println(util.RED, "the type is: ", g.Type, util.RESET)
 		return errors.New(Invalid_Type)
 	}
 }
