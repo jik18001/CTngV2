@@ -292,6 +292,10 @@ func PeriodicTask(ctx *CAContext) {
 		// add 1 to current period
 		periodnum = periodnum + 1
 		// convert int to string
+		// add a leading 0 if the string is only 1 digit
+		if periodnum < 10 {
+			period = "0" + strconv.Itoa(periodnum)
+		}
 		period = strconv.Itoa(periodnum)
 		rev := Generate_Revocation(ctx, period, 0)
 		fake_rev := Generate_Revocation(ctx, period, 1)

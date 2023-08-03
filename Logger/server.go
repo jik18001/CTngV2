@@ -214,6 +214,10 @@ func PeriodicTask(ctx *LoggerContext) {
 		}
 		periodint = periodint + 1
 		period = strconv.Itoa(periodint)
+		// add a leading zero if the period is less than 10
+		if periodint < 10 {
+			period = "0" + period
+		}
 		// update STH
 		certlist := ctx.CurrentPrecertPool.GetCerts()
 		fmt.Println("len of certlist: ", len(certlist))
