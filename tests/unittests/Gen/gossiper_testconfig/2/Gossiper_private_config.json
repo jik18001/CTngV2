@@ -1,0 +1,9 @@
+{
+  "Connected_Gossipers": [
+   "localhost:9000",
+   "localhost:9002",
+   "localhost:9003"
+  ],
+  "Owner_URL": "localhost:8001",
+  "Port": "9001"
+ }

@@ -13,30 +13,56 @@ import (
 	"os"
 )
 
+const (
+	prefix_CA            = "localhost:6"
+	prefix_logger        = "localhost:7"
+	prefix_monitor       = "localhost:8"
+	prefix_gossiper      = "localhost:9"
+	port_prefix_CA       = "6"
+	port_prefix_logger   = "7"
+	port_prefix_monitor  = "8"
+	port_prefix_gossiper = "9"
+)
+
+func Port_Postfix(key int) string {
+	if key < 10 {
+		return "00" + fmt.Sprint(key)
+	} else if key < 100 {
+		return "0" + fmt.Sprint(key)
+	} else if key < 1000 {
+		return fmt.Sprint(key)
+	}
+	// Handling case for key >= 1000, if needed
+	return ""
+}
+
 func GenerateCryptoconfig_map(Total int, Threshold int, entitytype string) map[string]crypto.StoredCryptoConfig {
-	prefix := "localhost:000"
+	// Assuming these prefixes are defined elsewhere in your code as constants
+	var prefix string
 	switch entitytype {
 	case "CA":
-		prefix = "localhost:910"
+		prefix = prefix_CA
 	case "Logger":
-		prefix = "localhost:900"
+		prefix = prefix_logger
 	case "Monitor":
-		prefix = "localhost:818"
+		prefix = prefix_monitor
 	case "Gossiper":
-		prefix = "localhost:808"
+		prefix = prefix_gossiper
+	default:
+		prefix = "localhost:000" // Default prefix if none of the above cases match
 	}
-	var cryptoConfigs map[string]crypto.StoredCryptoConfig
-	cryptoConfigs = make(map[string]crypto.StoredCryptoConfig)
+	cryptoConfigs := make(map[string]crypto.StoredCryptoConfig)
 	for i := 0; i < Total; i++ {
+		postfix := Port_Postfix(i)
 		newcryptoConfig := crypto.StoredCryptoConfig{
-			SelfID:          crypto.CTngID(prefix + fmt.Sprint(i)),
+			SelfID:          crypto.CTngID(prefix + postfix),
 			Threshold:       Threshold,
 			N:               Total,
 			HashScheme:      4,
 			SignScheme:      "rsa",
 			ThresholdScheme: "bls",
 		}
-		cryptoConfigs[prefix+fmt.Sprint(i)] = newcryptoConfig
+		cryptoConfigs[prefix+postfix] = newcryptoConfig
 	}
 	return cryptoConfigs
 }
@@ -47,14 +73,14 @@ func Generate_all_list(num_MG int, num_CA int, num_logger int) ([]string, []stri
 	C_list := make([]string, num_CA)
 	L_list := make([]string, num_logger)
 	for i := 0; i < num_MG; i++ {
-		G_list[i] = "localhost:808" + fmt.Sprint(i)
-		M_list[i] = "localhost:818" + fmt.Sprint(i)
+		G_list[i] = prefix_gossiper + Port_Postfix(i)
+		M_list[i] = prefix_monitor + Port_Postfix(i)
 	}
 	for i := 0; i < num_CA; i++ {
-		C_list[i] = "localhost:910" + fmt.Sprint(i)
+		C_list[i] = prefix_CA + Port_Postfix(i)
 	}
 	for i := 0; i < num_logger; i++ {
-		L_list[i] = "localhost:900" + fmt.Sprint(i)
+		L_list[i] = prefix_logger + Port_Postfix(i)
 	}
 	return G_list, M_list, C_list, L_list
 }
@@ -65,9 +91,9 @@ func GenerateCA_private_config_map(G_list []string, M_list []string, L_list []st
 		// generate CA config
 		ca_private_config := CA.GenerateCA_private_config_template()
 		// Signer
-		ca_private_config.Signer = "localhost:910" + fmt.Sprint(i)
+		ca_private_config.Signer = prefix_CA + Port_Postfix(i)
 		// Port
-		ca_private_config.Port = "910" + fmt.Sprint(i)
+		ca_private_config.Port = port_prefix_CA + Port_Postfix(i)
 		// Cert_per_period
 		ca_private_config.Cert_per_period = num_cert
 		// Gossiperlist
@@ -75,7 +101,7 @@ func GenerateCA_private_config_map(G_list []string, M_list []string, L_list []st
 		// Monitorlist
 		ca_private_config.Monitorlist = M_list
 		// Loggerlist
-		ca_private_config.Loggerlist = L_list
+		ca_private_config.Loggerlist = append(ca_private_config.Loggerlist, L_list[i%len(L_list)])
 		// append to caConfigs
 		ca_private_map[ca_private_config.Signer] = *ca_private_config
 	}
@@ -88,9 +114,9 @@ func GenerateLogger_private_config_map(G_list []string, M_list []string, C_list 
 		// generate logger config
 		logger_private_config := Logger.GenerateLogger_private_config_template()
 		// Signer
-		logger_private_config.Signer = "localhost:900" + fmt.Sprint(i)
+		logger_private_config.Signer = prefix_logger + Port_Postfix(i)
 		// Port
-		logger_private_config.Port = "900" + fmt.Sprint(i)
+		logger_private_config.Port = port_prefix_logger + Port_Postfix(i)
 		// Gossiperlist
 		logger_private_config.Gossiperlist = G_list
 		// Monitorlist
@@ -154,8 +180,8 @@ func GenerateMonitor_private_config_map(G_list []string, M_list []string, C_list
 			Logger_URLs:           L_list,
 			Signer:                M_list[i],
 			Gossiper_URL:          G_list[i],
-			Inbound_gossiper_port: "808" + fmt.Sprint(i),
-			Port:                  "818" + fmt.Sprint(i),
+			Inbound_gossiper_port: port_prefix_gossiper + Port_Postfix(i),
+			Port:                  port_prefix_monitor + Port_Postfix(i),
 		}
 		// append to monitorConfigs
 		Monitor_private_map[monitor_private_config.Signer] = *monitor_private_config
@@ -188,7 +214,7 @@ func GenerateGossiper_private_config_map(G_list []string, M_list []string, C_lis
 			// Crypto_config_location: filepath,
 			Connected_Gossipers: connected_gossiper,
 			Owner_URL:           M_list[i],
-			Port:                "808" + fmt.Sprint(i),
+			Port:                port_prefix_gossiper + Port_Postfix(i),
 		}
 		// append to gossiperConfigs
 		Gossiper_private_map[G_list[i]] = *gossiper_private_config

@@ -1,0 +1,15 @@
+{
+  "All_CA_URLs": [
+   "localhost:6000",
+   "localhost:6001"
+  ],
+  "All_Logger_URLs": [
+   "localhost:7000",
+   "localhost:7001"
+  ],
+  "MMD": 60,
+  "MRD": 60,
+  "Http_vers": [
+   "1.1"
+  ]
+ }

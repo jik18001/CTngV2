@@ -1,0 +1,20 @@
+{
+  "Signer": "localhost:7000",
+  "Port": "7000",
+  "CAlist": [
+   "localhost:6000",
+   "localhost:6001"
+  ],
+  "Monitorlist": [
+   "localhost:8000",
+   "localhost:8001",
+   "localhost:8002",
+   "localhost:8003"
+  ],
+  "Gossiperlist": [
+   "localhost:9000",
+   "localhost:9001",
+   "localhost:9002",
+   "localhost:9003"
+  ]
+ }

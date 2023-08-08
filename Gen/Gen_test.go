@@ -41,7 +41,7 @@ var RSAPrivateMap map[string]*rsa.PrivateKey
 var BLSPublicMap map[string][]byte
 var BLSPrivateMap map[string][]byte
 
-func Test_init(t *testing.T) {
+func test_init(t *testing.T) {
 	num_gossiper = 4
 	num_logger = 2
 	num_ca = 2
@@ -65,13 +65,13 @@ func Test_init(t *testing.T) {
 	BLSPrivateMap = make(map[string][]byte)
 }
 
-func Test_key_gen(t *testing.T) {
+func test_key_gen(t *testing.T) {
 	// Generate RSA key pair
 	RSAPublicMap, RSAPrivateMap = RSA_gen_all(G_list, M_list, C_list, L_list)
 	// Generate BLS key pair
 	BLSPublicMap, BLSPrivateMap = BLS_gen_all(G_list)
 }
-func Test_gen_CA_Logger(t *testing.T) {
+func test_gen_CA_Logger(t *testing.T) {
 	// Generate CA public config map
 	ca_public_config = GenerateCA_public_config(C_list, L_list, MMD, MMD, []string{"1.1"})
 	// Generate CA private config map
@@ -122,7 +122,7 @@ func Test_gen_CA_Logger(t *testing.T) {
 	}
 }
 
-func Test_gen_Monitor_Gossiper(t *testing.T) {
+func test_gen_Monitor_Gossiper(t *testing.T) {
 	// Generate Monitor public config map
 	monitor_public_config := GenerateMonitor_public_config(G_list, M_list, C_list, L_list, MMD, MMD, 5, []string{"1.1"})
 	// Generate Monitor private config map
@@ -175,4 +175,8 @@ func Test_gen_Monitor_Gossiper(t *testing.T) {
 		crypto_config.ThresholdSecretKey = BLSPrivateMap[G_list[i]]
 		write_all_configs_to_file(gossiper_public_config, gossiper_private_config, crypto_config, filepath, "Gossiper")
 	}
+}
+
+func TestGenall(t *testing.T) {
+	Generateall(4, 2, 2, 2, 2, 60, 60, "")
 }

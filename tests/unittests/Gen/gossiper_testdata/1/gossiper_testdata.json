@@ -1,0 +1,62 @@
+{
+  "16": {
+    "period": 16,
+    "converge_time": "06.933",
+    "num_sth_init": 2,
+    "num_rev_init": 2,
+    "num_acc_init": 0,
+    "num_con_init": 0,
+    "num_sth_frag": 4,
+    "num_rev_frag": 4,
+    "num_acc_frag": 0,
+    "num_sth_full": 2,
+    "num_rev_full": 2,
+    "num_acc_full": 0,
+    "num_blacklist_perm": 0
+  },
+  "17": {
+    "period": 17,
+    "converge_time": "06.953",
+    "num_sth_init": 2,
+    "num_rev_init": 2,
+    "num_acc_init": 0,
+    "num_con_init": 0,
+    "num_sth_frag": 4,
+    "num_rev_frag": 4,
+    "num_acc_frag": 0,
+    "num_sth_full": 2,
+    "num_rev_full": 2,
+    "num_acc_full": 0,
+    "num_blacklist_perm": 0
+  },
+  "18": {
+    "period": 18,
+    "converge_time": "06.985",
+    "num_sth_init": 2,
+    "num_rev_init": 2,
+    "num_acc_init": 0,
+    "num_con_init": 0,
+    "num_sth_frag": 4,
+    "num_rev_frag": 4,
+    "num_acc_frag": 0,
+    "num_sth_full": 2,
+    "num_rev_full": 2,
+    "num_acc_full": 0,
+    "num_blacklist_perm": 0
+  },
+  "19": {
+    "period": 19,
+    "converge_time": "06.990",
+    "num_sth_init": 2,
+    "num_rev_init": 2,
+    "num_acc_init": 0,
+    "num_con_init": 0,
+    "num_sth_frag": 4,
+    "num_rev_frag": 4,
+    "num_acc_frag": 0,
+    "num_sth_full": 2,
+    "num_rev_full": 2,
+    "num_acc_full": 0,
+    "num_blacklist_perm": 0
+  }
+}

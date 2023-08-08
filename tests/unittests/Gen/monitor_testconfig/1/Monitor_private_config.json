@@ -1,0 +1,14 @@
+{
+  "CA_URLs": [
+   "localhost:6000",
+   "localhost:6001"
+  ],
+  "Logger_URLs": [
+   "localhost:7000",
+   "localhost:7001"
+  ],
+  "Signer": "localhost:8000",
+  "Gossiper_URL": "localhost:9000",
+  "Inbound_gossiper_port": "9000",
+  "Port": "8000"
+ }

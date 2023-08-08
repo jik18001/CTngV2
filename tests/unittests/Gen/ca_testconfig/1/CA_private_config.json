@@ -1,0 +1,20 @@
+{
+  "Signer": "localhost:6000",
+  "Port": "6000",
+  "Loggerlist": [
+   "localhost:7000"
+  ],
+  "Monitorlist": [
+   "localhost:8000",
+   "localhost:8001",
+   "localhost:8002",
+   "localhost:8003"
+  ],
+  "Gossiperlist": [
+   "localhost:9000",
+   "localhost:9001",
+   "localhost:9002",
+   "localhost:9003"
+  ],
+  "Cert_per_period": 2
+ }
