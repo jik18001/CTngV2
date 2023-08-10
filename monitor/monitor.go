@@ -318,15 +318,25 @@ func IsAuthority(c *MonitorContext, authURL string) bool {
 func GenerateUpdate(c *MonitorContext) ClientUpdate {
 	storageList_sth_full := []definition.Gossip_object{}
 	storageList_rev_full := []definition.Gossip_object{}
+	storageList_pom_con := []definition.Gossip_object{}
+	storageList_pom_acc := []definition.Gossip_object{}
 	for _, gossipObject := range *c.Storage_STH_FULL {
 		storageList_sth_full = append(storageList_sth_full, gossipObject)
 	}
 	for _, gossipObject := range *c.Storage_REV_FULL {
 		storageList_rev_full = append(storageList_rev_full, gossipObject)
 	}
+	for _, gossipObject := range *c.Storage_CONFLICT_POM_DELTA {
+		storageList_pom_con = append(storageList_pom_con, gossipObject)
+	}
+	for _, gossipObject := range *c.Storage_ACCUSATION_POM_DELTA {
+		storageList_pom_acc = append(storageList_pom_acc, gossipObject)
+	}
 	CTupdate := ClientUpdate{
 		STHs:      storageList_sth_full,
 		REVs:      storageList_rev_full,
+		POM_CONs:  storageList_pom_con,
+		POM_ACCs:  storageList_pom_acc,
 		MonitorID: c.Monitor_crypto_config.SelfID.String(),
 		Period:    util.GetCurrentPeriod(),
 	}

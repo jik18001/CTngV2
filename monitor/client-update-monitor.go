@@ -17,6 +17,8 @@ import (
 type ClientUpdate struct {
 	STHs      []definition.Gossip_object
 	REVs      []definition.Gossip_object
+	POM_CONs  []definition.Gossip_object
+	POM_ACCs  []definition.Gossip_object
 	MonitorID string
 	//Period here means the update period, the client udpate object can contain more information than just the period
 	Period string

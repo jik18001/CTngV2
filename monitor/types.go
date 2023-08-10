@@ -19,12 +19,14 @@ type MonitorContext struct {
 	Monitor_crypto_config  *crypto.CryptoConfig
 	Storage_TEMP           *definition.Gossip_Storage
 	// Gossip objects from the gossiper will be assigned to their dedicated storage
-	Storage_CONFLICT_POM   *definition.Gossip_Storage
-	Storage_ACCUSATION_POM *definition.Gossip_Storage
-	Storage_STH_FULL       *definition.Gossip_Storage
-	Storage_REV_FULL       *definition.Gossip_Storage
-	Storage_NUM_FULL       *definition.Gossip_object
-	Storage_CRV            map[string]*bitset.BitSet
+	// we need to keep track of all poms but we only need delta pom for each update period
+	Storage_CONFLICT_POM         *definition.Gossip_Storage
+	Storage_ACCUSATION_POM       *definition.Gossip_Storage
+	Storage_CONFLICT_POM_DELTA   *definition.Gossip_Storage
+	Storage_ACCUSATION_POM_DELTA *definition.Gossip_Storage
+	Storage_STH_FULL             *definition.Gossip_Storage
+	Storage_REV_FULL             *definition.Gossip_Storage
+	Storage_CRV                  map[string]*bitset.BitSet
 	// Utilize Storage directory: A folder for the files of each MMD.
 	// Folder should be set to the current MMD "Period" String upon initialization.
 	StorageFile_CRV  string
@@ -187,10 +189,12 @@ func (c *MonitorContext) StoreObject(o definition.Gossip_object) {
 		(*c.Storage_TEMP)[o.GetID()] = o
 	case definition.CON_INIT:
 		(*c.Storage_CONFLICT_POM)[o.GetID()] = o
+		(*c.Storage_CONFLICT_POM_DELTA)[o.GetID()] = o
 		fmt.Println(util.BLUE, "CONFLICT_POM Stored", util.RESET)
 	case definition.ACC_FULL:
 		//ACCUSATION POM does not need to be stored, but this function is here for testing purposes
 		(*c.Storage_ACCUSATION_POM)[o.GetID()] = o
+		(*c.Storage_ACCUSATION_POM_DELTA)[o.GetID()] = o
 		fmt.Println(util.BLUE, "ACCUSATION_POM Stored", util.RESET)
 	case definition.STH_FULL:
 		(*c.Storage_STH_FULL)[o.GetID()] = o
@@ -235,6 +239,16 @@ func (c *MonitorContext) WipeStorage() {
 			delete(*c.Storage_REV_FULL, key)
 		}
 	}
+	for key := range *c.Storage_CONFLICT_POM_DELTA {
+		if key.Period != util.GetCurrentPeriod() {
+			delete(*c.Storage_CONFLICT_POM_DELTA, key)
+		}
+	}
+	for key := range *c.Storage_ACCUSATION_POM_DELTA {
+		if key.Period != util.GetCurrentPeriod() {
+			delete(*c.Storage_ACCUSATION_POM_DELTA, key)
+		}
+	}
 	fmt.Println(util.BLUE, "Temp storage has been wiped.", util.RESET)
 }
 
@@ -264,6 +278,10 @@ func InitializeMonitorContext(public_config_path string, private_config_path str
 	*storage_conflict_pom = make(definition.Gossip_Storage)
 	storage_accusation_pom := new(definition.Gossip_Storage)
 	*storage_accusation_pom = make(definition.Gossip_Storage)
+	storage_conflict_pom_delta := new(definition.Gossip_Storage)
+	*storage_conflict_pom_delta = make(definition.Gossip_Storage)
+	storage_accusation_pom_delta := new(definition.Gossip_Storage)
+	*storage_accusation_pom_delta = make(definition.Gossip_Storage)
 	storage_sth_init := new(definition.Gossip_Storage)
 	*storage_sth_init = make(definition.Gossip_Storage)
 	storage_rev_init := new(definition.Gossip_Storage)
@@ -273,18 +291,19 @@ func InitializeMonitorContext(public_config_path string, private_config_path str
 	storage_rev_full := new(definition.Gossip_Storage)
 	*storage_rev_full = make(definition.Gossip_Storage)
 	ctx := MonitorContext{
-		Monitor_private_config: priv,
-		Monitor_public_config:  pub,
-		Monitor_crypto_config:  crypto,
-		Storage_TEMP:           storage_temp,
-		Storage_CONFLICT_POM:   storage_conflict_pom,
-		Storage_ACCUSATION_POM: storage_accusation_pom,
-		Storage_STH_FULL:       storage_sth_full,
-		Storage_REV_FULL:       storage_rev_full,
-		Storage_NUM_FULL:       &definition.Gossip_object{},
-		Storage_CRV:            make(map[string]*bitset.BitSet),
-		StorageID:              storageID,
-		Mode:                   0,
+		Monitor_private_config:       priv,
+		Monitor_public_config:        pub,
+		Monitor_crypto_config:        crypto,
+		Storage_TEMP:                 storage_temp,
+		Storage_CONFLICT_POM:         storage_conflict_pom,
+		Storage_ACCUSATION_POM:       storage_accusation_pom,
+		Storage_CONFLICT_POM_DELTA:   storage_conflict_pom_delta,
+		Storage_ACCUSATION_POM_DELTA: storage_accusation_pom_delta,
+		Storage_STH_FULL:             storage_sth_full,
+		Storage_REV_FULL:             storage_rev_full,
+		Storage_CRV:                  make(map[string]*bitset.BitSet),
+		StorageID:                    storageID,
+		Mode:                         0,
 	}
 	return &ctx
 }
