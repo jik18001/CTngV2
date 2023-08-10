@@ -3,6 +3,7 @@ package CA
 import (
 	"CTngV2/crypto"
 	"CTngV2/definition"
+	"CTngV2/util"
 	"encoding/json"
 
 	"github.com/bits-and-blooms/bitset"
@@ -84,10 +85,12 @@ func Generate_Revocation(c *CAContext, Period string, REV_type int) definition.G
 	hash_revocation, _ := crypto.GenerateSHA256([]byte(Period + string(hash) + string(hash_delta)))
 	// sign hash_revocation
 	signature, _ := crypto.RSASign(hash_revocation, &c.CA_crypto_config.SignSecretKey, c.CA_crypto_config.SelfID)
+	// compress Delta CRV
+	compress_delta, _ := util.CompressData(hashmsgdelta)
 	// create revocation object
 	revocation := Revocation{
 		Period:    Period,
-		Delta_CRV: hashmsgdelta,
+		Delta_CRV: compress_delta,
 		SRH:       signature.String(),
 	}
 	// create gossip object

@@ -1,10 +1,13 @@
 package util
 
 import (
+	"bytes"
+	"compress/gzip"
 	"crypto"
 	"crypto/x509"
 	"encoding/binary"
 	"encoding/pem"
+	"io/ioutil"
 	"math"
 	"math/rand"
 	"net/http"
@@ -131,4 +134,27 @@ func GetCurrentTimestamp() string {
 
 func GetRandomLatency(min int, max int) int {
 	return min + rand.Intn(max-min)
+}
+
+func CompressData(data []byte) ([]byte, error) {
+	var compressed bytes.Buffer
+	gzipWriter := gzip.NewWriter(&compressed)
+	_, err := gzipWriter.Write(data)
+	if err != nil {
+		return nil, err
+	}
+	gzipWriter.Close()
+	return compressed.Bytes(), nil
+}
+
+func DecompressData(compressedData []byte) ([]byte, error) {
+	gzipReader, err := gzip.NewReader(bytes.NewReader(compressedData))
+	if err != nil {
+		return nil, err
+	}
+	decompressedData, err := ioutil.ReadAll(gzipReader)
+	if err != nil {
+		return nil, err
+	}
+	return decompressedData, nil
 }

@@ -3,6 +3,7 @@ package client
 import (
 	"CTngV2/CA"
 	"CTngV2/definition"
+	"CTngV2/util"
 	"encoding/json"
 	"fmt"
 
@@ -17,7 +18,9 @@ func Get_SRH_and_DCRV(rev definition.Gossip_object) (string, bitset.BitSet) {
 	}
 	newSRH := revocation.SRH
 	var newDCRV bitset.BitSet
-	err = newDCRV.UnmarshalBinary(revocation.Delta_CRV)
+	// decompress Delta_CRV
+	decompressed_DCRV, _ := util.DecompressData(revocation.Delta_CRV)
+	err = newDCRV.UnmarshalBinary(decompressed_DCRV)
 	if err != nil {
 		fmt.Println(err)
 	}

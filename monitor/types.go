@@ -297,7 +297,9 @@ func Get_SRH_and_DCRV(rev definition.Gossip_object) (string, bitset.BitSet) {
 	}
 	newSRH := revocation.SRH
 	var newDCRV bitset.BitSet
-	err = newDCRV.UnmarshalBinary(revocation.Delta_CRV)
+	// decompress DCRV
+	decompressed_DCRV, err := util.DecompressData(revocation.Delta_CRV)
+	err = newDCRV.UnmarshalBinary(decompressed_DCRV)
 	if err != nil {
 		fmt.Println(err)
 	}
