@@ -210,7 +210,7 @@ func (c *MonitorContext) StoreObject(o definition.Gossip_object) {
 		if _, ok := c.Storage_CRV[key]; !ok {
 			c.Storage_CRV[key] = &DCRV
 		} else {
-			c.Storage_CRV[key].SymmetricDifference(&DCRV)
+			c.Storage_CRV[key].Union(&DCRV)
 		}
 		fmt.Println(util.BLUE, "REV_FULL Stored", util.RESET)
 	default:

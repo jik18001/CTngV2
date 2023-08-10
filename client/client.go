@@ -148,7 +148,7 @@ func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate, verify bool,
 		if _, ok := ctx.CRV_database[key]; !ok {
 			ctx.CRV_database[key] = &DCRV
 		} else {
-			ctx.CRV_database[key].SymmetricDifference(&DCRV)
+			ctx.CRV_database[key].Union(&DCRV)
 		}
 	}
 	ctx.CRV_DB_RWLock.Unlock()
