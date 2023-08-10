@@ -8,6 +8,7 @@ import (
 	"CTngV2/util"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -162,7 +163,8 @@ func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate, verify bool,
 			}
 		}
 		var STH_def definition.STH
-		err := json.Unmarshal([]byte(sth.Payload[1]), &STH_def)
+		payload1, _ := hex.DecodeString(sth.Payload[1])
+		err := json.Unmarshal(payload1, &STH_def)
 		if err != nil {
 			fmt.Println("sth unmarshal failed")
 			return false
@@ -175,6 +177,32 @@ func (ctx *ClientContext) HandleUpdate(update monitor.ClientUpdate, verify bool,
 		ctx.STH_database[key] = newrecord
 	}
 	ctx.STH_DB_RWLock.Unlock()
+	ctx.POM_DB_RWLock.Lock()
+	for _, pom := range update.POM_ACCs {
+		if verify {
+			err := pom.Verify(ctx.Crypto)
+			if err != nil {
+				fmt.Println("pom verification failed")
+				return false
+			}
+		}
+		//Update POM
+		key := pom.Payload[0]
+		ctx.POM_database[key] = pom
+	}
+	for _, pom := range update.POM_CONs {
+		if verify {
+			err := pom.Verify(ctx.Crypto)
+			if err != nil {
+				fmt.Println("pom verification failed")
+				return false
+			}
+		}
+		//Update POM
+		key := pom.Payload[0]
+		ctx.POM_database[key] = pom
+	}
+	ctx.POM_DB_RWLock.Unlock()
 	return true
 }
 
@@ -187,32 +215,40 @@ func (ctx *ClientContext) VerifyCTngextension(cert *x509.Certificate) bool {
 	faulty_logger = 0
 	Precert := util.ParseTBSCertificate(cert)
 	for _, loggerinfo := range CTngext.LoggerInformation {
-		err := loggerinfo.STH.Verify(ctx.Crypto)
-		if err != nil {
-			fmt.Println("Cert logger STH verification failed")
+		// if logger is blacklisted already
+		if _, ok := ctx.POM_database[loggerinfo.STH.Signer]; ok {
+			fmt.Println("Logger is blacklisted")
 			faulty_logger++
 		} else {
-			var treeinfo definition.STH
-			err := json.Unmarshal([]byte(loggerinfo.STH.Payload[1]), &treeinfo)
+			err := loggerinfo.STH.Verify(ctx.Crypto)
 			if err != nil {
-				fmt.Println("sth unmarshal failed")
+				fmt.Println("Cert logger STH verification failed")
 				faulty_logger++
 			} else {
-				roothash := ctx.STH_database[loggerinfo.STH.Payload[0]+"@"+loggerinfo.STH.Period]
-				if roothash != treeinfo.RootHash {
-					fmt.Println("STH from cert logger does not match with the one in the database")
-					fmt.Println("STH from cert logger : ", treeinfo.RootHash)
-					fmt.Println("STH from database : ", roothash)
+				var treeinfo definition.STH
+				decoded, _ := hex.DecodeString(loggerinfo.STH.Payload[1])
+				err := json.Unmarshal(decoded, &treeinfo)
+				if err != nil {
+					fmt.Println("sth unmarshal failed")
 					faulty_logger++
 				} else {
-					//fmt.Println("Loggerinfo.POI: ", loggerinfo.POI)
-					pass, err := crypto.VerifyPOI([]byte(roothash), loggerinfo.POI.Poi, *Precert)
-					if !pass || err != nil {
-						fmt.Println("Cert logger POI verification failed")
+					roothash := ctx.STH_database[loggerinfo.STH.Payload[0]+"@"+loggerinfo.STH.Period]
+					if roothash != treeinfo.RootHash {
+						fmt.Println("STH from cert logger does not match with the one in the database")
+						fmt.Println("STH from cert logger : ", treeinfo.RootHash)
+						fmt.Println("STH from database : ", roothash)
 						faulty_logger++
+					} else {
+						//fmt.Println("Loggerinfo.POI: ", loggerinfo.POI)
+						roothashbyte, _ := hex.DecodeString(roothash)
+						pass, err := crypto.VerifyPOI(roothashbyte, loggerinfo.POI.Poi, *Precert)
+						if !pass || err != nil {
+							fmt.Println("Cert logger POI verification failed")
+							faulty_logger++
+						}
 					}
-				}
 
+				}
 			}
 		}
 	}

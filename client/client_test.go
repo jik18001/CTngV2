@@ -2,7 +2,6 @@ package client
 
 import (
 	"CTngV2/monitor"
-	//"CTngV2/definition"
 	"CTngV2/util"
 	"crypto/x509"
 	"encoding/json"
@@ -92,7 +91,7 @@ func TestInit(t *testing.T) {
 	//fmt.Println(ctx.Crypto.ThresholdPublicMap)
 }
 
-func TestHandleUpdate(t *testing.T) {
+func testHandleUpdate(t *testing.T) {
 	ctx := &ClientContext{
 		Status:          "NEW",
 		Config_filepath: "client/Client_config.json",
@@ -100,14 +99,55 @@ func TestHandleUpdate(t *testing.T) {
 		Config:          &ClientConfig{},
 	}
 	ctx.InitializeClientContext()
-	update_1 := ctx.LoadUpdate("monitor_testdata/1/Period_19/ClientUpdate.json")
-	update_2 := ctx.LoadUpdate("monitor_testdata/1/Period_20/ClientUpdate.json")
-	update_3 := ctx.LoadUpdate("monitor_testdata/1/Period_21/ClientUpdate.json")
+	update_1 := ctx.LoadUpdate("monitor_testdata/1/Period_55/ClientUpdate.json")
+	update_2 := ctx.LoadUpdate("monitor_testdata/1/Period_56/ClientUpdate.json")
+	update_3 := ctx.LoadUpdate("monitor_testdata/1/Period_57/ClientUpdate.json")
 	ctx.HandleUpdate(update_1, true, true)
-	ctx.HandleUpdate(update_2, true, false)
-	ctx.HandleUpdate(update_3, false, false)
+	ctx.HandleUpdate(update_2, true, true)
+	ctx.HandleUpdate(update_3, true, true)
 	fmt.Println("Presenting STH database:")
 	fmt.Println(ctx.STH_database)
 	fmt.Println("Presenting CRV database:")
 	fmt.Println(ctx.CRV_database)
+	fmt.Println("Presenting PoM database:")
+	//only print key
+	for key, _ := range ctx.POM_database {
+		fmt.Println(key)
+	}
+}
+
+func TestCert(t *testing.T) {
+	ctx := &ClientContext{
+		Status:          "NEW",
+		Config_filepath: "client/Client_config.json",
+		Crypto_filepath: "client/Client_crypto_config.json",
+		Config:          &ClientConfig{},
+	}
+	ctx.InitializeClientContext()
+	update_1 := ctx.LoadUpdate("monitor_testdata/1/Period_55/ClientUpdate.json")
+	update_2 := ctx.LoadUpdate("monitor_testdata/1/Period_56/ClientUpdate.json")
+	//update_3 := ctx.LoadUpdate("monitor_testdata/1/Period_57/ClientUpdate.json")
+	ctx.HandleUpdate(update_1, true, true)
+	ctx.HandleUpdate(update_2, true, true)
+	//ctx.HandleUpdate(update_3, true, true)
+	fmt.Println("Presenting STH database:")
+	fmt.Println(ctx.STH_database)
+	fmt.Println("Presenting CRV database:")
+	fmt.Println(ctx.CRV_database)
+	fmt.Println("Presenting PoM database:")
+	//only print key
+	for key, _ := range ctx.POM_database {
+		fmt.Println(key)
+	}
+	// Load the certificate
+	certbyte, err := util.ReadCertificateFromDisk("badcertafter2.crt")
+	if err != nil {
+		t.Error(err)
+	}
+	cert, err := x509.ParseCertificate(certbyte)
+	if err != nil {
+		t.Error(err)
+	}
+	ctx.VerifyCTngextension(cert)
+
 }

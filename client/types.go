@@ -2,6 +2,7 @@ package client
 
 import (
 	"CTngV2/crypto"
+	"CTngV2/definition"
 	"CTngV2/monitor"
 	"CTngV2/util"
 	"encoding/json"
@@ -20,6 +21,7 @@ type ClientConfig struct {
 	MRD                  int
 	STH_Storage_filepath string
 	CRV_Storage_filepath string
+	PoM_Store_filepath   string
 }
 
 type ClientContext struct {
@@ -29,8 +31,10 @@ type ClientContext struct {
 	// the databases are shared resources and should be protected with mutex
 	STH_database  map[string]string         // key = entity_ID + @ + Period, content = RootHash
 	CRV_database  map[string]*bitset.BitSet // key = entity_ID, content = CRV
+	POM_database  map[string]definition.Gossip_object
 	STH_DB_RWLock *sync.RWMutex
 	CRV_DB_RWLock *sync.RWMutex
+	POM_DB_RWLock *sync.RWMutex
 	// Don't need lock for monitor integerity DB because it is only checked once per period
 	Config_filepath string
 	Crypto_filepath string
@@ -47,6 +51,10 @@ func SaveCRVDatabase(ctx *ClientContext) {
 		crvstorage[key], _ = value.MarshalBinary()
 	}
 	util.WriteData(ctx.Config.CRV_Storage_filepath, crvstorage)
+}
+
+func SavePomDatabase(ctx *ClientContext) {
+	util.WriteData(ctx.Config.PoM_Store_filepath, ctx.POM_database)
 }
 
 func LoadSTHDatabase(ctx *ClientContext) {
@@ -79,6 +87,17 @@ func LoadCRVDatabase(ctx *ClientContext) {
 	}
 }
 
+func LoadPoMdatabase(ctx *ClientContext) {
+	databyte, err := util.ReadByte(ctx.Config.PoM_Store_filepath)
+	if err != nil {
+		ctx.POM_database = make(map[string]definition.Gossip_object)
+		return
+	}
+	json.Unmarshal(databyte, &ctx.POM_database)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
 func (ctx *ClientContext) LoadUpdate(filepath string) monitor.ClientUpdate {
 	update_json, err := util.ReadByte(filepath)
 	if err != nil {
@@ -99,9 +118,11 @@ func (ctx *ClientContext) InitializeClientContext() {
 	// initialize the Locks for the databases
 	ctx.STH_DB_RWLock = &sync.RWMutex{}
 	ctx.CRV_DB_RWLock = &sync.RWMutex{}
+	ctx.POM_DB_RWLock = &sync.RWMutex{}
 	// initialize the databases
 	ctx.STH_database = make(map[string]string)
 	ctx.CRV_database = make(map[string]*bitset.BitSet)
+	ctx.POM_database = make(map[string]definition.Gossip_object)
 	// load the databases
 	if err != nil {
 		log.Fatal(err)
