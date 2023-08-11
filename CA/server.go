@@ -282,6 +282,8 @@ func PeriodicTask(ctx *CAContext) {
 			//ctngexts = GetCTngExtensions(&certlist[i])
 			//fmt.Println("CTng Extension for Cert", i, "is", ctngexts)
 		}
+		//revoke a certificate
+		ctx.CRV.Revoke(ctx.OnlineDuration)
 		//fmt.Println(certlist)
 		// get current period
 		period := GetCurrentPeriod()
@@ -299,6 +301,8 @@ func PeriodicTask(ctx *CAContext) {
 		period = strconv.Itoa(periodnum)
 		rev := Generate_Revocation(ctx, period, 0)
 		fake_rev := Generate_Revocation(ctx, period, 1)
+		// update CRV
+		ctx.CRV.CRV_pre_update = ctx.CRV.CRV_current
 		ctx.REV_storage[period] = rev
 		ctx.REV_storage_fake[period] = fake_rev
 		fmt.Println("Fake REV = Real REV? ", reflect.DeepEqual(ctx.REV_storage[period].Payload, ctx.REV_storage_fake[period].Payload))

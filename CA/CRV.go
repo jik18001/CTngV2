@@ -12,7 +12,7 @@ import (
 type CRV struct {
 	CRV_pre_update *bitset.BitSet
 	CRV_current    *bitset.BitSet
-	CRV_cache      map[string]*bitset.BitSet
+	//CRV_cache      map[string]*bitset.BitSet
 }
 
 type Revocation struct {
@@ -25,7 +25,7 @@ func CRV_init() *CRV {
 	CRV := new(CRV)
 	CRV.CRV_pre_update = bitset.New(10000)
 	CRV.CRV_current = bitset.New(10000)
-	CRV.CRV_cache = make(map[string]*bitset.BitSet)
+	//CRV.CRV_cache = make(map[string]*bitset.BitSet)
 	return CRV
 }
 
@@ -41,6 +41,7 @@ func (crv *CRV) GetDeltaCRV() []byte {
 }
 
 // Compute delta between one of the cached CRV and CRV_current
+/*
 func (crv *CRV) GetDeltaCRVCache(LastUpdatePeriod string) []byte {
 	// compute delta between CRV_pre_update and CRV_current
 	CRV_delta := crv.CRV_current.Union(crv.CRV_cache[LastUpdatePeriod])
@@ -49,7 +50,7 @@ func (crv *CRV) GetDeltaCRVCache(LastUpdatePeriod string) []byte {
 		panic(err)
 	}
 	return bytes
-}
+}*/
 
 // revoke by revocation ID
 func (crv *CRV) Revoke(index int) {
