@@ -25,7 +25,7 @@ func Verify_CON(g Gossip_object, c *crypto.CryptoConfig) error {
 	if sigerr1 == nil && sigerr2 == nil {
 		err1 := c.Verify([]byte(g.Payload[1]), rsaSig1)
 		err2 := c.Verify([]byte(g.Payload[2]), rsaSig2)
-		fmt.Print(util.YELLOW, err1, err2, util.RESET)
+		//fmt.Print(util.YELLOW, err1, err2, util.RESET)
 		if err1 == nil && err2 == nil {
 			return nil
 		} else {
