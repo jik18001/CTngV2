@@ -56,7 +56,9 @@ func handleCARequests(c *CAContext) {
 
 // receive get request from monitor
 func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
-	time.Sleep(time.Duration(rand.Intn(c.Maxlatency)) * time.Millisecond)
+	if c.Maxlatency > 0 {
+		time.Sleep(time.Duration(rand.Intn(c.Maxlatency)) * time.Millisecond)
+	}
 	c.Request_Count_lock.Lock()
 	defer c.Request_Count_lock.Unlock()
 	Period := util.GetCurrentPeriod()

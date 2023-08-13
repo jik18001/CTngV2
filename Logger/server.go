@@ -44,7 +44,9 @@ func handleLoggerRequests(ctx *LoggerContext) {
 }
 
 func requestSTH(c *LoggerContext, w http.ResponseWriter, r *http.Request) {
-	time.Sleep(time.Duration(rand.Intn(c.Maxlatency)) * time.Millisecond)
+	if c.Maxlatency > 0 {
+		time.Sleep(time.Duration(rand.Intn(c.Maxlatency)) * time.Millisecond)
+	}
 	// get current period
 	Period := util.GetCurrentPeriod()
 	c.Request_Count_lock.Lock()

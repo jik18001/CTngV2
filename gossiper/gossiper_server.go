@@ -351,7 +351,9 @@ func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_obje
 	}
 	for _, url := range c.Gossiper_private_config.Connected_Gossipers {
 		go func(url, dstendpoint string) {
-			time.Sleep(time.Duration(util.GetRandomLatency(c.Min_latency, c.Max_latency)) * time.Millisecond) // Delay before sending
+			if c.Max_latency > 0 {
+				time.Sleep(time.Duration(util.GetRandomLatency(c.Min_latency, c.Max_latency)) * time.Millisecond) // Delay before sending
+			}
 
 			resp, err := http.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
 			if err != nil {
