@@ -7,7 +7,7 @@ import (
 	"crypto/x509"
 	"encoding/binary"
 	"encoding/pem"
-	"io/ioutil"
+	"io"
 	"math"
 	"math/rand"
 	"net/http"
@@ -152,7 +152,7 @@ func DecompressData(compressedData []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	decompressedData, err := ioutil.ReadAll(gzipReader)
+	decompressedData, err := io.ReadAll(gzipReader)
 	if err != nil {
 		return nil, err
 	}

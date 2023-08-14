@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -25,7 +25,7 @@ func ReadByte(filename string) ([]byte, error) {
 	defer jsonFile.Close()
 
 	// read our opened xmlFile as a byte array.
-	byteValue, err := ioutil.ReadAll(jsonFile)
+	byteValue, err := io.ReadAll(jsonFile)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func WriteData(filename string, data interface{}) error {
 	if err != nil {
 		return err
 	}
-	err = ioutil.WriteFile(filename, file, 0644)
+	err = os.WriteFile(filename, file, 0644)
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func DeleteFilesAndDirectories(path string) error {
 
 func LoadConfiguration(config interface{}, file string) { //takes in the struct that it is updating and the file it is updating with
 	// Let's first read the file
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	if err != nil {
 		log.Fatal("Error when opening file: ", err)
 	}
