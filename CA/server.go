@@ -311,7 +311,7 @@ func PeriodicTask(ctx *CAContext) {
 		//fmt.Println(ctx.REV_storage_fake[period].Verify(ctx.CA_crypto_config))
 		//fmt.Println(ctx.REV_storage[period].Verify(ctx.CA_crypto_config))
 		fmt.Println("CA Finished Generating Revocation for next period")
-		ctx.SaveToStorage()
+		//ctx.SaveToStorage()
 		ctx.Request_Count_lock.Lock()
 		if ctx.Request_Count > 0 {
 			ctx.OnlineDuration = ctx.OnlineDuration + 1
