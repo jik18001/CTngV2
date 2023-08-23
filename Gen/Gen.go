@@ -9,7 +9,6 @@ import (
 	"crypto/rsa"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 )
 
@@ -230,16 +229,16 @@ func write_all_configs_to_file(public_config interface{}, private_config interfa
 	public_config_json, _ := json.MarshalIndent(public_config, " ", " ")
 	private_config_json, _ := json.MarshalIndent(private_config, " ", " ")
 	crypto_config_json, _ := json.MarshalIndent(crypto_config, " ", " ")
-	ioutil.WriteFile(public_config_path, public_config_json, 0644)
-	ioutil.WriteFile(private_config_path, private_config_json, 0644)
-	ioutil.WriteFile(crypto_config_path, crypto_config_json, 0644)
+	os.WriteFile(public_config_path, public_config_json, 0644)
+	os.WriteFile(private_config_path, private_config_json, 0644)
+	os.WriteFile(crypto_config_path, crypto_config_json, 0644)
 }
 
 func write_config_to_file(config interface{}, filepath string, entitytype string, configtype string) {
 	// write to file
 	config_path := filepath + entitytype + "_" + configtype + "_config.json"
 	config_json, _ := json.MarshalIndent(config, " ", " ")
-	ioutil.WriteFile(config_path, config_json, 0644)
+	os.WriteFile(config_path, config_json, 0644)
 }
 
 func RSA_gen(entity_list []string) (crypto.RSAPublicMap, map[string]*rsa.PrivateKey) {
