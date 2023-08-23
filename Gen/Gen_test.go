@@ -1,15 +1,16 @@
 package Gen
 
 import (
-	"CTngV2/CA"
-	"CTngV2/Logger"
-	"CTngV2/crypto"
-	"CTngV2/gossiper"
-	"CTngV2/monitor"
 	"crypto/rsa"
 	"fmt"
 	"os"
 	"testing"
+
+	"github.com/jik18001/CTngV2/CA"
+	"github.com/jik18001/CTngV2/Logger"
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/gossiper"
+	"github.com/jik18001/CTngV2/monitor"
 )
 
 var num_gossiper int

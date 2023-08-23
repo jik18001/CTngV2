@@ -1,9 +1,10 @@
 package main
 
 import (
-	"CTngV2/gossiper"
-	"CTngV2/util"
 	"fmt"
+
+	"github.com/jik18001/CTngV2/gossiper"
+	"github.com/jik18001/CTngV2/util"
 
 	"encoding/json"
 	"sort"

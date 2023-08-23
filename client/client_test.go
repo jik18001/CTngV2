@@ -1,8 +1,6 @@
 package client
 
 import (
-	"CTngV2/monitor"
-	"CTngV2/util"
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
@@ -10,6 +8,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"testing"
+
+	"github.com/jik18001/CTngV2/monitor"
+	"github.com/jik18001/CTngV2/util"
 
 	"github.com/bits-and-blooms/bitset"
 )

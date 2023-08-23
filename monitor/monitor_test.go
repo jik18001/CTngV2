@@ -1,7 +1,6 @@
 package monitor
 
 import (
-	"CTngV2/definition"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -9,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"testing"
+
+	"github.com/jik18001/CTngV2/definition"
 )
 
 type ClientMock struct{}

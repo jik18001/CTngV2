@@ -1,14 +1,15 @@
 package Logger
 
 import (
-	"CTngV2/crypto"
-	"CTngV2/definition"
-	"CTngV2/util"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/json"
 	"net/http"
 	"sync"
+
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 	//"fmt"
 )
 

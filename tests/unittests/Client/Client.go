@@ -1,7 +1,6 @@
 package main
 
 import (
-	"CTngV2/CA"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/asn1"
@@ -9,6 +8,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+
+	"github.com/jik18001/CTngV2/CA"
 )
 
 func main() {

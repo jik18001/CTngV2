@@ -1,11 +1,12 @@
 package monitor
 
 import (
-	"CTngV2/definition"
-	"CTngV2/util"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 	//"CTng/crypto"
 	//"bytes"
 	//"time"

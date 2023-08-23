@@ -1,8 +1,6 @@
 package gossiper
 
 import (
-	"CTngV2/definition"
-	"CTngV2/util"
 	"bytes"
 	"encoding/json"
 	"errors"
@@ -13,6 +11,9 @@ import (
 	"reflect"
 	"strings"
 	"time"
+
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 
 	"github.com/gorilla/mux"
 )

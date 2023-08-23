@@ -1,9 +1,6 @@
 package CA
 
 import (
-	"CTngV2/crypto"
-	"CTngV2/definition"
-	"CTngV2/util"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -15,6 +12,10 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 )
 
 type CAContext struct {

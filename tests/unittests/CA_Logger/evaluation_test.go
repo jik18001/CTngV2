@@ -1,16 +1,17 @@
 package main
 
 import (
-	"CTngV2/CA"
-	"CTngV2/crypto"
-	"CTngV2/definition"
-	"CTngV2/util"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"reflect"
 	"testing"
+
+	"github.com/jik18001/CTngV2/CA"
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 )
 
 func Test1(t *testing.T) {

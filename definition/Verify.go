@@ -1,12 +1,13 @@
 package definition
 
 import (
-	"CTngV2/crypto"
-	"CTngV2/util"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
+
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/util"
 	//"strings"
 	//"time"
 )

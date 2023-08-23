@@ -1,11 +1,12 @@
 package gossiper
 
 import (
-	"CTngV2/definition"
-	"CTngV2/util"
 	"errors"
 	"fmt"
 	"strconv"
+
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 )
 
 type GossiperInterfact interface {

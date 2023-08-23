@@ -2,10 +2,11 @@ package CA
 
 import (
 	//"CTng/crypto"
-	"CTngV2/crypto"
-	"CTngV2/definition"
-	"CTngV2/util"
 	"reflect"
+
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 
 	//"bytes"
 	"encoding/json"

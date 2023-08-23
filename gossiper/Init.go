@@ -1,11 +1,12 @@
 package gossiper
 
 import (
-	"CTngV2/crypto"
-	"CTngV2/definition"
-	"CTngV2/util"
 	"net/http"
 	"sync"
+
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 )
 
 func InitializeGossipObjectStorage() *Gossip_object_storage {

@@ -1,11 +1,12 @@
 package monitor
 
 import (
-	"CTngV2/util"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/jik18001/CTngV2/util"
 
 	"github.com/gorilla/mux"
 )

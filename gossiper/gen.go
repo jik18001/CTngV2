@@ -1,10 +1,11 @@
 package gossiper
 
 import (
-	"CTngV2/crypto"
-	"CTngV2/definition"
-	"CTngV2/util"
 	"fmt"
+
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 )
 
 func (ctx GossiperContext) Generate_Gossip_Object_FRAG(g definition.Gossip_object) definition.Gossip_object {

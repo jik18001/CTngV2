@@ -1,12 +1,13 @@
 package gossiper
 
 import (
-	"CTngV2/crypto"
-	"CTngV2/definition"
 	"math/rand"
 	"net/http"
 	"sync"
 	"time"
+
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/definition"
 )
 
 type Gossiper_public_config struct {

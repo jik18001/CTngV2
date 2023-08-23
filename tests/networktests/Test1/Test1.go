@@ -1,15 +1,16 @@
 package main
 
 import (
-	"CTngV2/CA"
-	"CTngV2/Logger"
-	"CTngV2/gossiper"
-	"CTngV2/monitor"
-	"CTngV2/util"
 	"fmt"
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/jik18001/CTngV2/CA"
+	"github.com/jik18001/CTngV2/Logger"
+	"github.com/jik18001/CTngV2/gossiper"
+	"github.com/jik18001/CTngV2/monitor"
+	"github.com/jik18001/CTngV2/util"
 )
 
 func StartCA(CID string) {

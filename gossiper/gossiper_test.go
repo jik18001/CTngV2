@@ -1,10 +1,11 @@
 package gossiper
 
 import (
-	"CTngV2/definition"
 	"fmt"
 	"testing"
 	"time"
+
+	"github.com/jik18001/CTngV2/definition"
 )
 
 // This function tests

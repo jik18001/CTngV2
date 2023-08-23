@@ -1,13 +1,14 @@
 package main
 
 import (
-	"CTngV2/gossiper"
-	"CTngV2/util"
 	"encoding/json"
 	"fmt"
 	"sort"
 	"strconv"
 	"testing"
+
+	"github.com/jik18001/CTngV2/gossiper"
+	"github.com/jik18001/CTngV2/util"
 )
 
 func TestResults(t *testing.T) {

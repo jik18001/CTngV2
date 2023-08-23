@@ -1,8 +1,6 @@
 package main
 
 import (
-	"CTngV2/CA"
-	"CTngV2/crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/tls"
@@ -15,6 +13,9 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/jik18001/CTngV2/CA"
+	"github.com/jik18001/CTngV2/crypto"
 )
 
 func main() {

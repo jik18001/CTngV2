@@ -1,8 +1,9 @@
 package networktests
 
 import (
-	"CTngV2/Gen"
 	"testing"
+
+	"github.com/jik18001/CTngV2/Gen"
 )
 
 func TestConfig(t *testing.T) {

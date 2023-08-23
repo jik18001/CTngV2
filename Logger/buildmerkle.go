@@ -1,13 +1,14 @@
 package Logger
 
 import (
-	"CTngV2/crypto"
-	"CTngV2/definition"
-	"CTngV2/util"
 	"crypto/x509"
 	"encoding/hex"
 	"encoding/json"
 	"strconv"
+
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 )
 
 func BuildMerkleTreeFromCerts(certs []x509.Certificate, ctx LoggerContext, periodNum int) (definition.Gossip_object, []byte, []crypto.POI_for_transmission) {

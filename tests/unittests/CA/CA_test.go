@@ -1,10 +1,11 @@
 package main
 
 import (
-	"CTngV2/crypto"
-	"CTngV2/util"
 	"crypto/x509"
 	"testing"
+
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/util"
 )
 
 func testCreatecerts(t *testing.T) {

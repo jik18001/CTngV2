@@ -1,10 +1,6 @@
 package Logger
 
 import (
-	"CTngV2/CA"
-	"CTngV2/crypto"
-	"CTngV2/definition"
-	"CTngV2/util"
 	"bytes"
 	"crypto/x509"
 	"encoding/json"
@@ -15,6 +11,11 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/jik18001/CTngV2/CA"
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 
 	"github.com/gorilla/mux"
 )

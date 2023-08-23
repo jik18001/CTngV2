@@ -1,7 +1,6 @@
 package CA
 
 import (
-	"CTngV2/crypto"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
@@ -12,6 +11,8 @@ import (
 	"net"
 	"strings"
 	"time"
+
+	"github.com/jik18001/CTngV2/crypto"
 	//"strconv"
 )
 

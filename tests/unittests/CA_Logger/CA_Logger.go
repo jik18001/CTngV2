@@ -1,10 +1,11 @@
 package main
 
 import (
-	"CTngV2/CA"
-	"CTngV2/Logger"
 	"fmt"
 	"os"
+
+	"github.com/jik18001/CTngV2/CA"
+	"github.com/jik18001/CTngV2/Logger"
 )
 
 func StartCA(CID string) {

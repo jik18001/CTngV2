@@ -1,15 +1,16 @@
 package CA
 
 import (
-	"CTngV2/crypto"
-	"CTngV2/definition"
-	"CTngV2/util"
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
 	"strconv"
 	"testing"
 	"time"
+
+	"github.com/jik18001/CTngV2/crypto"
+	"github.com/jik18001/CTngV2/definition"
+	"github.com/jik18001/CTngV2/util"
 
 	"github.com/bits-and-blooms/bitset"
 )
