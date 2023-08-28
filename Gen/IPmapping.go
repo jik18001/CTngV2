@@ -35,14 +35,14 @@ func Generate_IP_Json_template(num_monitor_gossiper int, num_ca int, num_logger 
 	logger_ip_map = make(map[int]string)
 	ca_ip_map = make(map[int]string)
 	for i := 0; i < num_ca; i++ {
-		ca_ip_map[i] = "127.0.0." + strconv.Itoa(i+1)
+		ca_ip_map[i] = "10.0.0." + strconv.Itoa(i+1)
 	}
 	for i := 0; i < num_logger; i++ {
-		logger_ip_map[i] = "127.0.1." + strconv.Itoa(i+1)
+		logger_ip_map[i] = "10.0.1." + strconv.Itoa(i+1)
 	}
 	for i := 0; i < num_monitor_gossiper; i++ {
-		monitor_ip_map[i] = "127.0.2." + strconv.Itoa(i+1)
-		gossiper_ip_map[i] = "127.0.3." + strconv.Itoa(i+1)
+		monitor_ip_map[i] = "10.0.2." + strconv.Itoa(i+1)
+		gossiper_ip_map[i] = "10.0.2." + strconv.Itoa(i+1)
 	}
 	var new_ip_json_template IP_Json
 	new_ip_json_template.CA_ip_map = ca_ip_map
