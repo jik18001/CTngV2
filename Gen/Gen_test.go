@@ -180,7 +180,7 @@ func test_gen_Monitor_Gossiper(t *testing.T) {
 
 func TestGenall(t *testing.T) {
 	Generateall(4, 2, 4, 4, 4, 60, 60, "")
-	newtemp := Generate_IP_Json_template(4, 4, 4)
+	newtemp := Generate_IP_Json_template(4, 4, 4, "172.30.0.", 11, "172.30.0.", 15, "172.30.0.", 19)
 	Write_IP_Json_to_files("IPLIST.json", newtemp)
 	IPLIST := Read_IP_Json_from_files("IPLIST.json")
 	Map_all(4, 4, 4, IPLIST)

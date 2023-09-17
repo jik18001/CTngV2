@@ -107,7 +107,6 @@ func QueryLoggers(c *MonitorContext) {
 				//log.Println(util.RED+"Query Logger Failed: "+err.Error(), util.RESET)
 				log.Println(util.RED+"Query Logger Failed, connection refused.", util.RESET)
 				Wait_then_accuse(c, logger, "logger")
-				return
 			} else {
 				sthBody, err2 := ioutil.ReadAll(sthResp.Body)
 				var STH definition.Gossip_object
@@ -115,13 +114,11 @@ func QueryLoggers(c *MonitorContext) {
 				if err2 != nil {
 					log.Println(util.RED+err2.Error(), util.RESET)
 					Wait_then_accuse(c, logger, "logger")
-					return
 				} else {
 					err3 := STH.Verify(c.Monitor_crypto_config)
 					if err3 != nil {
 						log.Println(util.RED+"STH signature verification failed", err3.Error(), util.RESET)
 						Wait_then_accuse(c, logger, "logger")
-						return
 					} else {
 						Process_valid_object(c, STH)
 					}
@@ -155,20 +152,17 @@ func QueryAuthorities(c *MonitorContext) {
 				if err2 != nil {
 					log.Println(util.RED+err2.Error(), util.RESET)
 					Wait_then_accuse(c, CA, "ca")
-					return
 				} else {
 					var REV definition.Gossip_object
 					err3 := json.Unmarshal(revBody, &REV)
 					if err3 != nil {
 						log.Println(util.RED+err3.Error(), util.RESET)
 						Wait_then_accuse(c, CA, "ca")
-						return
 					} else {
 						err4 := REV.Verify(c.Monitor_crypto_config)
 						if err4 != nil {
 							log.Println(util.RED+"Revocation information signature verification failed", err4.Error(), util.RESET)
 							Wait_then_accuse(c, CA, "ca")
-							return
 						} else {
 							SRH, DCRV := Get_SRH_and_DCRV(REV)
 							key := REV.Payload[0]
@@ -176,7 +170,6 @@ func QueryAuthorities(c *MonitorContext) {
 							if !pass {
 								fmt.Println("SRH verification failed")
 								Wait_then_accuse(c, CA, "ca")
-								return
 							} else {
 								fmt.Println("REV Payload: " + REV.Payload[0] + REV.Payload[1] + REV.Payload[2])
 								Process_valid_object(c, REV)

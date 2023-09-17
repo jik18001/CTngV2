@@ -24,7 +24,7 @@ type IP_Json struct {
 	CA_ip_map       map[int]string `json:"ca_ip_map"`
 }
 
-func Generate_IP_Json_template(num_monitor_gossiper int, num_ca int, num_logger int) IP_Json {
+func Generate_IP_Json_template(num_monitor_gossiper int, num_ca int, num_logger int, mg_mask string, mg_offset int, ca_mask string, ca_offset int, logger_mask string, logger_offset int) IP_Json {
 	var monitor_ip_map map[int]string
 	var gossiper_ip_map map[int]string
 	var logger_ip_map map[int]string
@@ -35,14 +35,14 @@ func Generate_IP_Json_template(num_monitor_gossiper int, num_ca int, num_logger 
 	logger_ip_map = make(map[int]string)
 	ca_ip_map = make(map[int]string)
 	for i := 0; i < num_ca; i++ {
-		ca_ip_map[i] = "10.0.0." + strconv.Itoa(i+1)
+		ca_ip_map[i] = ca_mask + strconv.Itoa(i+ca_offset)
 	}
 	for i := 0; i < num_logger; i++ {
-		logger_ip_map[i] = "10.0.1." + strconv.Itoa(i+1)
+		logger_ip_map[i] = logger_mask + strconv.Itoa(i+logger_offset)
 	}
 	for i := 0; i < num_monitor_gossiper; i++ {
-		monitor_ip_map[i] = "10.0.2." + strconv.Itoa(i+1)
-		gossiper_ip_map[i] = "10.0.2." + strconv.Itoa(i+1)
+		monitor_ip_map[i] = mg_mask + strconv.Itoa(i+mg_offset)
+		gossiper_ip_map[i] = mg_mask + strconv.Itoa(i+mg_offset)
 	}
 	var new_ip_json_template IP_Json
 	new_ip_json_template.CA_ip_map = ca_ip_map
@@ -237,8 +237,10 @@ func Map_local_to_Gossiper_IP_priv_config(priv_config_path string, ip_json_confi
 	for index, gossipers := range gossiper_priv_config.Connected_Gossipers {
 		//change localhost to actual IP
 		//take the data out and slice out the last 5 characters
+		//index should be the last 3 characters of the port number (ignore leading 0)
+		sindex, _ := strconv.Atoi(gossipers[len(gossipers)-3:])
 		semicolon_and_port := gossipers[len(gossipers)-5:]
-		new_dest := ip_json_config.Gossiper_ip_map[index] + semicolon_and_port
+		new_dest := ip_json_config.Gossiper_ip_map[sindex] + semicolon_and_port
 		gossiper_priv_config.Connected_Gossipers[index] = new_dest
 	}
 	semicolon_and_port_1 := gossiper_priv_config.Owner_URL[len(gossiper_priv_config.Owner_URL)-5:]
