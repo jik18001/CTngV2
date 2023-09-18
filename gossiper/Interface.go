@@ -421,9 +421,15 @@ func (ctx GossiperContext) IsConvergent() bool {
 	defer ctx.Gossip_object_storage.REV_FULL_LOCK.RUnlock()
 	ctx.Gossip_object_storage.STH_FULL_LOCK.RLock()
 	defer ctx.Gossip_object_storage.STH_FULL_LOCK.RUnlock()
+	ctx.Gossip_object_storage.ACC_FULL_LOCK.RLock()
+	defer ctx.Gossip_object_storage.ACC_FULL_LOCK.RUnlock()
 	count1 := len(ctx.Gossip_object_storage.REV_FULL)
 	count2 := len(ctx.Gossip_object_storage.STH_FULL)
+	count3 := len(ctx.Gossip_object_storage.ACC_FULL)
 	if count1 == ctx.Total_CA && count2 == ctx.Total_Logger {
+		return true
+	}
+	if count3 == ctx.Total_Logger+ctx.Total_CA {
 		return true
 	}
 	return false
