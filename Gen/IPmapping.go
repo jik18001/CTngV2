@@ -262,7 +262,7 @@ func Map_local_to_CA_IP_priv_config(priv_config_path string, ip_json_config IP_J
 		//change localhost to actual IP
 		//take the data out and slice out the last 5 characters
 		semicolon_and_port := logger[len(logger)-5:]
-		new_dest := ip_json_config.Logger_ip_map[index] + semicolon_and_port
+		new_dest := ip_json_config.Logger_ip_map[MID-1] + semicolon_and_port
 		ca_priv_config.Loggerlist[index] = new_dest
 	}
 	// iterate over MonitorList
