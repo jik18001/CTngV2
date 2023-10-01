@@ -2,6 +2,7 @@ package CA
 
 import (
 	"encoding/json"
+	"math/rand"
 
 	"github.com/jik18001/CTngV2/crypto"
 	"github.com/jik18001/CTngV2/definition"
@@ -9,6 +10,24 @@ import (
 
 	"github.com/bits-and-blooms/bitset"
 )
+
+const seed = 2023 // A fixed seed for reproducibility.
+
+func GenerateRandomBitPositions(totalBits int, density float64) []int {
+	numOnes := int(float64(totalBits) * density)
+	positions := make(map[int]bool)
+	var result []int
+
+	for len(positions) < numOnes {
+		position := rand.Intn(totalBits)
+		if !positions[position] {
+			positions[position] = true
+			result = append(result, position)
+		}
+	}
+
+	return result
+}
 
 type CRV struct {
 	CRV_pre_update *bitset.BitSet
@@ -24,8 +43,8 @@ type Revocation struct {
 
 func CRV_init() *CRV {
 	CRV := new(CRV)
-	CRV.CRV_pre_update = bitset.New(10000)
-	CRV.CRV_current = bitset.New(10000)
+	CRV.CRV_pre_update = bitset.New(1000000)
+	CRV.CRV_current = bitset.New(1000000)
 	//CRV.CRV_cache = make(map[string]*bitset.BitSet)
 	return CRV
 }
@@ -56,6 +75,14 @@ func (crv *CRV) GetDeltaCRVCache(LastUpdatePeriod string) []byte {
 // revoke by revocation ID
 func (crv *CRV) Revoke(index int) {
 	crv.CRV_current.Set(uint(index))
+}
+
+func (crv *CRV) MassRevoke(ratio float64) {
+	// generate random bit positions
+	positions := GenerateRandomBitPositions(1000000, ratio)
+	for _, position := range positions {
+		crv.CRV_current.Set(uint(position))
+	}
 }
 
 func Generate_Revocation(c *CAContext, Period string, REV_type int) definition.Gossip_object {

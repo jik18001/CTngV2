@@ -163,7 +163,7 @@ func receive_poi(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	}
 	target_cert := c.CurrentCertificatePool.GetCertBySubjectKeyID(string(poi.SubjectKeyId))
 	if target_cert != nil {
-		fmt.Println(poi.SubjectKeyId)
+		//fmt.Println(poi.SubjectKeyId)
 		target_cert = UpdateCTngExtension(target_cert, Logger_info)
 		c.CurrentCertificatePool.UpdateCertBySubjectKeyID(string(poi.SubjectKeyId), target_cert)
 	}
@@ -272,7 +272,7 @@ func PeriodicTask(ctx *CAContext) {
 	for i := 0; i < len(certs); i++ {
 		//store in current cert pool
 		ctx.CurrentCertificatePool.AddCert(&tbscerts[i])
-		fmt.Println(certs[i].SubjectKeyId)
+		//fmt.Println(certs[i].SubjectKeyId)
 		Send_Signed_PreCert_To_Loggers(ctx, certs[i], ctx.CA_private_config.Loggerlist)
 	}
 	fmt.Println("CA Finished Sending Pre-Certs to Loggers")
@@ -285,8 +285,10 @@ func PeriodicTask(ctx *CAContext) {
 			//ctngexts = GetCTngExtensions(&certlist[i])
 			//fmt.Println("CTng Extension for Cert", i, "is", ctngexts)
 		}
-		//revoke a certificate
-		ctx.CRV.Revoke(ctx.OnlineDuration)
+		//mass revoke for the first period
+		if ctx.OnlineDuration == 0 {
+			ctx.CRV.MassRevoke(ctx.RevocationRatio)
+		}
 		//fmt.Println(certlist)
 		// get current period
 		period := GetCurrentPeriod()
