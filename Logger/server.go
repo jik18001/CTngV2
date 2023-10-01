@@ -131,8 +131,8 @@ func receive_pre_cert(c *LoggerContext, w http.ResponseWriter, r *http.Request) 
 
 // send STH to CA
 func Send_STH_to_CA(c *LoggerContext, sth definition.Gossip_object, ca string) {
-	roohashsent, _ := definition.ExtractRootHash(sth)
-	fmt.Println("RootHash sent: ", roohashsent)
+	//roohashsent, _ := definition.ExtractRootHash(sth)
+	//fmt.Println("RootHash sent: ", roohashsent)
 	sth_json, err := json.Marshal(sth)
 	if err != nil {
 		log.Fatalf("Failed to marshal STH: %v", err)
@@ -151,7 +151,7 @@ func Send_POI_to_CA(c *LoggerContext, poi crypto.POI_for_transmission, ca string
 	if err != nil {
 		log.Fatalf("Failed to marshal POI: %v", err)
 	}
-	fmt.Println("POI sent: ", poi_json)
+	//fmt.Println("POI sent: ", poi_json)
 	resp, err := c.Client.Post(PROTOCOL+ca+"/CA/receive-poi", "application/json", bytes.NewBuffer(poi_json))
 	if err != nil {
 		fmt.Println("Failed to send POI to CA: ", err)

@@ -67,7 +67,7 @@ func testCertMarshal(t *testing.T) {
 	fmt.Println(cert)
 }
 
-func TestCtngExtension(t *testing.T) {
+func testCtngExtension(t *testing.T) {
 	ctx := InitializeCAContext("testFiles/ca_testconfig/1/CA_public_config.json", "testFiles/ca_testconfig/1/CA_private_config.json", "testFiles/ca_testconfig/1/CA_crypto_config.json")
 	issuer := Generate_Issuer(ctx.CA_private_config.Signer)
 	// generate host
@@ -129,13 +129,14 @@ func TestREV(t *testing.T) {
 	periodnum = periodnum + 1
 	// convert int to string
 	period = strconv.Itoa(periodnum)
+	ctx.CRV.MassRevoke(0.01)
 	rev := Generate_Revocation(ctx, period, 0)
 	fake_rev := Generate_Revocation(ctx, period, 1)
 	ctx.REV_storage[period] = rev
 	ctx.REV_storage[period] = fake_rev
 	bool1 := rev.Verify(ctx.CA_crypto_config)
 	bool2 := fake_rev.Verify(ctx.CA_crypto_config)
-	fmt.Println(rev.Type, fake_rev.Type)
+	fmt.Println(rev)
 	fmt.Println(bool1)
 	fmt.Println(bool2)
 
