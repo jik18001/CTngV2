@@ -287,8 +287,26 @@ func PeriodicTask(ctx *CAContext) {
 		}
 		//mass revoke for the first period
 		if ctx.OnlineDuration == 0 {
+			fmt.Println(ctx.RevocationRatio)
+			var prebinary []byte
+			var postbinary []byte
+
+			// Serialize the CRV_current before mass revocation
+			prebinary, _ = ctx.CRV.CRV_current.MarshalBinary()
+			compressed_binary, _ := util.CompressData(prebinary)
+			prelen := len(compressed_binary)
+
+			// Perform mass revocation
 			ctx.CRV.MassRevoke(ctx.RevocationRatio)
+
+			// Serialize the CRV_current after mass revocation
+			postbinary, _ = ctx.CRV.CRV_current.MarshalBinary()
+			compressed_binary2, _ := util.CompressData(postbinary)
+			postlen := len(compressed_binary2)
+
+			fmt.Println("CRV size before and after mass revocation: ", prelen, postlen)
 		}
+
 		//fmt.Println(certlist)
 		// get current period
 		period := GetCurrentPeriod()
@@ -305,6 +323,7 @@ func PeriodicTask(ctx *CAContext) {
 		}
 		period = strconv.Itoa(periodnum)
 		rev := Generate_Revocation(ctx, period, 0)
+		//fmt.Println(rev)
 		fake_rev := Generate_Revocation(ctx, period, 1)
 		// update CRV
 		ctx.CRV.CRV_pre_update = ctx.CRV.CRV_current

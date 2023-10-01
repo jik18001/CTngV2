@@ -117,7 +117,7 @@ func testGenerateKeypairs(t *testing.T) {
 
 }
 
-func TestREV(t *testing.T) {
+func testREV(t *testing.T) {
 	ctx := InitializeCAContext("testFiles/ca_testconfig/1/CA_public_config.json", "testFiles/ca_testconfig/1/CA_private_config.json", "testFiles/ca_testconfig/1/CA_crypto_config.json")
 	// get current period
 	period := GetCurrentPeriod()
@@ -142,7 +142,8 @@ func TestREV(t *testing.T) {
 
 }
 
-func testTask(t *testing.T) {
+func TestTask(t *testing.T) {
 	ctx := InitializeCAContext("testFiles/ca_testconfig/1/CA_public_config.json", "testFiles/ca_testconfig/1/CA_private_config.json", "testFiles/ca_testconfig/1/CA_crypto_config.json")
+	ctx.RevocationRatio = 0.01
 	StartCA(ctx)
 }
