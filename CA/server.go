@@ -138,7 +138,7 @@ func receive_sth(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	// Update the STH storage
 	//fmt.Println("STH passed verification")
 	c.STH_storage[gossip_sth.Signer] = gossip_sth
-	fmt.Println("STH storage: ", c.STH_storage)
+	//fmt.Println("STH storage: ", c.STH_storage)
 }
 
 // receive POI from logger
@@ -150,7 +150,7 @@ func receive_poi(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("POI received: ", poi)
+	//fmt.Println("POI received: ", poi)
 	//fmt.Println("Logger ID in this poi: ", poi.LoggerID)
 	// Get the STH of the logger
 	sth := c.STH_storage[poi.LoggerID]

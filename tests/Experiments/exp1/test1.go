@@ -21,6 +21,7 @@ func StartCA(CID string) {
 	path_3 := path_prefix + "/CA_crypto_config.json"
 	ctx_ca := CA.InitializeCAContext(path_1, path_2, path_3)
 	ctx_ca.Maxlatency = 500
+	ctx_ca.RevocationRatio = 0.01
 	CA.StartCA(ctx_ca)
 }
 
