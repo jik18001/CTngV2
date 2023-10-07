@@ -137,8 +137,8 @@ func receive_sth(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	}
 	// Update the STH storage
 	//fmt.Println("STH passed verification")
-	//c.STH_storage_lock.Lock()
-	//defer c.STH_storage_lock.Unlock()
+	c.STH_storage_lock.Lock()
+	defer c.STH_storage_lock.Unlock()
 	c.STH_storage[gossip_sth.Signer] = gossip_sth
 	//fmt.Println("STH storage: ", c.STH_storage)
 }
@@ -167,9 +167,9 @@ func receive_poi(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	if target_cert != nil {
 		//fmt.Println(poi.SubjectKeyId)
 		target_cert = UpdateCTngExtension(target_cert, Logger_info)
-		//c.Certpool_lock.Lock()
+		c.Certpool_lock.Lock()
 		c.CurrentCertificatePool.UpdateCertBySubjectKeyID(string(poi.SubjectKeyId), target_cert)
-		//c.Certpool_lock.Unlock()
+		c.Certpool_lock.Unlock()
 	}
 }
 
@@ -290,26 +290,26 @@ func PeriodicTask(ctx *CAContext) {
 			//fmt.Println("CTng Extension for Cert", i, "is", ctngexts)
 		}
 		//mass revoke for the first period
-		if ctx.OnlineDuration == 0 {
-			fmt.Println(ctx.RevocationRatio)
-			var prebinary []byte
-			var postbinary []byte
+		//if ctx.OnlineDuration == 0 {
+		fmt.Println(ctx.RevocationRatio)
+		var prebinary []byte
+		var postbinary []byte
 
-			// Serialize the CRV_current before mass revocation
-			prebinary, _ = ctx.CRV.CRV_current.MarshalBinary()
-			compressed_binary, _ := util.CompressData(prebinary)
-			prelen := len(compressed_binary)
+		// Serialize the CRV_current before mass revocation
+		prebinary, _ = ctx.CRV.CRV_current.MarshalBinary()
+		compressed_binary, _ := util.CompressData(prebinary)
+		prelen := len(compressed_binary)
 
-			// Perform mass revocation
-			ctx.CRV.MassRevoke(ctx.RevocationRatio)
+		// Perform mass revocation
+		ctx.CRV.MassRevoke(ctx.RevocationRatio)
 
-			// Serialize the CRV_current after mass revocation
-			postbinary, _ = ctx.CRV.CRV_current.MarshalBinary()
-			compressed_binary2, _ := util.CompressData(postbinary)
-			postlen := len(compressed_binary2)
+		// Serialize the CRV_current after mass revocation
+		postbinary, _ = ctx.CRV.CRV_current.MarshalBinary()
+		compressed_binary2, _ := util.CompressData(postbinary)
+		postlen := len(compressed_binary2)
 
-			fmt.Println("CRV size before and after mass revocation: ", prelen, postlen)
-		}
+		fmt.Println("CRV size before and after mass revocation: ", prelen, postlen)
+		//}
 
 		//fmt.Println(certlist)
 		// get current period
