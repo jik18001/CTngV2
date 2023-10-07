@@ -137,6 +137,8 @@ func receive_sth(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	}
 	// Update the STH storage
 	//fmt.Println("STH passed verification")
+	c.STH_storage_lock.Lock()
+	defer c.STH_storage_lock.Unlock()
 	c.STH_storage[gossip_sth.Signer] = gossip_sth
 	//fmt.Println("STH storage: ", c.STH_storage)
 }
@@ -165,7 +167,9 @@ func receive_poi(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	if target_cert != nil {
 		//fmt.Println(poi.SubjectKeyId)
 		target_cert = UpdateCTngExtension(target_cert, Logger_info)
+		c.Certpool_lock.Lock()
 		c.CurrentCertificatePool.UpdateCertBySubjectKeyID(string(poi.SubjectKeyId), target_cert)
+		c.Certpool_lock.Unlock()
 	}
 }
 

@@ -44,6 +44,8 @@ type CAContext struct {
 	Request_Count_lock     *sync.Mutex
 	Maxlatency             int
 	RevocationRatio        float64
+	STH_storage_lock       *sync.Mutex
+	Certpool_lock          *sync.Mutex
 }
 
 type CA_public_config struct {
@@ -321,6 +323,8 @@ func InitializeCAContext(public_config_path string, private_config_file_path str
 		CertCounter:            0,
 		STH_storage:            make(map[string]definition.Gossip_object),
 		Request_Count_lock:     &sync.Mutex{},
+		STH_storage_lock:       &sync.Mutex{},
+		Certpool_lock:          &sync.Mutex{},
 	}
 	// Initialize http client
 	tr := &http.Transport{}

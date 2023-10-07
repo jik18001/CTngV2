@@ -24,7 +24,7 @@ type IP_Json struct {
 	CA_ip_map       map[int]string `json:"ca_ip_map"`
 }
 
-func Generate_IP_Json_template(num_monitor_gossiper int, num_ca int, num_logger int, mg_mask string, mg_offset int, ca_mask string, ca_offset int, logger_mask string, logger_offset int) IP_Json {
+func Generate_IP_Json_template(num_ca int, num_logger int, num_monitor_gossiper int, ca_mask string, ca_offset int, logger_mask string, logger_offset int, mg_mask string, mg_offset int) IP_Json {
 	var monitor_ip_map map[int]string
 	var gossiper_ip_map map[int]string
 	var logger_ip_map map[int]string
@@ -79,6 +79,7 @@ func Write_IP_Json_to_files(fp string, new_ip_json IP_Json) {
 func Map_local_to_IP_crypto_config(crypto_config_path string, ip_json_config IP_Json, ID int, num_logger int, num_ca int, num_monitor_gossiper int) {
 	cryptoconfig, _ := crypto.ReadCryptoConfig(crypto_config_path)
 	//prefix is localhost:x, first 10 characters
+	fmt.Println("cryptoconfig.SelfID: ", cryptoconfig.SelfID.String())
 	self_prefix := cryptoconfig.SelfID.String()[0:11]
 	switch self_prefix {
 	case prefix_CA:

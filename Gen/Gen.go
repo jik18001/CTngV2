@@ -36,7 +36,7 @@ func Port_Postfix(key int) string {
 	return ""
 }
 
-func GenerateCryptoconfig_map(Total int, Threshold int, entitytype string) map[string]crypto.StoredCryptoConfig {
+func GenerateCryptoconfig_map(Total_MG int, Total_entity, Threshold int, entitytype string) map[string]crypto.StoredCryptoConfig {
 	// Assuming these prefixes are defined elsewhere in your code as constants
 	var prefix string
 	switch entitytype {
@@ -52,12 +52,12 @@ func GenerateCryptoconfig_map(Total int, Threshold int, entitytype string) map[s
 		prefix = "localhost:000" // Default prefix if none of the above cases match
 	}
 	cryptoConfigs := make(map[string]crypto.StoredCryptoConfig)
-	for i := 0; i < Total; i++ {
+	for i := 0; i < Total_entity; i++ {
 		postfix := Port_Postfix(i)
 		newcryptoConfig := crypto.StoredCryptoConfig{
 			SelfID:          crypto.CTngID(prefix + postfix),
 			Threshold:       Threshold,
-			N:               Total,
+			N:               Total_MG,
 			HashScheme:      4,
 			SignScheme:      "rsa",
 			ThresholdScheme: "bls",
@@ -102,6 +102,7 @@ func GenerateCA_private_config_map(G_list []string, M_list []string, L_list []st
 		ca_private_config.Monitorlist = M_list
 		// Loggerlist
 		ca_private_config.Loggerlist = append(ca_private_config.Loggerlist, L_list[i%len(L_list)])
+		ca_private_config.Loggerlist = append(ca_private_config.Loggerlist, L_list[len(L_list)-1-i%len(L_list)])
 		// append to caConfigs
 		ca_private_map[ca_private_config.Signer] = *ca_private_config
 	}
@@ -322,7 +323,7 @@ func Generateall(num_gossiper int, Threshold int, num_logger int, num_ca int, nu
 	// Generate CA private config map
 	ca_private_config_map = GenerateCA_private_config_map(G_list, M_list, L_list, num_ca, num_cert)
 	// Generate CA crypto config map
-	ca_crypto_config_map = GenerateCryptoconfig_map(Total, Threshold, "CA")
+	ca_crypto_config_map = GenerateCryptoconfig_map(Total, num_ca, Threshold, "CA")
 	// Create CA directory
 	os.Mkdir("ca_testconfig", 0777)
 	// Generate Logger public config map
@@ -330,7 +331,7 @@ func Generateall(num_gossiper int, Threshold int, num_logger int, num_ca int, nu
 	// Generate Logger private config map
 	logger_private_config_map = GenerateLogger_private_config_map(G_list, M_list, C_list, num_logger)
 	// Generate Logger crypto config map
-	logger_crypto_config_map = GenerateCryptoconfig_map(Total, Threshold, "Logger")
+	logger_crypto_config_map = GenerateCryptoconfig_map(Total, num_logger, Threshold, "Logger")
 	// Create Logger directory
 	os.Mkdir("logger_testconfig", 0777)
 	// write all CA public config, private config, crypto config to file
@@ -370,7 +371,7 @@ func Generateall(num_gossiper int, Threshold int, num_logger int, num_ca int, nu
 	// Generate Monitor private config map
 	monitor_private_config_map = GenerateMonitor_private_config_map(G_list, M_list, C_list, L_list, MMD, MMD, 5, []string{"1.1"}, " ")
 	// Generate Monitor crypto config map
-	monitor_crypto_config_map = GenerateCryptoconfig_map(Total, Threshold, "Monitor")
+	monitor_crypto_config_map = GenerateCryptoconfig_map(Total, Total, Threshold, "Monitor")
 	// Create Monitor directory
 	os.Mkdir("monitor_testconfig", 0777)
 	// write all Monitor public config, private config, crypto config to file
@@ -396,7 +397,7 @@ func Generateall(num_gossiper int, Threshold int, num_logger int, num_ca int, nu
 	// Generate Gossiper private config map
 	gossiper_private_config_map = GenerateGossiper_private_config_map(G_list, M_list, C_list, L_list, MMD, MMD, 5, 5, []string{"1.1"}, " ")
 	// Generate Gossiper crypto config map
-	gossiper_crypto_config_map = GenerateCryptoconfig_map(Total, Threshold, "Gossiper")
+	gossiper_crypto_config_map = GenerateCryptoconfig_map(Total, Total, Threshold, "Gossiper")
 	// Create Gossiper directory
 	os.Mkdir("gossiper_testconfig", 0777)
 	// write all Gossiper public config, private config, crypto config to file
