@@ -398,10 +398,10 @@ func (ctx *MonitorContext) VerifySRH(srh string, dCRV *bitset.BitSet, CAID strin
 	// verify the SRH
 	hashmsg1, _ := CRV_old.MarshalBinary()
 	hashmsg2, _ := dCRV.MarshalBinary()
-	hash1, _ := crypto.GenerateSHA256(hashmsg1)
-	hash2, _ := crypto.GenerateSHA256(hashmsg2)
+	hash_old, _ := crypto.GenerateSHA256(hashmsg1)
+	hash_delta, _ := crypto.GenerateSHA256(hashmsg2)
 
-	localhash, _ := crypto.GenerateSHA256([]byte(Period + string(hash1) + string(hash2)))
+	localhash, _ := crypto.GenerateSHA256([]byte(Period + string(hash_old) + string(hash_delta)))
 	// the localhash will be te message we used to verify the Signature on the SRH
 	// verify the signature
 	rsasig, err := crypto.RSASigFromString(srh)

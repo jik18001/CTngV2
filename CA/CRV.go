@@ -2,6 +2,7 @@ package CA
 
 import (
 	"encoding/json"
+	"fmt"
 	"math/rand"
 
 	"github.com/jik18001/CTngV2/crypto"
@@ -52,12 +53,13 @@ func CRV_init() *CRV {
 // Compute delta between CRV_pre_update and CRV_current
 func (crv *CRV) GetDeltaCRV() []byte {
 	// compute delta between CRV_pre_update and CRV_current
+	//fmt.Println("preupdate == current?: ", crv.CRV_pre_update == crv.CRV_current)
 	if crv.CRV_pre_update == crv.CRV_current {
 		empty := bitset.New(1000000)
 		bytes, _ := empty.MarshalBinary()
 		return bytes
 	}
-	CRV_delta := crv.CRV_current.Intersection(crv.CRV_pre_update)
+	CRV_delta := crv.CRV_current.SymmetricDifference(crv.CRV_pre_update)
 	bytes, err := CRV_delta.MarshalBinary()
 	if err != nil {
 		panic(err)
@@ -140,5 +142,6 @@ func Generate_Revocation(c *CAContext, Period string, REV_type int) definition.G
 		Crypto_Scheme: "RSA",
 		Payload:       [3]string{c.CA_private_config.Signer, "CRV", string(payload3)},
 	}
+	fmt.Println("compressed delta CRV: ", compress_delta)
 	return gossipREV
 }

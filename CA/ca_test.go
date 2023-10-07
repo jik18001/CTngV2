@@ -144,6 +144,6 @@ func testREV(t *testing.T) {
 
 func TestTask(t *testing.T) {
 	ctx := InitializeCAContext("testFiles/ca_testconfig/1/CA_public_config.json", "testFiles/ca_testconfig/1/CA_private_config.json", "testFiles/ca_testconfig/1/CA_crypto_config.json")
-	ctx.RevocationRatio = 0.01
+	ctx.RevocationRatio = 0.001
 	StartCA(ctx)
 }
