@@ -171,7 +171,7 @@ func QueryAuthorities(c *MonitorContext) {
 								fmt.Println("SRH verification failed")
 								Wait_then_accuse(c, CA, "ca")
 							} else {
-								fmt.Println("REV Payload: " + REV.Payload[0] + REV.Payload[1] + REV.Payload[2])
+								//fmt.Println("REV Payload: " + REV.Payload[0] + REV.Payload[1] + REV.Payload[2])
 								Process_valid_object(c, REV)
 							}
 						}

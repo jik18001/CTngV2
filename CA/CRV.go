@@ -52,7 +52,7 @@ func CRV_init() *CRV {
 // Compute delta between CRV_pre_update and CRV_current
 func (crv *CRV) GetDeltaCRV() []byte {
 	// compute delta between CRV_pre_update and CRV_current
-	CRV_delta := crv.CRV_current.Union(crv.CRV_pre_update)
+	CRV_delta := crv.CRV_current.Intersection(crv.CRV_pre_update)
 	bytes, err := CRV_delta.MarshalBinary()
 	if err != nil {
 		panic(err)
