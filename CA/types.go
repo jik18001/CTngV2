@@ -46,6 +46,7 @@ type CAContext struct {
 	RevocationRatio        float64
 	STH_storage_lock       *sync.Mutex
 	Certpool_lock          *sync.Mutex
+	Fresh                  bool
 }
 
 type CA_public_config struct {
@@ -325,6 +326,7 @@ func InitializeCAContext(public_config_path string, private_config_file_path str
 		Request_Count_lock:     &sync.Mutex{},
 		STH_storage_lock:       &sync.Mutex{},
 		Certpool_lock:          &sync.Mutex{},
+		Fresh:                  true,
 	}
 	// Initialize http client
 	tr := &http.Transport{}

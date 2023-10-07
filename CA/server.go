@@ -301,15 +301,16 @@ func PeriodicTask(ctx *CAContext) {
 		prelen := len(compressed_binary)
 
 		// Perform mass revocation
-		ctx.CRV.MassRevoke(ctx.RevocationRatio)
+		if ctx.Fresh {
+			ctx.CRV.MassRevoke(ctx.RevocationRatio)
 
-		// Serialize the CRV_current after mass revocation
-		postbinary, _ = ctx.CRV.CRV_current.MarshalBinary()
-		compressed_binary2, _ := util.CompressData(postbinary)
-		postlen := len(compressed_binary2)
-
-		fmt.Println("CRV size before and after mass revocation: ", prelen, postlen)
-		//}
+			// Serialize the CRV_current after mass revocation
+			postbinary, _ = ctx.CRV.CRV_current.MarshalBinary()
+			compressed_binary2, _ := util.CompressData(postbinary)
+			postlen := len(compressed_binary2)
+			ctx.Fresh = false
+			fmt.Println("CRV size before and after mass revocation: ", prelen, postlen)
+		}
 
 		//fmt.Println(certlist)
 		// get current period
