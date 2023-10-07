@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"reflect"
+	"sync"
+	"time"
 
 	"github.com/jik18001/CTngV2/crypto"
 	"github.com/jik18001/CTngV2/definition"
@@ -43,6 +45,7 @@ type MonitorContext struct {
 	Period_Offset          string
 	Clockdrift_miliseconds int
 	Maxdrift_miliseconds   int
+	CRV_lock               *sync.Mutex
 }
 
 type Monitor_private_config struct {
@@ -112,7 +115,9 @@ func (c *MonitorContext) SaveStorage(Period string, update ClientUpdate) error {
 	//save CRV
 	var crvstorage = make(map[string][]byte)
 	for key, value := range c.Storage_CRV {
-		crvstorage[key], _ = value.MarshalBinary()
+		crvbin, _ := value.MarshalBinary()
+		crvstorage[key], _ = util.CompressData(crvbin)
+		//crvstorage[key], _ = value.MarshalBinary()
 	}
 	util.WriteData(c.StorageFile_CRV, crvstorage)
 	fmt.Println(util.BLUE, "File Storage Complete for Period: ", util.GetCurrentPeriod(), util.RESET)
@@ -202,21 +207,28 @@ func (c *MonitorContext) StoreObject(o definition.Gossip_object) {
 		fmt.Println(util.BLUE, "STH_FULL Stored", util.RESET)
 	case definition.REV_FULL:
 		(*c.Storage_REV_FULL)[o.GetID()] = o
-		SRH, DCRV := Get_SRH_and_DCRV(o)
+		_, DCRV := Get_SRH_and_DCRV(o)
 		key := o.Payload[0]
 		//verif REV_FULL
 		//verify SRH
-		if !c.VerifySRH(SRH, &DCRV, key, o.Period) {
-			fmt.Println("SRH verification failed")
-			return
-		}
+		/*
+			if !c.VerifySRH(SRH, &DCRV, key, o.Period) {
+				return
+			}*/
 		//Update CRV
 		// look for CRV first
-		if _, ok := c.Storage_CRV[key]; !ok {
-			c.Storage_CRV[key] = &DCRV
-		} else {
-			c.Storage_CRV[key].Union(&DCRV)
+		f := func() {
+			if _, ok := c.Storage_CRV[key]; !ok {
+				c.CRV_lock.Lock()
+				c.Storage_CRV[key] = &DCRV
+				c.CRV_lock.Unlock()
+			} else {
+				c.CRV_lock.Lock()
+				c.Storage_CRV[key].Union(&DCRV)
+				c.CRV_lock.Unlock()
+			}
 		}
+		time.AfterFunc(20*time.Second, f)
 		fmt.Println(util.BLUE, "REV_FULL Stored", util.RESET)
 	default:
 		(*c.Storage_TEMP)[o.GetID()] = o
@@ -305,6 +317,7 @@ func InitializeMonitorContext(public_config_path string, private_config_path str
 		Storage_CRV:                  make(map[string]*bitset.BitSet),
 		StorageID:                    storageID,
 		Mode:                         0,
+		CRV_lock:                     &sync.Mutex{},
 	}
 	return &ctx
 }
