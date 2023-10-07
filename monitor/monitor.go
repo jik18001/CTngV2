@@ -411,7 +411,8 @@ func (ctx *MonitorContext) VerifySRH(srh string, dCRV *bitset.BitSet, CAID strin
 	ca_publickey := ctx.Monitor_crypto_config.SignPublicMap[rsasig.ID]
 	err = crypto.RSAVerify(localhash, rsasig, &ca_publickey)
 	if err != nil {
-		fmt.Println("Fail to verify the signature on the SRH")
+		fmt.Println("Fail to verify the signature on the SRH: ", err)
+		fmt.Println(dCRV)
 		return false
 	}
 	//fmt.Println("SRH verification success")
