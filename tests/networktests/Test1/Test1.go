@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+
+	//"runtime/pprof"
 	"time"
 
 	"github.com/jik18001/CTngV2/CA"
@@ -79,6 +81,20 @@ func main() {
 		fmt.Println("Usage: go run Test1.go <CA|Logger|Monitor|Gossiper> <ID>")
 		os.Exit(1)
 	}
+	/*
+		f, err := os.Create(os.Args[2] + ".prof")
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		pprof.StartCPUProfile(f)
+		time.AfterFunc(3*time.Minute, func() {
+			fmt.Println("Terminating the program after 3 minutes.")
+			pprof.StopCPUProfile()
+			f.Close()
+			os.Exit(0)
+		})*/
+
 	switch os.Args[1] {
 	case "CA":
 		StartCA(os.Args[2])

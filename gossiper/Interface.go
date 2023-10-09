@@ -75,6 +75,11 @@ func (ctx *GossiperContext) InBlacklistPerm(id string) bool {
 }
 
 func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_object) {
+	err := gossip_object.Verify(ctx.Gossiper_crypto_config)
+	if err != nil {
+		fmt.Println(util.RED, "Invalid object "+definition.TypeString(gossip_object.Type)+" signed by "+gossip_object.Signer+".", util.RESET)
+		return
+	}
 	switch gossip_object.Type {
 	case definition.STH_INIT:
 		ctx.Gossip_object_storage.STH_INIT_LOCK.Lock()

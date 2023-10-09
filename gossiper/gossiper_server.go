@@ -55,13 +55,14 @@ func Gossip_object_handler(c *GossiperContext, w http.ResponseWriter, r *http.Re
 	}
 	// Verify the object is valid, if invalid we just ignore it
 	// CON do not have a signature on it yet
-	err = gossip_obj.Verify(c.Gossiper_crypto_config)
-	if err != nil {
-		//fmt.Println("Received invalid object "+TypeString(gossip_obj.Type)+" from " + util.GetSenderURL(r) + ".")
-		fmt.Println(util.RED, "Received invalid object "+definition.TypeString(gossip_obj.Type)+" signed by "+gossip_obj.Signer+".", util.RESET)
-		http.Error(w, err.Error(), http.StatusOK)
-		return
-	}
+	/*
+		err = gossip_obj.Verify(c.Gossiper_crypto_config)
+		if err != nil {
+			//fmt.Println("Received invalid object "+TypeString(gossip_obj.Type)+" from " + util.GetSenderURL(r) + ".")
+			fmt.Println(util.RED, "Received invalid object "+definition.TypeString(gossip_obj.Type)+" signed by "+gossip_obj.Signer+".", util.RESET)
+			http.Error(w, err.Error(), http.StatusOK)
+			return
+		}*/
 	Handle_Gossip_object(c, gossip_obj)
 }
 
