@@ -431,10 +431,7 @@ func (ctx GossiperContext) IsConvergent() bool {
 	count1 := len(ctx.Gossip_object_storage.REV_FULL)
 	count2 := len(ctx.Gossip_object_storage.STH_FULL)
 	count3 := len(ctx.Gossip_object_storage.ACC_FULL)
-	if count1 == ctx.Total_CA && count2 == ctx.Total_Logger {
-		return true
-	}
-	if count3 == ctx.Total_Logger+ctx.Total_CA {
+	if count1+count2+count3 == ctx.Total_Logger+ctx.Total_CA {
 		return true
 	}
 	return false
