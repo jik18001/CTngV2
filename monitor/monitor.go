@@ -109,6 +109,7 @@ func QueryLoggers(c *MonitorContext) {
 				Wait_then_accuse(c, logger, "logger")
 			} else {
 				sthBody, err2 := ioutil.ReadAll(sthResp.Body)
+				sthResp.Body.Close()
 				var STH definition.Gossip_object
 				err2 = json.Unmarshal(sthBody, &STH)
 				if err2 != nil {
@@ -149,6 +150,7 @@ func QueryAuthorities(c *MonitorContext) {
 				continue
 			} else {
 				revBody, err2 := ioutil.ReadAll(revResp.Body)
+				revResp.Body.Close()
 				if err2 != nil {
 					log.Println(util.RED+err2.Error(), util.RESET)
 					Wait_then_accuse(c, CA, "ca")
