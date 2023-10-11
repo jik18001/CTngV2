@@ -46,6 +46,11 @@ type MonitorContext struct {
 	Clockdrift_miliseconds int
 	Maxdrift_miliseconds   int
 	CRV_lock               *sync.Mutex
+	CONFLICT_POM_lock      *sync.RWMutex
+	ACCUSATION_POM_lock    *sync.RWMutex
+	STH_FULL_lock          *sync.RWMutex
+	REV_FULL_lock          *sync.RWMutex
+	TEMP_lock              *sync.RWMutex
 }
 
 type Monitor_private_config struct {
@@ -159,22 +164,34 @@ func (c *MonitorContext) GetObject(id definition.Gossip_ID) definition.Gossip_ob
 	GType := id.Type
 	switch GType {
 	case definition.CON_INIT:
+		c.CONFLICT_POM_lock.RLock()
 		obj := (*c.Storage_CONFLICT_POM)[id]
+		c.CONFLICT_POM_lock.RUnlock()
 		return obj
 	case definition.ACC_FULL:
+		c.ACCUSATION_POM_lock.RLock()
 		obj := (*c.Storage_ACCUSATION_POM)[id]
+		c.ACCUSATION_POM_lock.RUnlock()
 		return obj
 	case definition.STH_FULL:
+		c.STH_FULL_lock.RLock()
 		obj := (*c.Storage_STH_FULL)[id]
+		c.STH_FULL_lock.RUnlock()
 		return obj
 	case definition.REV_FULL:
+		c.REV_FULL_lock.RLock()
 		obj := (*c.Storage_REV_FULL)[id]
+		c.REV_FULL_lock.RUnlock()
 		return obj
 	case definition.STH_INIT:
+		c.TEMP_lock.RLock()
 		obj := (*c.Storage_TEMP)[id]
+		c.TEMP_lock.RUnlock()
 		return obj
 	case definition.REV_INIT:
+		c.TEMP_lock.RLock()
 		obj := (*c.Storage_TEMP)[id]
+		c.TEMP_lock.RUnlock()
 		return obj
 	}
 	return definition.Gossip_object{}
@@ -190,23 +207,35 @@ func (c *MonitorContext) IsDuplicate(g definition.Gossip_object) bool {
 func (c *MonitorContext) StoreObject(o definition.Gossip_object) {
 	switch o.Type {
 	case definition.STH_INIT:
+		c.TEMP_lock.Lock()
 		(*c.Storage_TEMP)[o.GetID()] = o
+		c.TEMP_lock.Unlock()
 	case definition.REV_INIT:
+		c.TEMP_lock.Lock()
 		(*c.Storage_TEMP)[o.GetID()] = o
+		c.TEMP_lock.Unlock()
 	case definition.CON_INIT:
+		c.CONFLICT_POM_lock.Lock()
 		(*c.Storage_CONFLICT_POM)[o.GetID()] = o
+		c.CONFLICT_POM_lock.Unlock()
 		(*c.Storage_CONFLICT_POM_DELTA)[o.GetID()] = o
 		fmt.Println(util.BLUE, "CONFLICT_POM Stored", util.RESET)
 	case definition.ACC_FULL:
 		//ACCUSATION POM does not need to be stored, but this function is here for testing purposes
+		c.ACCUSATION_POM_lock.Lock()
 		(*c.Storage_ACCUSATION_POM)[o.GetID()] = o
+		c.ACCUSATION_POM_lock.Unlock()
 		(*c.Storage_ACCUSATION_POM_DELTA)[o.GetID()] = o
 		fmt.Println(util.BLUE, "ACCUSATION_POM Stored", util.RESET)
 	case definition.STH_FULL:
+		c.STH_FULL_lock.Lock()
 		(*c.Storage_STH_FULL)[o.GetID()] = o
+		c.STH_FULL_lock.Unlock()
 		fmt.Println(util.BLUE, "STH_FULL Stored", util.RESET)
 	case definition.REV_FULL:
+		c.REV_FULL_lock.Lock()
 		(*c.Storage_REV_FULL)[o.GetID()] = o
+		c.REV_FULL_lock.Unlock()
 		_, DCRV := Get_SRH_and_DCRV(o)
 		key := o.Payload[0]
 		//verif REV_FULL
@@ -317,6 +346,11 @@ func InitializeMonitorContext(public_config_path string, private_config_path str
 		Storage_CRV:                  make(map[string]*bitset.BitSet),
 		StorageID:                    storageID,
 		Mode:                         0,
+		CONFLICT_POM_lock:            &sync.RWMutex{},
+		ACCUSATION_POM_lock:          &sync.RWMutex{},
+		STH_FULL_lock:                &sync.RWMutex{},
+		REV_FULL_lock:                &sync.RWMutex{},
+		TEMP_lock:                    &sync.RWMutex{},
 		CRV_lock:                     &sync.Mutex{},
 	}
 	return &ctx
