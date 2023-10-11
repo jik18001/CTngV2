@@ -40,9 +40,10 @@ func StartMonitorServer(c *MonitorContext) {
 	}
 	time.Sleep(time.Duration(c.Clockdrift_miliseconds) * time.Millisecond)
 	tr := &http.Transport{
-		MaxIdleConnsPerHost:   3000,
-		MaxConnsPerHost:       3000,
-		ExpectContinueTimeout: 10,
+		MaxIdleConnsPerHost: 10,
+		MaxConnsPerHost:     300,
+		WriteBufferSize:     1024 * 1024, // 1MB
+		ReadBufferSize:      1024 * 1024, // 1MB
 	}
 	c.Client = &http.Client{
 		Transport: tr,

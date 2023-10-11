@@ -364,7 +364,12 @@ func StartCA(c *CAContext) {
 		time.Sleep(time.Duration(60-second+1) * time.Second)
 	}
 	// Initialize CA context
-	tr := &http.Transport{}
+	tr := &http.Transport{
+		MaxIdleConnsPerHost: 10,
+		MaxConnsPerHost:     300,
+		WriteBufferSize:     1024 * 1024, // 1MB
+		ReadBufferSize:      1024 * 1024, // 1MB
+	}
 	c.Client = &http.Client{
 		Transport: tr,
 	}

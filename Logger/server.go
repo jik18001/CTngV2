@@ -257,7 +257,12 @@ func PeriodicTask(ctx *LoggerContext) {
 // Start the logger
 func StartLogger(c *LoggerContext) {
 	// set up HTTP client
-	tr := &http.Transport{}
+	tr := &http.Transport{
+		MaxIdleConnsPerHost: 10,
+		MaxConnsPerHost:     300,
+		WriteBufferSize:     1024 * 1024, // 1MB
+		ReadBufferSize:      1024 * 1024, // 1MB
+	}
 	c.Client = &http.Client{
 		Transport: tr,
 	}
