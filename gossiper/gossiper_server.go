@@ -430,7 +430,11 @@ func StartGossiperServer(c *GossiperContext) {
 	// Check if the storage file exists in this directory
 	//InitializeGossiperStorage(c)
 	// Create the http client to be used.
-	tr := &http.Transport{}
+	tr := &http.Transport{
+		MaxIdleConnsPerHost:   3000,
+		MaxConnsPerHost:       3000,
+		ExpectContinueTimeout: 10,
+	}
 	c.Client = &http.Client{
 		Transport: tr,
 	}
