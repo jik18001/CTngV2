@@ -85,14 +85,23 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		ctx.Gossip_object_storage.STH_INIT_LOCK.Lock()
 		ctx.Gossip_object_storage.STH_INIT[gossip_object.GetID()] = gossip_object
 		ctx.Gossip_object_storage.STH_INIT_LOCK.Unlock()
+		if ctx.IsInitConvergent() {
+			ctx.Converge_time_init = util.GetCurrentSecond()
+		}
 	case definition.REV_INIT:
 		ctx.Gossip_object_storage.REV_INIT_LOCK.Lock()
 		ctx.Gossip_object_storage.REV_INIT[gossip_object.GetID()] = gossip_object
 		ctx.Gossip_object_storage.REV_INIT_LOCK.Unlock()
+		if ctx.IsInitConvergent() {
+			ctx.Converge_time_init = util.GetCurrentSecond()
+		}
 	case definition.ACC_INIT:
 		ctx.Gossip_object_storage.ACC_INIT_LOCK.Lock()
 		ctx.Gossip_object_storage.ACC_INIT[gossip_object.GetID()] = gossip_object
 		ctx.Gossip_object_storage.ACC_INIT_LOCK.Unlock()
+		if ctx.IsInitConvergent() {
+			ctx.Converge_time_init = util.GetCurrentSecond()
+		}
 	case definition.CON_INIT:
 		ctx.Gossip_object_storage.CON_INIT_LOCK.Lock()
 		ctx.Gossip_object_storage.CON_INIT[gossip_object.GetID()] = gossip_object
@@ -102,6 +111,9 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 			ctx.Gossip_blacklist.BLACKLIST_PERM_LOCK.Lock()
 			ctx.Gossip_blacklist.BLACKLIST_PERM[gossip_object.Payload[0]] = true
 			ctx.Gossip_blacklist.BLACKLIST_PERM_LOCK.Unlock()
+		}
+		if ctx.IsInitConvergent() {
+			ctx.Converge_time_init = util.GetCurrentSecond()
 		}
 	case definition.STH_FRAG:
 		ctx.Gossip_object_storage.STH_FRAG_LOCK.Lock()
@@ -431,6 +443,23 @@ func (ctx GossiperContext) IsConvergent() bool {
 	count1 := len(ctx.Gossip_object_storage.REV_FULL)
 	count2 := len(ctx.Gossip_object_storage.STH_FULL)
 	count3 := len(ctx.Gossip_object_storage.ACC_FULL)
+	count4 := len(ctx.Gossip_object_storage.CON_INIT)
+	if count1+count2+count3+count4 == ctx.Total_Logger+ctx.Total_CA {
+		return true
+	}
+	return false
+}
+
+func (ctx GossiperContext) IsInitConvergent() bool {
+	ctx.Gossip_object_storage.REV_INIT_LOCK.RLock()
+	defer ctx.Gossip_object_storage.REV_INIT_LOCK.RUnlock()
+	ctx.Gossip_object_storage.STH_INIT_LOCK.RLock()
+	defer ctx.Gossip_object_storage.STH_INIT_LOCK.RUnlock()
+	ctx.Gossip_object_storage.ACC_INIT_LOCK.RLock()
+	defer ctx.Gossip_object_storage.ACC_INIT_LOCK.RUnlock()
+	count1 := len(ctx.Gossip_object_storage.REV_INIT)
+	count2 := len(ctx.Gossip_object_storage.STH_INIT)
+	count3 := len(ctx.Gossip_object_storage.ACC_INIT)
 	if count1+count2+count3 == ctx.Total_Logger+ctx.Total_CA {
 		return true
 	}

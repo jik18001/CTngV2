@@ -62,6 +62,7 @@ type GossiperContext struct {
 	Gossip_blacklist      *Gossip_blacklist
 	Gossiper_log          *Gossiper_log
 	Converge_time         string
+	Converge_time_init    string
 	//File I/O
 	StorageID        string
 	StorageFile      string
@@ -78,6 +79,7 @@ type GossiperContext struct {
 type Gossiper_log_entry struct {
 	Period             int    `json:"period"` // Period of the log
 	Converge_time      string `json:"converge_time"`
+	Converge_time_init string `json:"converge_time_init"`
 	NUM_STH_INIT       int    `json:"num_sth_init"`
 	NUM_REV_INIT       int    `json:"num_rev_init"`
 	NUM_ACC_INIT       int    `json:"num_acc_init"`
