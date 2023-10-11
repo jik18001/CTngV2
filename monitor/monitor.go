@@ -43,6 +43,7 @@ func receiveGossip(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
 func handle_gossip_from_gossiper(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
 	var gossip_obj definition.Gossip_object
 	err := json.NewDecoder(r.Body).Decode(&gossip_obj)
+	r.Body.Close()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}

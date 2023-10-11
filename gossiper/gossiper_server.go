@@ -49,6 +49,7 @@ func Gossip_object_handler(c *GossiperContext, w http.ResponseWriter, r *http.Re
 	//time.Sleep(time.Duration(util.GetRandomLatency(c.Min_latency, c.Max_latency)) * time.Millisecond)
 	var gossip_obj definition.Gossip_object
 	err := json.NewDecoder(r.Body).Decode(&gossip_obj)
+	r.Body.Close()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
