@@ -2,7 +2,6 @@ package CA
 
 import (
 	"encoding/json"
-	"fmt"
 	"math/rand"
 
 	"github.com/jik18001/CTngV2/crypto"
@@ -142,6 +141,6 @@ func Generate_Revocation(c *CAContext, Period string, REV_type int) definition.G
 		Crypto_Scheme: "RSA",
 		Payload:       [3]string{c.CA_private_config.Signer, "CRV", string(payload3)},
 	}
-	fmt.Println("compressed delta CRV: ", compress_delta)
+	//fmt.Println("compressed delta CRV: ", compress_delta)
 	return gossipREV
 }

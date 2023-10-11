@@ -230,7 +230,7 @@ func Handle_OBJ_FRAG(c *GossiperContext, gossip_obj definition.Gossip_object) {
 		itemlist := c.GetObjectList(gossip_obj.GetID(), gossip_obj.Type)
 		target_type := gossip_obj.GetTargetType()
 		obj := c.Generate_Gossip_Object_FULL(itemlist, target_type)
-		fmt.Println(util.BLUE, "Generated full object: ", obj, util.RESET)
+		fmt.Println(util.BLUE, "Generated full object: ", obj.Type, util.RESET)
 		Handle_Gossip_object(c, obj)
 	}
 	if itemcount < c.Gossiper_crypto_config.Threshold {
