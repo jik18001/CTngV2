@@ -431,6 +431,9 @@ func StartGossiperServer(c *GossiperContext) {
 	// Check if the storage file exists in this directory
 	//InitializeGossiperStorage(c)
 	// Create the http client to be used.
+	time_wait := util.Getwaitingtime(c.Gossiper_public_config.MMD)
+	fmt.Println("Waiting for ", time_wait, " seconds")
+	time.Sleep(time.Duration(time_wait) * time.Second)
 	tr := &http.Transport{
 		MaxIdleConnsPerHost: 300,
 		MaxConnsPerHost:     300,

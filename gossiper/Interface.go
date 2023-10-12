@@ -38,6 +38,7 @@ func (ctx *GossiperContext) Save() {
 	g_log_entry := Gossiper_log_entry{
 		Period:             Period,
 		Converge_time:      ctx.Converge_time,
+		Converge_time_init: ctx.Converge_time_init,
 		NUM_STH_INIT:       len(ctx.Gossip_object_storage.STH_INIT),
 		NUM_REV_INIT:       len(ctx.Gossip_object_storage.REV_INIT),
 		NUM_ACC_INIT:       len(ctx.Gossip_object_storage.ACC_INIT),
@@ -87,6 +88,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		ctx.Gossip_object_storage.STH_INIT_LOCK.Unlock()
 		if ctx.IsInitConvergent() {
 			ctx.Converge_time_init = util.GetCurrentSecond()
+			fmt.Println(util.BLUE, "INIT Converge time: ", ctx.Converge_time_init, util.RESET)
 		}
 	case definition.REV_INIT:
 		ctx.Gossip_object_storage.REV_INIT_LOCK.Lock()
@@ -94,6 +96,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		ctx.Gossip_object_storage.REV_INIT_LOCK.Unlock()
 		if ctx.IsInitConvergent() {
 			ctx.Converge_time_init = util.GetCurrentSecond()
+			fmt.Println(util.BLUE, "INIT Converge time: ", ctx.Converge_time_init, util.RESET)
 		}
 	case definition.ACC_INIT:
 		ctx.Gossip_object_storage.ACC_INIT_LOCK.Lock()
@@ -101,6 +104,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		ctx.Gossip_object_storage.ACC_INIT_LOCK.Unlock()
 		if ctx.IsInitConvergent() {
 			ctx.Converge_time_init = util.GetCurrentSecond()
+			fmt.Println(util.BLUE, "INIT Converge time: ", ctx.Converge_time_init, util.RESET)
 		}
 	case definition.CON_INIT:
 		ctx.Gossip_object_storage.CON_INIT_LOCK.Lock()
@@ -114,6 +118,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		}
 		if ctx.IsInitConvergent() {
 			ctx.Converge_time_init = util.GetCurrentSecond()
+			fmt.Println(util.BLUE, "INIT Converge time: ", ctx.Converge_time_init, util.RESET)
 		}
 	case definition.STH_FRAG:
 		ctx.Gossip_object_storage.STH_FRAG_LOCK.Lock()
@@ -268,7 +273,7 @@ func (ctx *GossiperContext) IsDuplicate_G(gossip_object definition.Gossip_object
 	return false
 }
 
-func (ctx GossiperContext) Store(obj any) {
+func (ctx *GossiperContext) Store(obj any) {
 	switch obj.(type) {
 	case definition.Gossip_object:
 		gossip_object := obj.(definition.Gossip_object)
@@ -276,7 +281,7 @@ func (ctx GossiperContext) Store(obj any) {
 	}
 }
 
-func (ctx GossiperContext) IsDuplicate(obj any) (bool, error) {
+func (ctx *GossiperContext) IsDuplicate(obj any) (bool, error) {
 	switch obj.(type) {
 	case definition.Gossip_object:
 		gossip_object := obj.(definition.Gossip_object)
@@ -285,11 +290,11 @@ func (ctx GossiperContext) IsDuplicate(obj any) (bool, error) {
 	return false, errors.New("Unknown type")
 }
 
-func (ctx GossiperContext) InBlacklist(Entity_URL string) bool {
+func (ctx *GossiperContext) InBlacklist(Entity_URL string) bool {
 	return ctx.InBlacklistPerm(Entity_URL)
 }
 
-func (ctx GossiperContext) GetObjectList(GID definition.Gossip_ID, TargetType string) []definition.Gossip_object {
+func (ctx *GossiperContext) GetObjectList(GID definition.Gossip_ID, TargetType string) []definition.Gossip_object {
 	var newlist []definition.Gossip_object
 	switch TargetType {
 	case definition.STH_FRAG:
@@ -308,7 +313,7 @@ func (ctx GossiperContext) GetObjectList(GID definition.Gossip_ID, TargetType st
 	return newlist
 }
 
-func (ctx GossiperContext) GetGossipObjectCount(GID definition.Gossip_ID, TargetType string) int {
+func (ctx *GossiperContext) GetGossipObjectCount(GID definition.Gossip_ID, TargetType string) int {
 	switch TargetType {
 	case definition.STH_INIT:
 		ctx.Gossip_object_storage.STH_INIT_LOCK.RLock()
@@ -382,7 +387,7 @@ func (ctx GossiperContext) GetGossipObjectCount(GID definition.Gossip_ID, Target
 	return 0
 }
 
-func (ctx GossiperContext) GetObject(GID definition.Gossip_ID, targettype string) definition.Gossip_object {
+func (ctx *GossiperContext) GetObject(GID definition.Gossip_ID, targettype string) definition.Gossip_object {
 	switch targettype {
 	case definition.STH_INIT:
 		ctx.Gossip_object_storage.STH_INIT_LOCK.RLock()
@@ -416,7 +421,7 @@ func (ctx GossiperContext) GetObject(GID definition.Gossip_ID, targettype string
 	return definition.Gossip_object{}
 }
 
-func (ctx GossiperContext) GetItemCount(ID any, TargetType string) (int, error) {
+func (ctx *GossiperContext) GetItemCount(ID any, TargetType string) (int, error) {
 	switch ID.(type) {
 	case definition.Gossip_ID:
 		return ctx.GetGossipObjectCount(ID.(definition.Gossip_ID), TargetType), nil
@@ -424,7 +429,7 @@ func (ctx GossiperContext) GetItemCount(ID any, TargetType string) (int, error) 
 	return 0, errors.New("Invalid ID Type")
 }
 
-func (ctx GossiperContext) GetItem(ID any, TargetType string) any {
+func (ctx *GossiperContext) GetItem(ID any, TargetType string) any {
 	switch ID.(type) {
 	case definition.Gossip_ID:
 		return ctx.GetObject(ID.(definition.Gossip_ID), TargetType)
@@ -433,7 +438,7 @@ func (ctx GossiperContext) GetItem(ID any, TargetType string) any {
 	return nil
 }
 
-func (ctx GossiperContext) IsConvergent() bool {
+func (ctx *GossiperContext) IsConvergent() bool {
 	ctx.Gossip_object_storage.REV_FULL_LOCK.RLock()
 	defer ctx.Gossip_object_storage.REV_FULL_LOCK.RUnlock()
 	ctx.Gossip_object_storage.STH_FULL_LOCK.RLock()
@@ -450,7 +455,7 @@ func (ctx GossiperContext) IsConvergent() bool {
 	return false
 }
 
-func (ctx GossiperContext) IsInitConvergent() bool {
+func (ctx *GossiperContext) IsInitConvergent() bool {
 	ctx.Gossip_object_storage.REV_INIT_LOCK.RLock()
 	defer ctx.Gossip_object_storage.REV_INIT_LOCK.RUnlock()
 	ctx.Gossip_object_storage.STH_INIT_LOCK.RLock()
@@ -466,7 +471,7 @@ func (ctx GossiperContext) IsInitConvergent() bool {
 	return false
 }
 
-func (ctx GossiperContext) IsMalicious(obj definition.Gossip_object) bool {
+func (ctx *GossiperContext) IsMalicious(obj definition.Gossip_object) bool {
 	switch obj.Type {
 	case definition.STH_INIT:
 		obj_2 := ctx.GetObject(obj.GetID(), definition.STH_INIT)
@@ -482,7 +487,7 @@ func (ctx GossiperContext) IsMalicious(obj definition.Gossip_object) bool {
 	return false
 }
 
-func (ctx GossiperContext) WipeStorage() {
+func (ctx *GossiperContext) WipeStorage() {
 	// clear all storage
 	CON_INIT := ctx.Gossip_object_storage.CON_INIT
 	*ctx.Gossip_object_storage = *InitializeGossipObjectStorage()
@@ -494,7 +499,7 @@ func (ctx GossiperContext) WipeStorage() {
 	// clear all PoM counter and gossiper log
 }
 
-func (ctx GossiperContext) CleanUpGossiperStorage() {
+func (ctx *GossiperContext) CleanUpGossiperStorage() {
 	//delete all files in storage directory
 	err := util.DeleteFilesAndDirectories(ctx.StorageDirectory)
 	if err != nil {

@@ -8,7 +8,7 @@ import (
 	"github.com/jik18001/CTngV2/util"
 )
 
-func (ctx GossiperContext) Generate_Gossip_Object_FRAG(g definition.Gossip_object) definition.Gossip_object {
+func (ctx *GossiperContext) Generate_Gossip_Object_FRAG(g definition.Gossip_object) definition.Gossip_object {
 	sig_frag, err := ctx.Gossiper_crypto_config.ThresholdSign(g.Payload[0] + g.Payload[1] + g.Payload[2])
 	if err != nil {
 		fmt.Println("Error in threshold signing: " + err.Error())
@@ -27,7 +27,7 @@ func (ctx GossiperContext) Generate_Gossip_Object_FRAG(g definition.Gossip_objec
 	return g
 }
 
-func (ctx GossiperContext) Generate_Gossip_Object_FULL(g_list []definition.Gossip_object, TargetType string) definition.Gossip_object {
+func (ctx *GossiperContext) Generate_Gossip_Object_FULL(g_list []definition.Gossip_object, TargetType string) definition.Gossip_object {
 	// Extract all the signatures from the gossip objects
 	sig_frag_list := []crypto.SigFragment{}
 	signer_list := []string{}
@@ -62,7 +62,7 @@ func (ctx GossiperContext) Generate_Gossip_Object_FULL(g_list []definition.Gossi
 	}
 }
 
-func (ctx GossiperContext) Generate_CON_INIT(obj1 definition.Gossip_object, obj2 definition.Gossip_object) definition.Gossip_object {
+func (ctx *GossiperContext) Generate_CON_INIT(obj1 definition.Gossip_object, obj2 definition.Gossip_object) definition.Gossip_object {
 	D2_POM := definition.Gossip_object{
 		Application: definition.CTNG_APPLICATION,
 		Type:        definition.CON_INIT,

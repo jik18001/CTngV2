@@ -81,6 +81,10 @@ func main() {
 		fmt.Println("Usage: go run Test1.go <CA|Logger|Monitor|Gossiper> <ID>")
 		os.Exit(1)
 	}
+	time.AfterFunc(3*time.Minute, func() {
+		fmt.Println("Terminating the program after 3 minutes.")
+		os.Exit(0)
+	})
 	/*
 		f, err := os.Create(os.Args[2] + ".prof")
 		if err != nil {
