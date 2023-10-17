@@ -36,20 +36,22 @@ func countFragments(fragmentMap map[definition.Gossip_ID][]definition.Gossip_obj
 func (ctx *GossiperContext) Save() {
 	Period, _ := strconv.Atoi(util.GetCurrentPeriod())
 	g_log_entry := Gossiper_log_entry{
-		Period:             Period,
-		Converge_time:      ctx.Converge_time,
-		Converge_time_init: ctx.Converge_time_init,
-		NUM_STH_INIT:       len(ctx.Gossip_object_storage.STH_INIT),
-		NUM_REV_INIT:       len(ctx.Gossip_object_storage.REV_INIT),
-		NUM_ACC_INIT:       len(ctx.Gossip_object_storage.ACC_INIT),
-		NUM_CON_INIT:       len(ctx.Gossip_object_storage.CON_INIT),
-		NUM_STH_FRAG:       0,
-		NUM_REV_FRAG:       0,
-		NUM_ACC_FRAG:       0,
-		NUM_STH_FULL:       len(ctx.Gossip_object_storage.STH_FULL),
-		NUM_REV_FULL:       len(ctx.Gossip_object_storage.REV_FULL),
-		NUM_ACC_FULL:       len(ctx.Gossip_object_storage.ACC_FULL),
-		NUM_BLACKLIST_PERM: len(ctx.Gossip_blacklist.BLACKLIST_PERM),
+		Period:                 Period,
+		Converge_time:          ctx.Converge_time,
+		Converge_time_init:     ctx.Converge_time_init,
+		Total_traffic_received: ctx.Total_traffic_received,
+		Total_traffic_sent:     ctx.Total_traffic_sent,
+		NUM_STH_INIT:           len(ctx.Gossip_object_storage.STH_INIT),
+		NUM_REV_INIT:           len(ctx.Gossip_object_storage.REV_INIT),
+		NUM_ACC_INIT:           len(ctx.Gossip_object_storage.ACC_INIT),
+		NUM_CON_INIT:           len(ctx.Gossip_object_storage.CON_INIT),
+		NUM_STH_FRAG:           0,
+		NUM_REV_FRAG:           0,
+		NUM_ACC_FRAG:           0,
+		NUM_STH_FULL:           len(ctx.Gossip_object_storage.STH_FULL),
+		NUM_REV_FULL:           len(ctx.Gossip_object_storage.REV_FULL),
+		NUM_ACC_FULL:           len(ctx.Gossip_object_storage.ACC_FULL),
+		NUM_BLACKLIST_PERM:     len(ctx.Gossip_blacklist.BLACKLIST_PERM),
 	}
 	g_log_entry.NUM_STH_FRAG = countFragments(ctx.Gossip_object_storage.STH_FRAG)
 	g_log_entry.NUM_REV_FRAG = countFragments(ctx.Gossip_object_storage.REV_FRAG)

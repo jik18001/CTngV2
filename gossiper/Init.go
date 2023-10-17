@@ -64,6 +64,10 @@ func InitializeGossiperContext(public_config_path string, private_config_path st
 		StorageDirectory:        "Gossip_log/",
 		Client:                  &http.Client{},
 		Verbose:                 false,
+		Total_traffic_sent:      0,
+		Total_traffic_received:  0,
+		Counter1_lock:           sync.Mutex{},
+		Counter2_lock:           sync.Mutex{},
 	}
 	return ctx
 }

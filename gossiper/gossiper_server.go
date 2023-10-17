@@ -49,11 +49,15 @@ func Gossip_object_handler(c *GossiperContext, w http.ResponseWriter, r *http.Re
 	//time.Sleep(time.Duration(util.GetRandomLatency(c.Min_latency, c.Max_latency)) * time.Millisecond)
 	var gossip_obj definition.Gossip_object
 	err := json.NewDecoder(r.Body).Decode(&gossip_obj)
+	bytecount := r.ContentLength
 	r.Body.Close()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	c.Counter1_lock.Lock()
+	c.Total_traffic_received += int(bytecount)
+	c.Counter1_lock.Unlock()
 	// Verify the object is valid, if invalid we just ignore it
 	// CON do not have a signature on it yet
 	/*
@@ -330,6 +334,10 @@ func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_obje
 		panic(err)
 	}
 	dstendpoint := ""
+	bytecount := len(msg)
+	c.Counter2_lock.Lock()
+	c.Total_traffic_sent += bytecount * len(c.Gossiper_private_config.Connected_Gossipers)
+	c.Counter2_lock.Unlock()
 	switch gossip_obj.Type {
 	case definition.STH_INIT:
 		dstendpoint = "/gossip/sth_init"
