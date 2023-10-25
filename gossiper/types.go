@@ -78,7 +78,7 @@ type GossiperContext struct {
 	Total_traffic_received int
 	Counter1_lock          sync.Mutex
 	Counter2_lock          sync.Mutex
-	log_lock               sync.Mutex
+	Timerlist              []int
 }
 
 type Gossiper_log_entry struct {
@@ -98,6 +98,7 @@ type Gossiper_log_entry struct {
 	NUM_REV_FULL           int    `json:"num_rev_full"`
 	NUM_ACC_FULL           int    `json:"num_acc_full"`
 	NUM_BLACKLIST_PERM     int    `json:"num_blacklist_perm"`
+	Timerlist              []int  `json:"timerlist"`
 }
 
 type Gossiper_log map[int]Gossiper_log_entry

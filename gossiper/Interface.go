@@ -52,6 +52,7 @@ func (ctx *GossiperContext) Save() {
 		NUM_REV_FULL:           len(ctx.Gossip_object_storage.REV_FULL),
 		NUM_ACC_FULL:           len(ctx.Gossip_object_storage.ACC_FULL),
 		NUM_BLACKLIST_PERM:     len(ctx.Gossip_blacklist.BLACKLIST_PERM),
+		Timerlist:              ctx.Timerlist,
 	}
 	g_log_entry.NUM_STH_FRAG = countFragments(ctx.Gossip_object_storage.STH_FRAG)
 	g_log_entry.NUM_REV_FRAG = countFragments(ctx.Gossip_object_storage.REV_FRAG)
