@@ -78,27 +78,27 @@ type GossiperContext struct {
 	Total_traffic_received int
 	Counter1_lock          sync.Mutex
 	Counter2_lock          sync.Mutex
-	Timerlist              []int
+	Timerlist              []float64
 }
 
 type Gossiper_log_entry struct {
-	Period                 int    `json:"period"` // Period of the log
-	Converge_time          string `json:"converge_time"`
-	Converge_time_init     string `json:"converge_time_init"`
-	Total_traffic_received int    `json:"total_traffic_received"`
-	Total_traffic_sent     int    `json:"total_traffic_sent"`
-	NUM_STH_INIT           int    `json:"num_sth_init"`
-	NUM_REV_INIT           int    `json:"num_rev_init"`
-	NUM_ACC_INIT           int    `json:"num_acc_init"`
-	NUM_CON_INIT           int    `json:"num_con_init"`
-	NUM_STH_FRAG           int    `json:"num_sth_frag"`
-	NUM_REV_FRAG           int    `json:"num_rev_frag"`
-	NUM_ACC_FRAG           int    `json:"num_acc_frag"`
-	NUM_STH_FULL           int    `json:"num_sth_full"`
-	NUM_REV_FULL           int    `json:"num_rev_full"`
-	NUM_ACC_FULL           int    `json:"num_acc_full"`
-	NUM_BLACKLIST_PERM     int    `json:"num_blacklist_perm"`
-	Timerlist              []int  `json:"timerlist"`
+	Period                 int       `json:"period"` // Period of the log
+	Converge_time          string    `json:"converge_time"`
+	Converge_time_init     string    `json:"converge_time_init"`
+	Total_traffic_received int       `json:"total_traffic_received"`
+	Total_traffic_sent     int       `json:"total_traffic_sent"`
+	NUM_STH_INIT           int       `json:"num_sth_init"`
+	NUM_REV_INIT           int       `json:"num_rev_init"`
+	NUM_ACC_INIT           int       `json:"num_acc_init"`
+	NUM_CON_INIT           int       `json:"num_con_init"`
+	NUM_STH_FRAG           int       `json:"num_sth_frag"`
+	NUM_REV_FRAG           int       `json:"num_rev_frag"`
+	NUM_ACC_FRAG           int       `json:"num_acc_frag"`
+	NUM_STH_FULL           int       `json:"num_sth_full"`
+	NUM_REV_FULL           int       `json:"num_rev_full"`
+	NUM_ACC_FULL           int       `json:"num_acc_full"`
+	NUM_BLACKLIST_PERM     int       `json:"num_blacklist_perm"`
+	Timerlist              []float64 `json:"total_time"`
 }
 
 type Gossiper_log map[int]Gossiper_log_entry

@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"reflect"
-	"strconv"
 	"strings"
 	"time"
 
@@ -48,9 +47,6 @@ func handleRequests(c *GossiperContext) {
 func Gossip_object_handler(c *GossiperContext, w http.ResponseWriter, r *http.Request) {
 	// add a random delay to simulate network delay, bounded by lower and upper bounds
 	//time.Sleep(time.Duration(util.GetRandomLatency(c.Min_latency, c.Max_latency)) * time.Millisecond)
-	clock := util.GetCurrentSecond()
-	clock_int, _ := strconv.Atoi(clock)
-	c.Timerlist = append(c.Timerlist, clock_int)
 	var gossip_obj definition.Gossip_object
 	err := json.NewDecoder(r.Body).Decode(&gossip_obj)
 	bytecount := r.ContentLength

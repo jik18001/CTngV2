@@ -84,6 +84,9 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		fmt.Println(util.RED, "Invalid object "+definition.TypeString(gossip_object.Type)+" signed by "+gossip_object.Signer+".", util.RESET)
 		return
 	}
+	clock := util.GetCurrentSecond()
+	clock_float, _ := strconv.ParseFloat(clock, 64)
+	ctx.Timerlist = append(ctx.Timerlist, clock_float)
 	switch gossip_object.Type {
 	case definition.STH_INIT:
 		ctx.Gossip_object_storage.STH_INIT_LOCK.Lock()
