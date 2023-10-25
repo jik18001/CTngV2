@@ -55,6 +55,14 @@ func Gossip_object_handler(c *GossiperContext, w http.ResponseWriter, r *http.Re
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	c.log_lock.Lock()
+	logFile, err := os.OpenFile("server.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
+	if err != nil {
+		log.Fatal("Error opening log file:", err)
+	}
+	defer logFile.Close()
+	log.SetOutput(logFile)
+	c.log_lock.Unlock()
 	c.Counter1_lock.Lock()
 	c.Total_traffic_received += int(bytecount)
 	c.Counter1_lock.Unlock()

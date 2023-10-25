@@ -78,6 +78,7 @@ type GossiperContext struct {
 	Total_traffic_received int
 	Counter1_lock          sync.Mutex
 	Counter2_lock          sync.Mutex
+	log_lock               sync.Mutex
 }
 
 type Gossiper_log_entry struct {
