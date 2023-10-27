@@ -91,7 +91,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 	case definition.STH_INIT:
 		ctx.Gossip_object_storage.STH_INIT_LOCK.Lock()
 		// if it is a duplicate, ignore it
-		if ctx.IsDuplicate_G(gossip_object) {
+		if ctx.DupCheckInLock(gossip_object) {
 			return false
 		}
 		ctx.Gossip_object_storage.STH_INIT[gossip_object.GetID()] = gossip_object
@@ -103,7 +103,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 	case definition.REV_INIT:
 		ctx.Gossip_object_storage.REV_INIT_LOCK.Lock()
 		// if it is a duplicate, ignore it
-		if ctx.IsDuplicate_G(gossip_object) {
+		if ctx.DupCheckInLock(gossip_object) {
 			return false
 		}
 		ctx.Gossip_object_storage.REV_INIT[gossip_object.GetID()] = gossip_object
@@ -115,7 +115,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 	case definition.ACC_INIT:
 		ctx.Gossip_object_storage.ACC_INIT_LOCK.Lock()
 		// if it is a duplicate, ignore it
-		if ctx.IsDuplicate_G(gossip_object) {
+		if ctx.DupCheckInLock(gossip_object) {
 			return false
 		}
 		ctx.Gossip_object_storage.ACC_INIT[gossip_object.GetID()] = gossip_object
@@ -127,7 +127,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 	case definition.CON_INIT:
 		ctx.Gossip_object_storage.CON_INIT_LOCK.Lock()
 		// if it is a duplicate, ignore it
-		if ctx.IsDuplicate_G(gossip_object) {
+		if ctx.DupCheckInLock(gossip_object) {
 			return false
 		}
 		ctx.Gossip_object_storage.CON_INIT[gossip_object.GetID()] = gossip_object
@@ -206,7 +206,74 @@ func (ctx *GossiperContext) Read_and_Store_If_Needed(gossip_object definition.Go
 	return 0
 
 }
+func (ctx *GossiperContext) DupCheckInLock(gossip_object definition.Gossip_object) bool {
+	switch gossip_object.Type {
+	case definition.STH_INIT:
+		if _, ok := ctx.Gossip_object_storage.STH_INIT[gossip_object.GetID()]; !ok {
+			return false
+		}
+		return ctx.Gossip_object_storage.STH_INIT[gossip_object.GetID()].Signature == gossip_object.Signature
+	case definition.REV_INIT:
+		if _, ok := ctx.Gossip_object_storage.REV_INIT[gossip_object.GetID()]; !ok {
+			return false
+		}
+		return ctx.Gossip_object_storage.REV_INIT[gossip_object.GetID()].Signature == gossip_object.Signature
+	case definition.ACC_INIT:
+		if _, ok := ctx.Gossip_object_storage.ACC_INIT[gossip_object.GetID()]; !ok {
+			return false
+		}
+		return ctx.Gossip_object_storage.ACC_INIT[gossip_object.GetID()].Signature == gossip_object.Signature
+	case definition.CON_INIT:
+		if _, ok := ctx.Gossip_object_storage.CON_INIT[gossip_object.GetID()]; !ok {
+			return false
+		}
+		return ctx.Gossip_object_storage.CON_INIT[gossip_object.GetID()].Signature == gossip_object.Signature
+	case definition.STH_FRAG:
+		if len(ctx.Gossip_object_storage.STH_FRAG[gossip_object.GetID()]) == 0 {
+			return false
+		}
+		for _, v := range ctx.Gossip_object_storage.STH_FRAG[gossip_object.GetID()] {
+			if v.Signature == gossip_object.Signature {
+				return true
+			}
+		}
 
+	case definition.REV_FRAG:
+		if len(ctx.Gossip_object_storage.REV_FRAG[gossip_object.GetID()]) == 0 {
+			return false
+		}
+		for _, v := range ctx.Gossip_object_storage.REV_FRAG[gossip_object.GetID()] {
+			if v.Signature == gossip_object.Signature {
+				return true
+			}
+		}
+	case definition.ACC_FRAG:
+		if len(ctx.Gossip_object_storage.ACC_FRAG[gossip_object.GetID()]) == 0 {
+			return false
+		}
+		for _, v := range ctx.Gossip_object_storage.ACC_FRAG[gossip_object.GetID()] {
+			if v.Signature == gossip_object.Signature {
+				return true
+			}
+		}
+	case definition.STH_FULL:
+		if _, ok := ctx.Gossip_object_storage.STH_FULL[gossip_object.GetID()]; !ok {
+			return false
+		}
+		return ctx.Gossip_object_storage.STH_FULL[gossip_object.GetID()].Signature == gossip_object.Signature
+	case definition.REV_FULL:
+		if _, ok := ctx.Gossip_object_storage.REV_FULL[gossip_object.GetID()]; !ok {
+			return false
+		}
+		return ctx.Gossip_object_storage.REV_FULL[gossip_object.GetID()].Signature == gossip_object.Signature
+	case definition.ACC_FULL:
+		if _, ok := ctx.Gossip_object_storage.ACC_FULL[gossip_object.GetID()]; !ok {
+			return false
+		}
+		return ctx.Gossip_object_storage.ACC_FULL[gossip_object.GetID()].Signature == gossip_object.Signature
+	}
+	return false
+}
 func (ctx *GossiperContext) IsDuplicate_G(gossip_object definition.Gossip_object) bool {
 	switch gossip_object.Type {
 	case definition.STH_INIT:
