@@ -92,6 +92,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		ctx.Gossip_object_storage.STH_INIT_LOCK.Lock()
 		// if it is a duplicate, ignore it
 		if ctx.DupCheckInLock(gossip_object) {
+			ctx.Gossip_object_storage.STH_INIT_LOCK.Unlock()
 			return false
 		}
 		ctx.Gossip_object_storage.STH_INIT[gossip_object.GetID()] = gossip_object
@@ -104,6 +105,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		ctx.Gossip_object_storage.REV_INIT_LOCK.Lock()
 		// if it is a duplicate, ignore it
 		if ctx.DupCheckInLock(gossip_object) {
+			ctx.Gossip_object_storage.REV_INIT_LOCK.Unlock()
 			return false
 		}
 		ctx.Gossip_object_storage.REV_INIT[gossip_object.GetID()] = gossip_object
@@ -116,6 +118,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		ctx.Gossip_object_storage.ACC_INIT_LOCK.Lock()
 		// if it is a duplicate, ignore it
 		if ctx.DupCheckInLock(gossip_object) {
+			ctx.Gossip_object_storage.ACC_INIT_LOCK.Unlock()
 			return false
 		}
 		ctx.Gossip_object_storage.ACC_INIT[gossip_object.GetID()] = gossip_object
@@ -128,6 +131,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		ctx.Gossip_object_storage.CON_INIT_LOCK.Lock()
 		// if it is a duplicate, ignore it
 		if ctx.DupCheckInLock(gossip_object) {
+			ctx.Gossip_object_storage.CON_INIT_LOCK.Unlock()
 			return false
 		}
 		ctx.Gossip_object_storage.CON_INIT[gossip_object.GetID()] = gossip_object
