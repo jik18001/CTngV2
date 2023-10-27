@@ -62,7 +62,19 @@ func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	}
 	c.Request_Count_lock.Lock()
 	defer c.Request_Count_lock.Unlock()
-	Period := util.GetCurrentPeriod()
+	Period := GetCurrentPeriod()
+	// convert string to int
+	periodnum, err := strconv.Atoi(Period)
+	if err != nil {
+	}
+	// add 1 to current period
+	periodnum = periodnum + 1
+	// convert int to string
+	// add a leading 0 if the string is only 1 digit
+	if periodnum < 10 {
+		Period = "0" + strconv.Itoa(periodnum)
+	}
+	Period = strconv.Itoa(periodnum)
 	c.Request_Count = c.Request_Count + 1
 	switch c.CA_Type {
 	case 0:
