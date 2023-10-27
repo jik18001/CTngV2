@@ -78,11 +78,15 @@ func (ctx *GossiperContext) InBlacklistPerm(id string) bool {
 	return ok
 }
 
-func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_object) {
+func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_object) bool {
 	err := gossip_object.Verify(ctx.Gossiper_crypto_config)
 	if err != nil {
 		fmt.Println(util.RED, "Invalid object "+definition.TypeString(gossip_object.Type)+" signed by "+gossip_object.Signer+".", util.RESET)
-		return
+		return false
+	}
+	// if it is a duplicate, ignore it
+	if ctx.IsDuplicate_G(gossip_object) {
+		return false
 	}
 	clock := util.GetCurrentSecond()
 	clock_float, _ := strconv.ParseFloat(clock, 64)
@@ -157,6 +161,7 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 			ctx.Gossip_blacklist.BLACKLIST_PERM_LOCK.Unlock()
 		}
 	}
+	return true
 }
 
 func (ctx *GossiperContext) Read_and_Store_If_Needed(gossip_object definition.Gossip_object) int {
@@ -279,12 +284,13 @@ func (ctx *GossiperContext) IsDuplicate_G(gossip_object definition.Gossip_object
 	return false
 }
 
-func (ctx *GossiperContext) Store(obj any) {
+func (ctx *GossiperContext) Store(obj any) bool {
 	switch obj.(type) {
 	case definition.Gossip_object:
 		gossip_object := obj.(definition.Gossip_object)
-		ctx.Store_gossip_object(gossip_object)
+		return ctx.Store_gossip_object(gossip_object)
 	}
+	return false
 }
 
 func (ctx *GossiperContext) IsDuplicate(obj any) (bool, error) {

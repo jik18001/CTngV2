@@ -124,7 +124,10 @@ func Handle_STH_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 		return
 	}
 	// if not malicious, we store the object
-	c.Store(gossip_obj)
+	proceed := c.Store(gossip_obj)
+	if !proceed {
+		return
+	}
 	// we send the object to the gossipers
 	c.Send_to_Gossipers(gossip_obj)
 	// also send to the monitor
@@ -163,7 +166,10 @@ func Handle_REV_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 	}
 	// if not malicious, we store the object
 	// we send the object to the gossipers
-	c.Store(gossip_obj)
+	proceed := c.Store(gossip_obj)
+	if !proceed {
+		return
+	}
 	c.Send_to_Gossipers(gossip_obj)
 	// also send to the monitor
 	c.Send_to_Monitor(gossip_obj)
@@ -191,7 +197,10 @@ func Handle_ACC_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 		return
 	}
 	// if not malicious, we store the object
-	c.Store(gossip_obj)
+	proceed := c.Store(gossip_obj)
+	if !proceed {
+		return
+	}
 	if c.InBlacklist(gossip_obj.Payload[0]) {
 		return
 	}
@@ -203,7 +212,10 @@ func Handle_ACC_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 func Handle_CON_INIT(c *GossiperContext, gossip_obj definition.Gossip_object) {
 	count, _ := c.GetItemCount(gossip_obj.GetID(), gossip_obj.Type)
 	if count == 0 {
-		c.Store(gossip_obj)
+		proceed := c.Store(gossip_obj)
+		if !proceed {
+			return
+		}
 		c.Send_to_Gossipers(gossip_obj)
 		c.Send_to_Monitor(gossip_obj)
 	}
