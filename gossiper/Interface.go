@@ -84,16 +84,16 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		fmt.Println(util.RED, "Invalid object "+definition.TypeString(gossip_object.Type)+" signed by "+gossip_object.Signer+".", util.RESET)
 		return false
 	}
-	// if it is a duplicate, ignore it
-	if ctx.IsDuplicate_G(gossip_object) {
-		return false
-	}
 	clock := util.GetCurrentSecond()
 	clock_float, _ := strconv.ParseFloat(clock, 64)
 	ctx.Timerlist = append(ctx.Timerlist, clock_float)
 	switch gossip_object.Type {
 	case definition.STH_INIT:
 		ctx.Gossip_object_storage.STH_INIT_LOCK.Lock()
+		// if it is a duplicate, ignore it
+		if ctx.IsDuplicate_G(gossip_object) {
+			return false
+		}
 		ctx.Gossip_object_storage.STH_INIT[gossip_object.GetID()] = gossip_object
 		ctx.Gossip_object_storage.STH_INIT_LOCK.Unlock()
 		if ctx.IsInitConvergent() {
@@ -102,6 +102,10 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		}
 	case definition.REV_INIT:
 		ctx.Gossip_object_storage.REV_INIT_LOCK.Lock()
+		// if it is a duplicate, ignore it
+		if ctx.IsDuplicate_G(gossip_object) {
+			return false
+		}
 		ctx.Gossip_object_storage.REV_INIT[gossip_object.GetID()] = gossip_object
 		ctx.Gossip_object_storage.REV_INIT_LOCK.Unlock()
 		if ctx.IsInitConvergent() {
@@ -110,6 +114,10 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		}
 	case definition.ACC_INIT:
 		ctx.Gossip_object_storage.ACC_INIT_LOCK.Lock()
+		// if it is a duplicate, ignore it
+		if ctx.IsDuplicate_G(gossip_object) {
+			return false
+		}
 		ctx.Gossip_object_storage.ACC_INIT[gossip_object.GetID()] = gossip_object
 		ctx.Gossip_object_storage.ACC_INIT_LOCK.Unlock()
 		if ctx.IsInitConvergent() {
@@ -118,6 +126,10 @@ func (ctx *GossiperContext) Store_gossip_object(gossip_object definition.Gossip_
 		}
 	case definition.CON_INIT:
 		ctx.Gossip_object_storage.CON_INIT_LOCK.Lock()
+		// if it is a duplicate, ignore it
+		if ctx.IsDuplicate_G(gossip_object) {
+			return false
+		}
 		ctx.Gossip_object_storage.CON_INIT[gossip_object.GetID()] = gossip_object
 		ctx.Gossip_object_storage.CON_INIT_LOCK.Unlock()
 		// if not in perm blacklist, add it
