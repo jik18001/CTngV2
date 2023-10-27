@@ -67,8 +67,6 @@ func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	periodnum, err := strconv.Atoi(Period)
 	if err != nil {
 	}
-	// add 1 to current period
-	periodnum = periodnum + 1
 	// convert int to string
 	// add a leading 0 if the string is only 1 digit
 	if periodnum < 10 {
