@@ -55,6 +55,7 @@ func handleCARequests(c *CAContext) {
 	log.Fatal(http.ListenAndServe(":"+c.CA_private_config.Port, nil))
 }
 
+/*
 // receive get request from monitor
 func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	if c.Maxlatency > 0 {
@@ -121,6 +122,82 @@ func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	case 6:
 		// sometimes unreponsive on second round since requested by monitor, behave normally on other rounds
 		if c.Request_Count%c.MisbehaviorInterval == 0 && c.OnlineDuration == 1 {
+			return
+		} else {
+			json.NewEncoder(w).Encode(c.REV_storage[Period])
+			return
+		}
+	}
+
+}*/
+
+// receive get request from monitor
+func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
+	if c.Maxlatency > 0 {
+		time.Sleep(time.Duration(rand.Intn(c.Maxlatency)) * time.Millisecond)
+	}
+	c.Request_Count_lock.Lock()
+	req_count := c.Request_Count + 1
+	c.Request_Count = c.Request_Count + 1
+	c.Request_Count_lock.Unlock()
+	Period := GetCurrentPeriod()
+	// convert string to int
+	periodnum, err := strconv.Atoi(Period)
+	if err != nil {
+	}
+	// convert int to string
+	// add a leading 0 if the string is only 1 digit
+	if periodnum < 10 {
+		Period = "0" + strconv.Itoa(periodnum)
+	}
+	Period = strconv.Itoa(periodnum)
+	switch c.CA_Type {
+	case 0:
+		//normal CA
+		json.NewEncoder(w).Encode(c.REV_storage[Period])
+		return
+	case 1:
+		//split-world CA
+		if req_count%c.MisbehaviorInterval == 0 && c.OnlineDuration == 1 {
+			json.NewEncoder(w).Encode(c.REV_storage_fake[Period])
+			fmt.Println("Fake REV sent")
+			return
+		} else {
+			json.NewEncoder(w).Encode(c.REV_storage[Period])
+			fmt.Println("Real REV sent")
+			return
+		}
+	case 2:
+		//always unresponsive CA
+		return
+	case 3:
+		//sometimes unresponsive CA
+		if req_count%c.MisbehaviorInterval == 0 || c.OnlineDuration == 1 {
+			return
+		} else {
+			json.NewEncoder(w).Encode(c.REV_storage[Period])
+			return
+		}
+	case 4:
+		// Split-world CA on second round since requested by monitor, behave normally on other rounds
+		if req_count%c.MisbehaviorInterval == 0 && c.OnlineDuration == 1 {
+			json.NewEncoder(w).Encode(c.REV_storage_fake[Period])
+		} else {
+			json.NewEncoder(w).Encode(c.REV_storage[Period])
+		}
+		return
+	case 5:
+		// always unresponsive CA on second round since requested by monitor, behave normally on other rounds
+		if c.OnlineDuration == 1 {
+			return
+		} else {
+			json.NewEncoder(w).Encode(c.REV_storage[Period])
+			return
+		}
+
+	case 6:
+		// sometimes unreponsive on second round since requested by monitor, behave normally on other rounds
+		if req_count%c.MisbehaviorInterval == 0 && c.OnlineDuration == 1 {
 			return
 		} else {
 			json.NewEncoder(w).Encode(c.REV_storage[Period])
