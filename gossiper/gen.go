@@ -27,6 +27,25 @@ func (ctx *GossiperContext) Generate_Gossip_Object_FRAG(g definition.Gossip_obje
 	return g
 }
 
+func (ctx *GossiperContext) Remove_Payload(g definition.Gossip_object) definition.Gossip_object {
+	g.Payload[1] = ""
+	g.Payload[2] = ""
+	if g.Type == definition.REV_INIT {
+		g.Type = "REV_NO_PAYLOAD"
+	}
+	return g
+}
+
+func (ctx *GossiperContext) ReconstructPayload(g definition.Gossip_object) definition.Gossip_object {
+	gid := g.GetID()
+	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RLock()
+	var tbfpayload [3]string
+	tbfpayload = ctx.Gossip_object_storage.REV_PAYLOAD[gid]
+	ctx.Gossip_object_storage.REV_INIT_LOCK.RUnlock()
+	g.Payload = tbfpayload
+	return g
+}
+
 func (ctx *GossiperContext) Generate_Gossip_Object_FULL(g_list []definition.Gossip_object, TargetType string) definition.Gossip_object {
 	// Extract all the signatures from the gossip objects
 	sig_frag_list := []crypto.SigFragment{}

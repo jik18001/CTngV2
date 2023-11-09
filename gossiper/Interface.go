@@ -9,7 +9,7 @@ import (
 	"github.com/jik18001/CTngV2/util"
 )
 
-type GossiperInterfact interface {
+type GossiperInterface interface {
 	InitializeGossiperContext(public_config_path string, private_config_path string, crypto_config_path string, storageID string) *GossiperContext
 	InBlacklist(Entity_URL string) bool
 	IsDuplicate(obj any) (bool, error)
@@ -31,6 +31,26 @@ func countFragments(fragmentMap map[definition.Gossip_ID][]definition.Gossip_obj
 		count += len(fragments)
 	}
 	return count
+}
+
+func (ctx *GossiperContext) SavePayload(g definition.Gossip_object) {
+	err := g.Verify(ctx.Gossiper_crypto_config)
+	if err != nil {
+		fmt.Println(util.RED, "Invalid object "+definition.TypeString(g.Type)+" signed by "+g.Signer+".", util.RESET)
+		return
+	}
+	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.Lock()
+	ctx.Gossip_object_storage.REV_PAYLOAD[g.GetID()] = g.Payload
+	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.Unlock()
+}
+
+func (ctx *GossiperContext) SearchPayload(gid definition.Gossip_ID) bool {
+	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RLock()
+	defer ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RUnlock()
+	if _, ok := ctx.Gossip_object_storage.REV_PAYLOAD[gid]; ok {
+		return true
+	}
+	return false
 }
 
 func (ctx *GossiperContext) Save() {

@@ -25,27 +25,29 @@ type Gossiper_private_config struct {
 }
 
 type Gossip_object_storage struct {
-	STH_INIT      map[definition.Gossip_ID]definition.Gossip_object
-	REV_INIT      map[definition.Gossip_ID]definition.Gossip_object
-	ACC_INIT      map[definition.Gossip_ID]definition.Gossip_object
-	CON_INIT      map[definition.Gossip_ID]definition.Gossip_object
-	STH_FRAG      map[definition.Gossip_ID][]definition.Gossip_object
-	REV_FRAG      map[definition.Gossip_ID][]definition.Gossip_object
-	ACC_FRAG      map[definition.Gossip_ID][]definition.Gossip_object
-	STH_FULL      map[definition.Gossip_ID]definition.Gossip_object
-	REV_FULL      map[definition.Gossip_ID]definition.Gossip_object
-	ACC_FULL      map[definition.Gossip_ID]definition.Gossip_object
-	STH_INIT_LOCK sync.RWMutex
-	REV_INIT_LOCK sync.RWMutex
-	ACC_INIT_LOCK sync.RWMutex
-	CON_INIT_LOCK sync.RWMutex
-	STH_FRAG_LOCK sync.RWMutex
-	REV_FRAG_LOCK sync.RWMutex
-	ACC_FRAG_LOCK sync.RWMutex
-	STH_FULL_LOCK sync.RWMutex
-	REV_FULL_LOCK sync.RWMutex
-	ACC_FULL_LOCK sync.RWMutex
-	CON_FULL_LOCK sync.RWMutex
+	STH_INIT         map[definition.Gossip_ID]definition.Gossip_object
+	REV_INIT         map[definition.Gossip_ID]definition.Gossip_object
+	ACC_INIT         map[definition.Gossip_ID]definition.Gossip_object
+	CON_INIT         map[definition.Gossip_ID]definition.Gossip_object
+	STH_FRAG         map[definition.Gossip_ID][]definition.Gossip_object
+	REV_FRAG         map[definition.Gossip_ID][]definition.Gossip_object
+	ACC_FRAG         map[definition.Gossip_ID][]definition.Gossip_object
+	STH_FULL         map[definition.Gossip_ID]definition.Gossip_object
+	REV_FULL         map[definition.Gossip_ID]definition.Gossip_object
+	ACC_FULL         map[definition.Gossip_ID]definition.Gossip_object
+	REV_PAYLOAD      map[definition.Gossip_ID][3]string
+	STH_INIT_LOCK    sync.RWMutex
+	REV_INIT_LOCK    sync.RWMutex
+	ACC_INIT_LOCK    sync.RWMutex
+	CON_INIT_LOCK    sync.RWMutex
+	STH_FRAG_LOCK    sync.RWMutex
+	REV_FRAG_LOCK    sync.RWMutex
+	ACC_FRAG_LOCK    sync.RWMutex
+	STH_FULL_LOCK    sync.RWMutex
+	REV_FULL_LOCK    sync.RWMutex
+	ACC_FULL_LOCK    sync.RWMutex
+	CON_FULL_LOCK    sync.RWMutex
+	REV_PAYLOAD_LOCK sync.RWMutex
 }
 
 type Gossip_blacklist struct {
@@ -76,6 +78,7 @@ type GossiperContext struct {
 	Max_latency            int
 	Total_traffic_sent     int
 	Total_traffic_received int
+	Optimization_threshold int
 	Counter1_lock          sync.Mutex
 	Counter2_lock          sync.Mutex
 	Timerlist              []float64
@@ -99,6 +102,11 @@ type Gossiper_log_entry struct {
 	NUM_ACC_FULL           int       `json:"num_acc_full"`
 	NUM_BLACKLIST_PERM     int       `json:"num_blacklist_perm"`
 	Timerlist              []float64 `json:"total_time"`
+}
+
+type Gossip_Notification struct {
+	Sender   string
+	GossipID definition.Gossip_ID
 }
 
 type Gossiper_log map[int]Gossiper_log_entry

@@ -11,26 +11,28 @@ import (
 
 func InitializeGossipObjectStorage() *Gossip_object_storage {
 	return &Gossip_object_storage{
-		STH_INIT:      make(map[definition.Gossip_ID]definition.Gossip_object),
-		REV_INIT:      make(map[definition.Gossip_ID]definition.Gossip_object),
-		ACC_INIT:      make(map[definition.Gossip_ID]definition.Gossip_object),
-		CON_INIT:      make(map[definition.Gossip_ID]definition.Gossip_object),
-		STH_FRAG:      make(map[definition.Gossip_ID][]definition.Gossip_object),
-		REV_FRAG:      make(map[definition.Gossip_ID][]definition.Gossip_object),
-		ACC_FRAG:      make(map[definition.Gossip_ID][]definition.Gossip_object),
-		STH_FULL:      make(map[definition.Gossip_ID]definition.Gossip_object),
-		REV_FULL:      make(map[definition.Gossip_ID]definition.Gossip_object),
-		ACC_FULL:      make(map[definition.Gossip_ID]definition.Gossip_object),
-		STH_INIT_LOCK: sync.RWMutex{},
-		REV_INIT_LOCK: sync.RWMutex{},
-		ACC_INIT_LOCK: sync.RWMutex{},
-		CON_INIT_LOCK: sync.RWMutex{},
-		STH_FRAG_LOCK: sync.RWMutex{},
-		REV_FRAG_LOCK: sync.RWMutex{},
-		ACC_FRAG_LOCK: sync.RWMutex{},
-		STH_FULL_LOCK: sync.RWMutex{},
-		REV_FULL_LOCK: sync.RWMutex{},
-		ACC_FULL_LOCK: sync.RWMutex{},
+		STH_INIT:         make(map[definition.Gossip_ID]definition.Gossip_object),
+		REV_INIT:         make(map[definition.Gossip_ID]definition.Gossip_object),
+		ACC_INIT:         make(map[definition.Gossip_ID]definition.Gossip_object),
+		CON_INIT:         make(map[definition.Gossip_ID]definition.Gossip_object),
+		STH_FRAG:         make(map[definition.Gossip_ID][]definition.Gossip_object),
+		REV_FRAG:         make(map[definition.Gossip_ID][]definition.Gossip_object),
+		ACC_FRAG:         make(map[definition.Gossip_ID][]definition.Gossip_object),
+		STH_FULL:         make(map[definition.Gossip_ID]definition.Gossip_object),
+		REV_FULL:         make(map[definition.Gossip_ID]definition.Gossip_object),
+		ACC_FULL:         make(map[definition.Gossip_ID]definition.Gossip_object),
+		REV_PAYLOAD:      make(map[definition.Gossip_ID][3]string),
+		STH_INIT_LOCK:    sync.RWMutex{},
+		REV_INIT_LOCK:    sync.RWMutex{},
+		ACC_INIT_LOCK:    sync.RWMutex{},
+		CON_INIT_LOCK:    sync.RWMutex{},
+		STH_FRAG_LOCK:    sync.RWMutex{},
+		REV_FRAG_LOCK:    sync.RWMutex{},
+		ACC_FRAG_LOCK:    sync.RWMutex{},
+		STH_FULL_LOCK:    sync.RWMutex{},
+		REV_FULL_LOCK:    sync.RWMutex{},
+		ACC_FULL_LOCK:    sync.RWMutex{},
+		REV_PAYLOAD_LOCK: sync.RWMutex{},
 	}
 }
 
@@ -68,6 +70,7 @@ func InitializeGossiperContext(public_config_path string, private_config_path st
 		Total_traffic_received:  0,
 		Counter1_lock:           sync.Mutex{},
 		Counter2_lock:           sync.Mutex{},
+		Optimization_threshold:  10,
 	}
 	return ctx
 }

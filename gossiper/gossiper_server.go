@@ -35,6 +35,8 @@ func handleRequests(c *GossiperContext) {
 	gorillaRouter.HandleFunc("/gossip/sth_frag", bindContext(c, Gossip_object_handler)).Methods("POST")
 	gorillaRouter.HandleFunc("/gossip/rev_frag", bindContext(c, Gossip_object_handler)).Methods("POST")
 	gorillaRouter.HandleFunc("/gossip/acc_frag", bindContext(c, Gossip_object_handler)).Methods("POST")
+	gorillaRouter.HandleFunc("/gossip/new_payload_request", bindContext(c, Gossip_request_handler)).Methods("POST")
+	gorillaRouter.HandleFunc("/gossip/new_payload_notification", bindContext(c, Gossip_notification_handler)).Methods("POST")
 	// Start the HTTP server.
 	http.Handle("/", gorillaRouter)
 	fmt.Println(util.BLUE+"Listening on port:", c.Gossiper_private_config.Port, util.RESET)
@@ -42,6 +44,91 @@ func handleRequests(c *GossiperContext) {
 	// We wont get here unless there's an error.
 	log.Fatal("ListenAndServe: ", err)
 	os.Exit(1)
+}
+
+func Gossip_notification_handler(c *GossiperContext, w http.ResponseWriter, r *http.Request) {
+	var notification Gossip_Notification
+	err := json.NewDecoder(r.Body).Decode(&notification)
+	bytecount := r.ContentLength
+	r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	c.Counter1_lock.Lock()
+	c.Total_traffic_received += int(bytecount)
+	c.Counter1_lock.Unlock()
+	//fmt.Println(util.BLUE+"Received notification from "+notification.Sender+".", util.RESET)
+	if c.SearchPayload(notification.GossipID) == false {
+		msg, _ := json.Marshal(notification.GossipID)
+		c.Counter2_lock.Lock()
+		c.Total_traffic_sent += len(msg)
+		c.Counter2_lock.Unlock()
+		url := notification.Sender
+		dstendpoint := "/gossip/new_payload_request"
+		resp, err := http.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
+		if err != nil {
+			if strings.Contains(err.Error(), "Client.Timeout") ||
+				strings.Contains(err.Error(), "connection refused") {
+				fmt.Println(util.RED+"Connection failed to "+url+"."+" Error message: ", err, util.RESET)
+			} else {
+				fmt.Println(util.RED+err.Error(), "sending to "+url+".", util.RESET)
+			}
+			return
+		}
+		defer func() {
+			if resp != nil && resp.Body != nil {
+				resp.Body.Close()
+			}
+		}()
+	}
+
+}
+
+func Gossip_request_handler(c *GossiperContext, w http.ResponseWriter, r *http.Request) {
+	var notification Gossip_Notification
+	err := json.NewDecoder(r.Body).Decode(&notification)
+	bytecount := r.ContentLength
+	r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	c.Counter1_lock.Lock()
+	c.Total_traffic_received += int(bytecount)
+	c.Counter1_lock.Unlock()
+	gid := notification.GossipID
+	obj := c.GetObject(gid, definition.REV_INIT)
+	if obj.Payload[0] != "" {
+		dstendpoint := ""
+		switch obj.Type {
+		case definition.REV_INIT:
+			dstendpoint = "/gossip/rev_init"
+		case definition.REV_FRAG:
+			dstendpoint = "/gossip/rev_frag"
+		}
+		msg, _ := json.Marshal(obj)
+		c.Counter2_lock.Lock()
+		c.Total_traffic_sent += len(msg)
+		c.Counter2_lock.Unlock()
+		url := notification.Sender
+		resp, err := http.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
+		if err != nil {
+			if strings.Contains(err.Error(), "Client.Timeout") ||
+				strings.Contains(err.Error(), "connection refused") {
+				fmt.Println(util.RED+"Connection failed to "+url+"."+" Error message: ", err, util.RESET)
+			} else {
+				fmt.Println(util.RED+err.Error(), "sending to "+url+".", util.RESET)
+			}
+			return
+		}
+		defer func() {
+			if resp != nil && resp.Body != nil {
+				resp.Body.Close()
+			}
+		}()
+	}
+	return
 }
 
 func Gossip_object_handler(c *GossiperContext, w http.ResponseWriter, r *http.Request) {
@@ -58,6 +145,12 @@ func Gossip_object_handler(c *GossiperContext, w http.ResponseWriter, r *http.Re
 	c.Counter1_lock.Lock()
 	c.Total_traffic_received += int(bytecount)
 	c.Counter1_lock.Unlock()
+	if bytecount > int64(c.Optimization_threshold) && gossip_obj.Type == definition.REV_INIT {
+		c.SavePayload(gossip_obj)
+	}
+	if bytecount > int64(c.Optimization_threshold) && (gossip_obj.Type == definition.REV_FRAG || gossip_obj.Type == "REV_NO_PAYLOAD") {
+		gossip_obj = c.ReconstructPayload(gossip_obj)
+	}
 	// Verify the object is valid, if invalid we just ignore it
 	// CON do not have a signature on it yet
 	/*
@@ -67,7 +160,8 @@ func Gossip_object_handler(c *GossiperContext, w http.ResponseWriter, r *http.Re
 			fmt.Println(util.RED, "Received invalid object "+definition.TypeString(gossip_obj.Type)+" signed by "+gossip_obj.Signer+".", util.RESET)
 			http.Error(w, err.Error(), http.StatusOK)
 			return
-		}*/
+		}
+	*/
 	Handle_Gossip_object(c, gossip_obj)
 }
 
@@ -347,30 +441,48 @@ func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_obje
 	}
 	dstendpoint := ""
 	bytecount := len(msg)
-	c.Counter2_lock.Lock()
-	c.Total_traffic_sent += bytecount * len(c.Gossiper_private_config.Connected_Gossipers)
-	c.Counter2_lock.Unlock()
-	switch gossip_obj.Type {
-	case definition.STH_INIT:
-		dstendpoint = "/gossip/sth_init"
-	case definition.REV_INIT:
-		dstendpoint = "/gossip/rev_init"
-	case definition.ACC_INIT:
-		dstendpoint = "/gossip/acc_init"
-	case definition.CON_INIT:
-		dstendpoint = "/gossip/con_init"
-	case definition.STH_FRAG:
-		dstendpoint = "/gossip/sth_frag"
-	case definition.REV_FRAG:
-		dstendpoint = "/gossip/rev_frag"
-	case definition.ACC_FRAG:
-		dstendpoint = "/gossip/acc_frag"
-	case definition.STH_FULL:
-		dstendpoint = "/gossip/sth_full"
-	case definition.REV_FULL:
-		dstendpoint = "/gossip/rev_full"
-	case definition.ACC_FULL:
-		dstendpoint = "/gossip/acc_full"
+	if bytecount > c.Optimization_threshold && (gossip_obj.Type == definition.REV_INIT) {
+		//fmt.Println("Optimization threshold reached")
+		var notification Gossip_Notification
+		notification.GossipID = gossip_obj.GetID()
+		notification.Sender = c.Gossiper_crypto_config.SelfID.String()
+		msg, _ := json.Marshal(notification)
+		bytecount = len(msg)
+		c.Counter2_lock.Lock()
+		c.Total_traffic_sent += bytecount * len(c.Gossiper_private_config.Connected_Gossipers)
+		c.Counter2_lock.Unlock()
+		dstendpoint = "/gossip/new_payload_notification"
+	} else {
+		if bytecount > c.Optimization_threshold && (gossip_obj.Type == definition.REV_FRAG) {
+			gossip_obj := c.Remove_Payload(gossip_obj)
+			msg, _ := json.Marshal(gossip_obj)
+			bytecount = len(msg)
+		}
+		c.Counter2_lock.Lock()
+		c.Total_traffic_sent += bytecount * len(c.Gossiper_private_config.Connected_Gossipers)
+		c.Counter2_lock.Unlock()
+		switch gossip_obj.Type {
+		case definition.STH_INIT:
+			dstendpoint = "/gossip/sth_init"
+		case definition.REV_INIT:
+			dstendpoint = "/gossip/rev_init"
+		case definition.ACC_INIT:
+			dstendpoint = "/gossip/acc_init"
+		case definition.CON_INIT:
+			dstendpoint = "/gossip/con_init"
+		case definition.STH_FRAG:
+			dstendpoint = "/gossip/sth_frag"
+		case definition.REV_FRAG:
+			dstendpoint = "/gossip/rev_frag"
+		case definition.ACC_FRAG:
+			dstendpoint = "/gossip/acc_frag"
+		case definition.STH_FULL:
+			dstendpoint = "/gossip/sth_full"
+		case definition.REV_FULL:
+			dstendpoint = "/gossip/rev_full"
+		case definition.ACC_FULL:
+			dstendpoint = "/gossip/acc_full"
+		}
 	}
 	for _, url := range c.Gossiper_private_config.Connected_Gossipers {
 		go func(url, dstendpoint string) {
