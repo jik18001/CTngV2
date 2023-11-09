@@ -30,9 +30,6 @@ func (ctx *GossiperContext) Generate_Gossip_Object_FRAG(g definition.Gossip_obje
 func (ctx *GossiperContext) Remove_Payload(g definition.Gossip_object) definition.Gossip_object {
 	g.Payload[1] = ""
 	g.Payload[2] = ""
-	if g.Type == definition.REV_INIT {
-		g.Type = "REV_NO_PAYLOAD"
-	}
 	return g
 }
 

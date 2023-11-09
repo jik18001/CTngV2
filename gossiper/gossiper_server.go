@@ -101,13 +101,7 @@ func Gossip_request_handler(c *GossiperContext, w http.ResponseWriter, r *http.R
 	gid := notification.GossipID
 	obj := c.GetObject(gid, definition.REV_INIT)
 	if obj.Payload[0] != "" {
-		dstendpoint := ""
-		switch obj.Type {
-		case definition.REV_INIT:
-			dstendpoint = "/gossip/rev_init"
-		case definition.REV_FRAG:
-			dstendpoint = "/gossip/rev_frag"
-		}
+		dstendpoint := "/gossip/rev_init"
 		msg, _ := json.Marshal(obj)
 		c.Counter2_lock.Lock()
 		c.Total_traffic_sent += len(msg)
@@ -149,7 +143,7 @@ func Gossip_object_handler(c *GossiperContext, w http.ResponseWriter, r *http.Re
 	if bytecount > int64(c.Optimization_threshold) && gossip_obj.Type == definition.REV_INIT {
 		c.SavePayload(gossip_obj)
 	}
-	if bytecount > int64(c.Optimization_threshold) && (gossip_obj.Type == definition.REV_FRAG || gossip_obj.Type == "REV_NO_PAYLOAD") {
+	if bytecount > int64(c.Optimization_threshold) && (gossip_obj.Type == definition.REV_FRAG) {
 		gossip_obj = c.ReconstructPayload(gossip_obj)
 	}
 	// Verify the object is valid, if invalid we just ignore it
