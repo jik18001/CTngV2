@@ -47,6 +47,7 @@ func handleRequests(c *GossiperContext) {
 }
 
 func Gossip_notification_handler(c *GossiperContext, w http.ResponseWriter, r *http.Request) {
+	fmt.Println(util.BLUE + "Received a new payload notification." + util.RESET)
 	var notification Gossip_Notification
 	err := json.NewDecoder(r.Body).Decode(&notification)
 	bytecount := r.ContentLength
@@ -87,6 +88,7 @@ func Gossip_notification_handler(c *GossiperContext, w http.ResponseWriter, r *h
 }
 
 func Gossip_request_handler(c *GossiperContext, w http.ResponseWriter, r *http.Request) {
+	fmt.Println(util.BLUE+"Received request from "+util.GetSenderURL(r)+".", util.RESET)
 	var notification Gossip_Notification
 	err := json.NewDecoder(r.Body).Decode(&notification)
 	bytecount := r.ContentLength
@@ -107,6 +109,7 @@ func Gossip_request_handler(c *GossiperContext, w http.ResponseWriter, r *http.R
 		c.Total_traffic_sent += len(msg)
 		c.Counter2_lock.Unlock()
 		url := notification.Sender
+		fmt.Println(obj.Payload)
 		resp, err := http.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
 		if err != nil {
 			if strings.Contains(err.Error(), "Client.Timeout") ||

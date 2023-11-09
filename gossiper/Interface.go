@@ -45,6 +45,7 @@ func (ctx *GossiperContext) SavePayload(g definition.Gossip_object) {
 }
 
 func (ctx *GossiperContext) SearchPayload(gid definition.Gossip_ID) bool {
+	gid.Type = definition.REV_INIT
 	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RLock()
 	defer ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RUnlock()
 	if _, ok := ctx.Gossip_object_storage.REV_PAYLOAD[gid]; ok {
