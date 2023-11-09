@@ -102,6 +102,9 @@ func Gossip_request_handler(c *GossiperContext, w http.ResponseWriter, r *http.R
 	c.Counter1_lock.Unlock()
 	gid := notification.GossipID
 	obj := c.GetObject(gid, definition.REV_INIT)
+	fmt.Println(notification)
+	fmt.Println(gid)
+	fmt.Println(obj.Payload)
 	if obj.Payload[0] != "" {
 		dstendpoint := "/gossip/rev_init"
 		msg, _ := json.Marshal(obj)
@@ -109,7 +112,6 @@ func Gossip_request_handler(c *GossiperContext, w http.ResponseWriter, r *http.R
 		c.Total_traffic_sent += len(msg)
 		c.Counter2_lock.Unlock()
 		url := notification.Sender
-		fmt.Println(obj.Payload)
 		resp, err := http.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
 		if err != nil {
 			if strings.Contains(err.Error(), "Client.Timeout") ||
@@ -444,6 +446,7 @@ func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_obje
 		var notification Gossip_Notification
 		notification.GossipID = gossip_obj.GetID()
 		notification.Sender = c.Gossiper_crypto_config.SelfID.String()
+		fmt.Println(notification)
 		msg, _ := json.Marshal(notification)
 		bytecount = len(msg)
 		c.Counter2_lock.Lock()
