@@ -60,7 +60,8 @@ func Gossip_notification_handler(c *GossiperContext, w http.ResponseWriter, r *h
 	c.Counter1_lock.Unlock()
 	//fmt.Println(util.BLUE+"Received notification from "+notification.Sender+".", util.RESET)
 	if c.SearchPayload(notification.GossipID) == false {
-		msg, _ := json.Marshal(notification.GossipID)
+		notification.Sender = c.Gossiper_crypto_config.SelfID.String()
+		msg, _ := json.Marshal(notification)
 		c.Counter2_lock.Lock()
 		c.Total_traffic_sent += len(msg)
 		c.Counter2_lock.Unlock()
