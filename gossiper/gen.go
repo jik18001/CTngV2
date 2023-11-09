@@ -35,6 +35,7 @@ func (ctx *GossiperContext) Remove_Payload(g definition.Gossip_object) definitio
 
 func (ctx *GossiperContext) ReconstructPayload(g definition.Gossip_object) definition.Gossip_object {
 	gid := g.GetID()
+	gid.Type = definition.REV_INIT
 	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RLock()
 	var tbfpayload [3]string
 	tbfpayload = ctx.Gossip_object_storage.REV_PAYLOAD[gid]
