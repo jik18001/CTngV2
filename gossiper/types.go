@@ -105,8 +105,10 @@ type Gossiper_log_entry struct {
 }
 
 type Gossip_Notification struct {
-	Sender   string
-	GossipID definition.Gossip_ID
+	Sender     string
+	Period     string
+	Type       string
+	Entity_URL string
 }
 
 type Gossiper_log map[int]Gossiper_log_entry

@@ -59,8 +59,12 @@ func Gossip_notification_handler(c *GossiperContext, w http.ResponseWriter, r *h
 	c.Counter1_lock.Lock()
 	c.Total_traffic_received += int(bytecount)
 	c.Counter1_lock.Unlock()
+	var newID definition.Gossip_ID
+	newID.Period = notification.Period
+	newID.Type = notification.Type
+	newID.Entity_URL = notification.Entity_URL
 	//fmt.Println(util.BLUE+"Received notification from "+notification.Sender+".", util.RESET)
-	if c.SearchPayload(notification.GossipID) == false {
+	if c.SearchPayload(newID) == false {
 		notification.Sender = c.Gossiper_crypto_config.SelfID.String()
 		msg, _ := json.Marshal(notification)
 		c.Counter2_lock.Lock()
@@ -100,10 +104,13 @@ func Gossip_request_handler(c *GossiperContext, w http.ResponseWriter, r *http.R
 	c.Counter1_lock.Lock()
 	c.Total_traffic_received += int(bytecount)
 	c.Counter1_lock.Unlock()
-	gid := notification.GossipID
-	obj := c.GetObject(gid, definition.REV_INIT)
+	var newID definition.Gossip_ID
+	newID.Period = notification.Period
+	newID.Type = notification.Type
+	newID.Entity_URL = notification.Entity_URL
+	obj := c.GetObject(newID, definition.REV_INIT)
 	fmt.Println(notification)
-	fmt.Println(gid)
+	fmt.Println(newID)
 	fmt.Println(obj.Payload)
 	if obj.Payload[0] != "" {
 		dstendpoint := "/gossip/rev_init"
@@ -444,8 +451,11 @@ func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_obje
 	if bytecount > c.Optimization_threshold && (gossip_obj.Type == definition.REV_INIT) {
 		//fmt.Println("Optimization threshold reached")
 		var notification Gossip_Notification
-		notification.GossipID = gossip_obj.GetID()
+		GID := gossip_obj.GetID()
 		notification.Sender = c.Gossiper_crypto_config.SelfID.String()
+		notification.Period = GID.Period
+		notification.Type = GID.Type
+		notification.Entity_URL = GID.Entity_URL
 		fmt.Println(notification)
 		msg, _ := json.Marshal(notification)
 		bytecount = len(msg)
