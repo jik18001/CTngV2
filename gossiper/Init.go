@@ -21,7 +21,7 @@ func InitializeGossipObjectStorage() *Gossip_object_storage {
 		STH_FULL:         make(map[definition.Gossip_ID]definition.Gossip_object),
 		REV_FULL:         make(map[definition.Gossip_ID]definition.Gossip_object),
 		ACC_FULL:         make(map[definition.Gossip_ID]definition.Gossip_object),
-		REV_PAYLOAD:      make(map[definition.Gossip_ID][3]string),
+		REV_PAYLOAD:      make(map[definition.Gossip_ID]definition.Gossip_object),
 		STH_INIT_LOCK:    sync.RWMutex{},
 		REV_INIT_LOCK:    sync.RWMutex{},
 		ACC_INIT_LOCK:    sync.RWMutex{},

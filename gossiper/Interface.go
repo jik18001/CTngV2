@@ -40,7 +40,7 @@ func (ctx *GossiperContext) SavePayload(g definition.Gossip_object) {
 		return
 	}
 	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.Lock()
-	ctx.Gossip_object_storage.REV_PAYLOAD[g.GetID()] = g.Payload
+	ctx.Gossip_object_storage.REV_PAYLOAD[g.GetID()] = g
 	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.Unlock()
 }
 
@@ -52,6 +52,16 @@ func (ctx *GossiperContext) SearchPayload(gid definition.Gossip_ID) bool {
 		return true
 	}
 	return false
+}
+
+func (ctx *GossiperContext) GetREVrequested(gid definition.Gossip_ID) definition.Gossip_object {
+	gid.Type = definition.REV_INIT
+	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RLock()
+	defer ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RUnlock()
+	if _, ok := ctx.Gossip_object_storage.REV_PAYLOAD[gid]; ok {
+		return ctx.Gossip_object_storage.REV_PAYLOAD[gid]
+	}
+	return definition.Gossip_object{}
 }
 
 func (ctx *GossiperContext) Save() {

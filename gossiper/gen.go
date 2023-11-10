@@ -38,7 +38,7 @@ func (ctx *GossiperContext) ReconstructPayload(g definition.Gossip_object) defin
 	gid.Type = definition.REV_INIT
 	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RLock()
 	var tbfpayload [3]string
-	tbfpayload = ctx.Gossip_object_storage.REV_PAYLOAD[gid]
+	tbfpayload = ctx.Gossip_object_storage.REV_PAYLOAD[gid].Payload
 	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RUnlock()
 	g.Payload = tbfpayload
 	return g

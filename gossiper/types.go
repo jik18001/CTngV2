@@ -35,7 +35,7 @@ type Gossip_object_storage struct {
 	STH_FULL         map[definition.Gossip_ID]definition.Gossip_object
 	REV_FULL         map[definition.Gossip_ID]definition.Gossip_object
 	ACC_FULL         map[definition.Gossip_ID]definition.Gossip_object
-	REV_PAYLOAD      map[definition.Gossip_ID][3]string
+	REV_PAYLOAD      map[definition.Gossip_ID]definition.Gossip_object
 	STH_INIT_LOCK    sync.RWMutex
 	REV_INIT_LOCK    sync.RWMutex
 	ACC_INIT_LOCK    sync.RWMutex

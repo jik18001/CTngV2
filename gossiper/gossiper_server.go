@@ -59,22 +59,23 @@ func Gossip_notification_handler(c *GossiperContext, w http.ResponseWriter, r *h
 	c.Counter1_lock.Lock()
 	c.Total_traffic_received += int(bytecount)
 	c.Counter1_lock.Unlock()
-	var newID definition.Gossip_ID
-	newID.Period = notification.Period
-	newID.Type = notification.Type
-	newID.Entity_URL = notification.Entity_URL
+	newID := definition.Gossip_ID{
+		Period:     notification.Period,
+		Type:       notification.Type,
+		Entity_URL: notification.Entity_URL,
+	}
 	fmt.Println(util.BLUE+"Received notification from "+notification.Sender+".", util.RESET)
 	fmt.Println("notification received: ", notification)
 	fmt.Println("GossipID Parsed: ", newID)
 	//fmt.Println(util.BLUE+"Received notification from "+notification.Sender+".", util.RESET)
 	if c.SearchPayload(newID) == false {
+		url := notification.Sender
+		dstendpoint := "/gossip/new_payload_request"
 		notification.Sender = c.Gossiper_crypto_config.SelfID.String()
 		msg, _ := json.Marshal(notification)
 		c.Counter2_lock.Lock()
 		c.Total_traffic_sent += len(msg)
 		c.Counter2_lock.Unlock()
-		url := notification.Sender
-		dstendpoint := "/gossip/new_payload_request"
 		resp, err := c.Client.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
 		if err != nil {
 			if strings.Contains(err.Error(), "Client.Timeout") ||
@@ -106,11 +107,12 @@ func Gossip_request_handler(c *GossiperContext, w http.ResponseWriter, r *http.R
 	c.Counter1_lock.Lock()
 	c.Total_traffic_received += int(bytecount)
 	c.Counter1_lock.Unlock()
-	var newID definition.Gossip_ID
-	newID.Period = notification.Period
-	newID.Type = notification.Type
-	newID.Entity_URL = notification.Entity_URL
-	obj := c.GetObject(newID, definition.REV_INIT)
+	newID := definition.Gossip_ID{
+		Period:     notification.Period,
+		Type:       notification.Type,
+		Entity_URL: notification.Entity_URL,
+	}
+	obj := c.GetREVrequested(newID)
 	fmt.Println(util.BLUE+"Received request from "+notification.Sender+".", util.RESET)
 	fmt.Println("request received: ", notification)
 	fmt.Println("GossipID Parsed: ", newID)
