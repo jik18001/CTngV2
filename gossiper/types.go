@@ -105,10 +105,10 @@ type Gossiper_log_entry struct {
 }
 
 type Gossip_Notification struct {
-	Sender     string
-	Period     string
-	Type       string
-	Entity_URL string
+	Sender     string `json:"sender"`
+	Period     string `json:"period"`
+	Type       string `json:"type"`
+	Entity_URL string `json:"entity_url"`
 }
 
 type Gossiper_log map[int]Gossiper_log_entry

@@ -74,7 +74,7 @@ func Gossip_notification_handler(c *GossiperContext, w http.ResponseWriter, r *h
 		c.Counter2_lock.Unlock()
 		url := notification.Sender
 		dstendpoint := "/gossip/new_payload_request"
-		resp, err := http.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
+		resp, err := c.Client.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
 		if err != nil {
 			if strings.Contains(err.Error(), "Client.Timeout") ||
 				strings.Contains(err.Error(), "connection refused") {
@@ -121,7 +121,7 @@ func Gossip_request_handler(c *GossiperContext, w http.ResponseWriter, r *http.R
 		c.Total_traffic_sent += len(msg)
 		c.Counter2_lock.Unlock()
 		url := notification.Sender
-		resp, err := http.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
+		resp, err := c.Client.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
 		if err != nil {
 			if strings.Contains(err.Error(), "Client.Timeout") ||
 				strings.Contains(err.Error(), "connection refused") {
@@ -458,8 +458,7 @@ func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_obje
 		notification.Period = GID.Period
 		notification.Type = GID.Type
 		notification.Entity_URL = GID.Entity_URL
-		fmt.Println("notification sent", notification)
-		msg, _ := json.Marshal(notification)
+		msg, _ = json.Marshal(notification)
 		bytecount = len(msg)
 		c.Counter2_lock.Lock()
 		c.Total_traffic_sent += bytecount * len(c.Gossiper_private_config.Connected_Gossipers)
@@ -468,7 +467,7 @@ func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_obje
 	} else {
 		if bytecount > c.Optimization_threshold && (gossip_obj.Type == definition.REV_FRAG) {
 			gossip_obj := c.Remove_Payload(gossip_obj)
-			msg, _ := json.Marshal(gossip_obj)
+			msg, _ = json.Marshal(gossip_obj)
 			bytecount = len(msg)
 		}
 		c.Counter2_lock.Lock()
@@ -503,7 +502,7 @@ func Send_obj_to_Gossipers(c *GossiperContext, gossip_obj definition.Gossip_obje
 				time.Sleep(time.Duration(util.GetRandomLatency(c.Min_latency, c.Max_latency)) * time.Millisecond) // Delay before sending
 			}
 
-			resp, err := http.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
+			resp, err := c.Client.Post("http://"+url+dstendpoint, "application/json", bytes.NewBuffer(msg))
 			if err != nil {
 				if strings.Contains(err.Error(), "Client.Timeout") ||
 					strings.Contains(err.Error(), "connection refused") {
