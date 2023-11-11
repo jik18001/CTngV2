@@ -71,6 +71,7 @@ func InitializeGossiperContext(public_config_path string, private_config_path st
 		Counter1_lock:           sync.Mutex{},
 		Counter2_lock:           sync.Mutex{},
 		Optimization_threshold:  10,
+		Optimization_mode:       true,
 	}
 	return ctx
 }

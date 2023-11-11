@@ -79,6 +79,7 @@ type GossiperContext struct {
 	Total_traffic_sent     int
 	Total_traffic_received int
 	Optimization_threshold int
+	Optimization_mode      bool
 	Counter1_lock          sync.Mutex
 	Counter2_lock          sync.Mutex
 	Timerlist              []float64

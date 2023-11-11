@@ -160,7 +160,7 @@ func Gossip_object_handler(c *GossiperContext, w http.ResponseWriter, r *http.Re
 	if bytecount > int64(c.Optimization_threshold) && gossip_obj.Type == definition.REV_INIT {
 		c.SavePayload(gossip_obj)
 	}
-	if bytecount > int64(c.Optimization_threshold) && (gossip_obj.Type == definition.REV_FRAG) {
+	if c.Optimization_mode == true && (gossip_obj.Type == definition.REV_FRAG) {
 		gossip_obj = c.ReconstructPayload(gossip_obj)
 	}
 	// Verify the object is valid, if invalid we just ignore it
