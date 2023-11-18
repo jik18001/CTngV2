@@ -95,7 +95,7 @@ func handle_gossip(c *MonitorContext, w http.ResponseWriter, r *http.Request) {
 	http.Error(w, "Gossip object Processed.", http.StatusOK)
 }
 */
-
+/*
 func QueryLoggers(c *MonitorContext) {
 	for _, logger := range c.Monitor_private_config.Logger_URLs {
 		// var today = time.Now().UTC().Format(time.RFC3339)[0:10]
@@ -129,8 +129,50 @@ func QueryLoggers(c *MonitorContext) {
 		}
 	}
 
+}*/
+
+func QueryLoggers(c *MonitorContext) {
+	for _, logger := range c.Monitor_private_config.Logger_URLs {
+		if Check_entity_pom(c, logger) {
+			fmt.Println(util.RED, "There is a PoM against this Logger. Query will not be initiated", util.RESET)
+		} else {
+			fmt.Println(util.GREEN + "Querying Logger Initiated" + util.RESET)
+
+			// Launch a goroutine to perform the query and introduce a delay
+			go func(loggerURL string) {
+				if c.Max_latency > 0 {
+					time.Sleep(time.Duration(util.GetRandomLatency(c.Min_latency, c.Max_latency)) * time.Millisecond) // Delay before sending
+				}
+				sthResp, err1 := http.Get(PROTOCOL + loggerURL + "/ctng/v2/get-sth/")
+				if err1 != nil {
+					log.Println(util.RED+"Query Logger Failed, connection refused.", util.RESET)
+					Wait_then_accuse(c, loggerURL, "logger")
+				} else {
+					// Read and process the response
+					sthBody, err2 := ioutil.ReadAll(sthResp.Body)
+					sthResp.Body.Close()
+					var STH definition.Gossip_object
+					err2 = json.Unmarshal(sthBody, &STH)
+					if err2 != nil {
+						log.Println(util.RED+err2.Error(), util.RESET)
+						Wait_then_accuse(c, loggerURL, "logger")
+					} else {
+						err3 := STH.Verify(c.Monitor_crypto_config)
+						if err3 != nil {
+							log.Println(util.RED+"STH signature verification failed"+err3.Error(), util.RESET)
+							Wait_then_accuse(c, loggerURL, "logger")
+						} else {
+							// Process valid object
+							Process_valid_object(c, STH)
+						}
+					}
+				}
+			}(logger)
+		}
+	}
 }
 
+/*
 // Queries CAs for revocation information
 // The revocation datapath hasn't been very fleshed out currently, nor has this function.
 func QueryAuthorities(c *MonitorContext) {
@@ -181,6 +223,62 @@ func QueryAuthorities(c *MonitorContext) {
 					}
 				}
 			}
+		}
+	}
+}*/
+
+func QueryAuthorities(c *MonitorContext) {
+	for _, CA := range c.Monitor_private_config.CA_URLs {
+		if Check_entity_pom(c, CA) {
+			fmt.Println(util.RED, "There is a PoM against this CA. Query will not be initiated", util.RESET)
+		} else {
+			fmt.Println(util.GREEN + "Querying CA Initiated" + util.RESET)
+
+			// Launch a goroutine to perform the query and introduce a delay
+			go func(CAURL string) {
+				if c.Max_latency > 0 {
+					time.Sleep(time.Duration(util.GetRandomLatency(c.Min_latency, c.Max_latency)) * time.Millisecond) // Delay before sending
+				}
+				revResp, err1 := http.Get(PROTOCOL + CAURL + "/ctng/v2/get-revocation/")
+				if err1 != nil {
+					log.Println(util.RED+"Query CA Failed, connection refused.", util.RESET)
+					Wait_then_accuse(c, CAURL, "ca")
+					return
+				}
+
+				revBody, err2 := ioutil.ReadAll(revResp.Body)
+				revResp.Body.Close()
+				if err2 != nil {
+					log.Println(util.RED+err2.Error(), util.RESET)
+					Wait_then_accuse(c, CAURL, "ca")
+					return
+				}
+
+				var REV definition.Gossip_object
+				err3 := json.Unmarshal(revBody, &REV)
+				if err3 != nil {
+					log.Println(util.RED+err3.Error(), util.RESET)
+					Wait_then_accuse(c, CAURL, "ca")
+					return
+				}
+
+				err4 := REV.Verify(c.Monitor_crypto_config)
+				if err4 != nil {
+					log.Println(util.RED+"Revocation information signature verification failed", err4.Error(), util.RESET)
+					Wait_then_accuse(c, CAURL, "ca")
+					return
+				}
+
+				SRH, DCRV := Get_SRH_and_DCRV(REV)
+				key := REV.Payload[0]
+				pass := c.VerifySRH(SRH, &DCRV, key, REV.Period)
+				if !pass {
+					fmt.Println("SRH verification failed")
+					Wait_then_accuse(c, CAURL, "ca")
+				} else {
+					Process_valid_object(c, REV)
+				}
+			}(CA)
 		}
 	}
 }

@@ -68,6 +68,8 @@ func InitializeGossiperContext(public_config_path string, private_config_path st
 		Verbose:                 false,
 		Total_traffic_sent:      0,
 		Total_traffic_received:  0,
+		Min_latency:             0,
+		Max_latency:             290,
 		Counter1_lock:           sync.Mutex{},
 		Counter2_lock:           sync.Mutex{},
 		Optimization_threshold:  10,

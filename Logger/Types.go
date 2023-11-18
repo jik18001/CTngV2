@@ -51,7 +51,8 @@ type LoggerContext struct {
 	Request_Count_lock    *sync.Mutex
 	CertPool_lock         *sync.Mutex
 	StoragePath           string
-	Maxlatency            int
+	Max_latency           int
+	Min_latency           int
 }
 
 type PrecertStorage struct {
@@ -115,6 +116,8 @@ func InitializeLoggerContext(public_config_path string, private_config_file_path
 		Logger_Type:           0,
 		Request_Count:         0,
 		OnlineDuration:        0,
+		Max_latency:           290,
+		Min_latency:           0,
 		STH_storage:           make(map[string]definition.Gossip_object),
 		STH_storage_fake:      make(map[string]definition.Gossip_object),
 		MisbehaviorInterval:   0,

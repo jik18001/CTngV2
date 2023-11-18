@@ -138,13 +138,9 @@ func GetRandomLatency(min int, max int) int {
 }*/
 
 func GetRandomLatency(min int, max int) int {
-	mean := float64(min+max) / 2
-	// Set the standard deviation so that ~99% of values fall within [min, max]
-	stddev := float64(max-min) / (2.575829 * 2)
-
+	multiplier := float64(max - min)
 	for {
-		// Generate a normally distributed value
-		value := rand.NormFloat64()*stddev + mean
+		value := rand.ExpFloat64()*multiplier + float64(min)
 
 		// Convert to int and check if within bounds
 		latency := int(value)

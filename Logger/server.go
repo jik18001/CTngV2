@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
@@ -45,8 +44,8 @@ func handleLoggerRequests(ctx *LoggerContext) {
 }
 
 func requestSTH(c *LoggerContext, w http.ResponseWriter, r *http.Request) {
-	if c.Maxlatency > 0 {
-		time.Sleep(time.Duration(rand.Intn(c.Maxlatency)) * time.Millisecond)
+	if c.Max_latency > 0 {
+		time.Sleep(time.Duration(util.GetRandomLatency(c.Min_latency, c.Max_latency)) * time.Millisecond) // Delay before sending
 	}
 	// get current period
 	Period := util.GetCurrentPeriod()

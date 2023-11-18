@@ -1,0 +1,52 @@
+{
+  "STHs": [
+    {
+      "application": "CTng",
+      "period": "45",
+      "type": "http://ctng.uconn.edu/301",
+      "signer": "",
+      "signers": [
+        "localhost:8082",
+        "localhost:8081"
+      ],
+      "signature": [
+        "{\"sign\":\"908855ad7ab51dbc8fead5df822bda3722e88eca1a4fe93e77aef9faa63ef00e906671e8fcc63e17c6295a6f3adb9c93\", \"ids\":[\"localhost:8081\",\"localhost:8082\"]}",
+        ""
+      ],
+      "timestamp": "2023-11-10T03:45:06Z",
+      "crypto_scheme": "bls",
+      "payload": [
+        "localhost:9000",
+        "7b225369676e6572223a226c6f63616c686f73743a39303030222c2254696d657374616d70223a22323032332d31312d31305430333a34343a34305a222c22506572696f64223a223434222c22526f6f7448617368223a2230336332643937633266663461333963616434366662363237333432363933356561373932643562333733613838333232393166343532303461633466363861222c225472656553697a65223a327d",
+        ""
+      ]
+    }
+  ],
+  "REVs": [
+    {
+      "application": "CTng",
+      "period": "45",
+      "type": "http://ctng.uconn.edu/302",
+      "signer": "",
+      "signers": [
+        "localhost:8083",
+        "localhost:8082"
+      ],
+      "signature": [
+        "{\"sign\":\"3a424de1fe7d4d7e83b6936bc02baf56aada416ac49cdd1d6d9214d54cb9bb1e28ff7dd7f279af98ba5f156b09d44e8a\", \"ids\":[\"localhost:8082\",\"localhost:8083\"]}",
+        ""
+      ],
+      "timestamp": "2023-11-10T03:45:06Z",
+      "crypto_scheme": "bls",
+      "payload": [
+        "localhost:9100",
+        "CRV",
+        "{\"Period\":\"45\",\"Delta_CRV\":\"H4sIAAAAAAAA/+zAUREAAAQFsNdAJad/KCeFny2npgMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwbAMAAP//DJvy1FDoAQA=\",\"SRH\":\"{\\\"sig\\\":\\\"19f3f4dc5d19b4a3458b690fe6f0b2f58f6e59482e383cd585fe04b44c63a1fd906aa7518ffa3c009e69d6a6082f0de465a181719b848104c468ca8345e1b578ec03b9f1039b8322b7e053aa26385ec2f349b353f1747ded602a7b676fcd67fd7039c00ff7f96cab45caec4ee0809315bebe84f197fb78d4485d18abf662b4cce990737be90ff8f439cc89fdee6ec72a761dd8f524f8af77299dac2a16541ae1846a360676df38f53ae70a3853abd1d2214a4290bdd03ec43dba866d1a7ee14886b08a9caf3009733e1126423ac82d17bf68abb613d329c8587efad2cf160c1732a224652f880ceed358e51d4d97d52c68dabe53de570cb1432f97f40de813c7\\\",\\\"id\\\":\\\"localhost:9100\\\"}\"}"
+      ]
+    }
+  ],
+  "POM_CONs": [],
+  "POM_ACCs": [],
+  "MonitorID": "localhost:8183",
+  "Period": "45"
+}

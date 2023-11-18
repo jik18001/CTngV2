@@ -45,6 +45,8 @@ type MonitorContext struct {
 	Period_Offset          string
 	Clockdrift_miliseconds int
 	Maxdrift_miliseconds   int
+	Max_latency            int
+	Min_latency            int
 	CRV_lock               *sync.Mutex
 	CONFLICT_POM_lock      *sync.RWMutex
 	ACCUSATION_POM_lock    *sync.RWMutex
@@ -346,6 +348,8 @@ func InitializeMonitorContext(public_config_path string, private_config_path str
 		Storage_CRV:                  make(map[string]*bitset.BitSet),
 		StorageID:                    storageID,
 		Mode:                         0,
+		Max_latency:                  290,
+		Min_latency:                  0,
 		CONFLICT_POM_lock:            &sync.RWMutex{},
 		ACCUSATION_POM_lock:          &sync.RWMutex{},
 		STH_FULL_lock:                &sync.RWMutex{},

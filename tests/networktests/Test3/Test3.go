@@ -21,7 +21,6 @@ func StartCA(CID string) {
 	ctx_ca := CA.InitializeCAContext(path_1, path_2, path_3)
 	ctx_ca.CA_Type = 3
 	ctx_ca.MisbehaviorInterval = 2
-	ctx_ca.Maxlatency = 500
 	CA.StartCA(ctx_ca)
 }
 
@@ -33,7 +32,6 @@ func StartLogger(LID string) {
 	ctx_logger := Logger.InitializeLoggerContext(path_1, path_2, path_3)
 	ctx_logger.Logger_Type = 3
 	ctx_logger.MisbehaviorInterval = 2
-	ctx_logger.Maxlatency = 500
 	Logger.StartLogger(ctx_logger)
 }
 

@@ -20,7 +20,6 @@ func StartCA(CID string) {
 	path_2 := path_prefix + "/CA_private_config.json"
 	path_3 := path_prefix + "/CA_crypto_config.json"
 	ctx_ca := CA.InitializeCAContext(path_1, path_2, path_3)
-	ctx_ca.Maxlatency = 500
 	ctx_ca.RevocationRatio = 0.01
 	CA.StartCA(ctx_ca)
 }
@@ -31,7 +30,6 @@ func StartLogger(LID string) {
 	path_2 := path_prefix + "/Logger_private_config.json"
 	path_3 := path_prefix + "/Logger_crypto_config.json"
 	ctx_logger := Logger.InitializeLoggerContext(path_1, path_2, path_3)
-	ctx_logger.Maxlatency = 500
 	Logger.StartLogger(ctx_logger)
 }
 

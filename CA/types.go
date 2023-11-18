@@ -42,7 +42,8 @@ type CAContext struct {
 	StoragePath2           string
 	STH_storage            map[string]definition.Gossip_object //store the STH by LID
 	Request_Count_lock     *sync.Mutex
-	Maxlatency             int
+	Min_latency            int
+	Max_latency            int
 	RevocationRatio        float64
 	STH_storage_lock       *sync.Mutex
 	Certpool_lock          *sync.Mutex
@@ -322,6 +323,8 @@ func InitializeCAContext(public_config_path string, private_config_file_path str
 		REV_storage_fake:       make(map[string]definition.Gossip_object),
 		MisbehaviorInterval:    0,
 		CertCounter:            0,
+		Min_latency:            0,
+		Max_latency:            290,
 		STH_storage:            make(map[string]definition.Gossip_object),
 		Request_Count_lock:     &sync.Mutex{},
 		STH_storage_lock:       &sync.Mutex{},

@@ -1,8 +1,10 @@
 {
-  "22": {
-    "period": 22,
-    "converge_time": "07.311",
-    "converge_time_init": "02.153",
+  "44": {
+    "period": 44,
+    "converge_time": "07.067",
+    "converge_time_init": "01.986",
+    "total_traffic_received": 13906,
+    "total_traffic_sent": 9745,
     "num_sth_init": 1,
     "num_rev_init": 1,
     "num_acc_init": 0,
@@ -13,6 +15,40 @@
     "num_sth_full": 1,
     "num_rev_full": 1,
     "num_acc_full": 0,
-    "num_blacklist_perm": 0
+    "num_blacklist_perm": 0,
+    "total_time": [
+      1.684,
+      1.986,
+      6.687,
+      7.067
+    ]
+  },
+  "45": {
+    "period": 45,
+    "converge_time": "06.933",
+    "converge_time_init": "01.908",
+    "total_traffic_received": 25132,
+    "total_traffic_sent": 19490,
+    "num_sth_init": 1,
+    "num_rev_init": 1,
+    "num_acc_init": 0,
+    "num_con_init": 0,
+    "num_sth_frag": 2,
+    "num_rev_frag": 2,
+    "num_acc_frag": 0,
+    "num_sth_full": 1,
+    "num_rev_full": 1,
+    "num_acc_full": 0,
+    "num_blacklist_perm": 0,
+    "total_time": [
+      1.684,
+      1.986,
+      6.687,
+      7.067,
+      1.851,
+      1.908,
+      6.747,
+      6.932
+    ]
   }
 }
