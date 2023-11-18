@@ -136,10 +136,13 @@ func requestREV(c *CAContext, w http.ResponseWriter, r *http.Request) {
 	if c.Maxlatency > 0 {
 		time.Sleep(time.Duration(rand.Intn(c.Maxlatency)) * time.Millisecond)
 	}
-	c.Request_Count_lock.Lock()
-	req_count := c.Request_Count + 1
-	c.Request_Count = c.Request_Count + 1
-	c.Request_Count_lock.Unlock()
+	req_count := 1
+	if c.CA_Type != 0 {
+		c.Request_Count_lock.Lock()
+		req_count = c.Request_Count + 1
+		c.Request_Count = c.Request_Count + 1
+		c.Request_Count_lock.Unlock()
+	}
 	Period := GetCurrentPeriod()
 	// convert string to int
 	periodnum, err := strconv.Atoi(Period)
