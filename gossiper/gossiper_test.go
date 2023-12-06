@@ -1,6 +1,7 @@
 package gossiper
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"testing"
@@ -264,8 +265,39 @@ func TestFragHandler(t *testing.T) {
 	//REV_FRAG_1 := ctx_g1.Generate_Gossip_Object_FRAG(REV_INIT_1)
 	REV_FRAG_2 := ctx_g2.Generate_Gossip_Object_FRAG(REV_INIT_1)
 	fmt.Println(REV_FRAG_2.Verify(ctx_g2.Gossiper_crypto_config))
-	ctx_g2.SavePayload(REV_INIT_1)
 	fmt.Println(ctx_g2.SearchPayload(REV_INIT_1.GetID(), ComputeobjHash(REV_INIT_1)))
+	ctx_g2.SavePayload(REV_INIT_1)
+	hashbytes := ComputeobjHash(REV_INIT_1)
+	newnotification := Gossip_Notification{
+		Sender:     "1",
+		Period:     "1",
+		Type:       "REV_INIT",
+		Entity_URL: "1",
+		Objhash:    hashbytes,
+	}
+	newid := definition.Gossip_ID{
+		Period:     newnotification.Period,
+		Type:       newnotification.Type,
+		Entity_URL: newnotification.Entity_URL,
+	}
+	var reconnotification Gossip_Notification
+	newnotification_json, _ := json.Marshal(newnotification)
+	r := bytes.NewReader(newnotification_json)
+	json.NewDecoder(r).Decode(&reconnotification)
+	reconhash := reconnotification.Objhash
+	reconid := definition.Gossip_ID{
+		Period:     reconnotification.Period,
+		Type:       reconnotification.Type,
+		Entity_URL: reconnotification.Entity_URL,
+	}
+
+	fmt.Println(ctx_g2.SearchPayload(REV_INIT_1.GetID(), ComputeobjHash(REV_INIT_1)))
+	fmt.Println(ctx_g2.SearchPayload(newid, newnotification.Objhash))
+	fmt.Println(ctx_g2.SearchPayload(reconid, newnotification.Objhash))
+	fmt.Println(ctx_g2.SearchPayload(reconid, reconhash))
+	fmt.Println(bytes.Equal(newnotification.Objhash, reconhash))
+	fmt.Println([]byte(newnotification.Objhash))
+	fmt.Println([]byte(reconhash))
 	REV_FRAG_2 = ctx_g2.Remove_Payload(REV_FRAG_2)
 	msg, _ := json.Marshal(REV_FRAG_2)
 	fmt.Println(REV_FRAG_2.Payload)

@@ -1,7 +1,7 @@
 package gossiper
 
 import (
-	"encoding/json"
+	"bytes"
 	"errors"
 	"fmt"
 	"strconv"
@@ -27,10 +27,10 @@ type GossiperInterface interface {
 	Save()
 }
 
-func ComputeobjHash(obj definition.Gossip_object) string {
-	obj_json, _ := json.Marshal(obj)
-	hash_byte, _ := crypto.GenerateSHA256(obj_json)
-	return string(hash_byte)
+func ComputeobjHash(obj definition.Gossip_object) []byte {
+	tobehashed := []byte(obj.Signature[0] + obj.Signer + obj.Period + obj.Type + obj.Payload[0] + obj.Payload[1] + obj.Payload[2])
+	hash_byte, _ := crypto.GenerateSHA256(tobehashed)
+	return hash_byte
 }
 func countFragments(fragmentMap map[definition.Gossip_ID][]definition.Gossip_object) int {
 	count := 0
@@ -51,21 +51,20 @@ func (ctx *GossiperContext) SavePayload(g definition.Gossip_object) {
 	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.Unlock()
 }
 
-func (ctx *GossiperContext) SearchPayload(gid definition.Gossip_ID, ohash string) bool {
+func (ctx *GossiperContext) SearchPayload(gid definition.Gossip_ID, ohash []byte) bool {
 	gid.Type = definition.REV_INIT
+
+	// Start of the critical section
 	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RLock()
-	defer ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RUnlock()
-	if _, ok := ctx.Gossip_object_storage.REV_PAYLOAD[gid]; !ok {
+	obj, ok := ctx.Gossip_object_storage.REV_PAYLOAD[gid]
+	ctx.Gossip_object_storage.REV_PAYLOAD_LOCK.RUnlock()
+	// End of the critical section
+	if !ok {
 		return false
-	} else {
-		obj := ctx.Gossip_object_storage.REV_PAYLOAD[gid]
-		hash1 := ComputeobjHash(obj)
-		if hash1 == ohash {
-			return true
-		} else {
-			return false
-		}
 	}
+
+	hash1 := ComputeobjHash(obj)
+	return bytes.Equal(hash1, ohash)
 }
 
 func (ctx *GossiperContext) GetREVrequested(gid definition.Gossip_ID) definition.Gossip_object {

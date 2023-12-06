@@ -47,7 +47,7 @@ func handleRequests(c *GossiperContext) {
 }
 
 func Gossip_notification_handler(c *GossiperContext, w http.ResponseWriter, r *http.Request) {
-	fmt.Println(util.BLUE + "Received a new payload notification." + util.RESET)
+	//fmt.Println(util.BLUE + "Received a new payload notification." + util.RESET)
 	var notification Gossip_Notification
 	err := json.NewDecoder(r.Body).Decode(&notification)
 	bytecount := r.ContentLength
@@ -64,9 +64,9 @@ func Gossip_notification_handler(c *GossiperContext, w http.ResponseWriter, r *h
 		Type:       notification.Type,
 		Entity_URL: notification.Entity_URL,
 	}
-	fmt.Println(util.BLUE+"Received notification from "+notification.Sender+".", util.RESET)
-	fmt.Println("notification received: ", notification)
-	fmt.Println("GossipID Parsed: ", newID)
+	//fmt.Println(util.BLUE+"Received notification from "+notification.Sender+".", util.RESET)
+	//fmt.Println("notification received: ", notification)
+	//fmt.Println("GossipID Parsed: ", newID)
 	//fmt.Println(util.BLUE+"Received notification from "+notification.Sender+".", util.RESET)
 	if c.SearchPayload(newID, notification.Objhash) == false {
 		url := notification.Sender
@@ -113,10 +113,10 @@ func Gossip_request_handler(c *GossiperContext, w http.ResponseWriter, r *http.R
 		Entity_URL: notification.Entity_URL,
 	}
 	obj := c.GetREVrequested(newID)
-	fmt.Println(util.BLUE+"Received request from "+notification.Sender+".", util.RESET)
-	fmt.Println("request received: ", notification)
-	fmt.Println("GossipID Parsed: ", newID)
-	fmt.Println("Object Payload found: ", obj.Payload)
+	//fmt.Println(util.BLUE+"Received request from "+notification.Sender+".", util.RESET)
+	//fmt.Println("request received: ", notification)
+	//fmt.Println("GossipID Parsed: ", newID)
+	//fmt.Println("Object Payload found: ", obj.Payload)
 	if obj.Payload[0] != "" {
 		dstendpoint := "/gossip/rev_init"
 		msg, _ := json.Marshal(obj)
