@@ -110,6 +110,7 @@ type Gossip_Notification struct {
 	Period     string `json:"period"`
 	Type       string `json:"type"`
 	Entity_URL string `json:"entity_url"`
+	Objhash    string `json:"objhash"`
 }
 
 type Gossiper_log map[int]Gossiper_log_entry
