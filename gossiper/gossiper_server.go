@@ -68,7 +68,7 @@ func Gossip_notification_handler(c *GossiperContext, w http.ResponseWriter, r *h
 	fmt.Println("notification received: ", notification)
 	fmt.Println("GossipID Parsed: ", newID)
 	//fmt.Println(util.BLUE+"Received notification from "+notification.Sender+".", util.RESET)
-	if c.SearchPayload(newID, notification.Sender) == false {
+	if c.SearchPayload(newID, notification.Objhash) == false {
 		url := notification.Sender
 		dstendpoint := "/gossip/new_payload_request"
 		notification.Sender = c.Gossiper_crypto_config.SelfID.String()
