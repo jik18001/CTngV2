@@ -2,14 +2,9 @@
 
 This is a Proof of Concept/Prototype code for CTng. Each entity can be found in their corresponding folder, and additional details can be found in separate documentation.
 
-## Hardware Requirements
-
-- Intel 12th gen core i7 12700K or above
-- 32 GB of system memory or above
-
 ## Software Requirements
 
-- WSL2 11.1.0ubuntu4 Operating System
+- Ubuntu 22.04
 - Visual Studio Code with Golang extension
 - Golang 1.19
 - g++ (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0
