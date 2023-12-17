@@ -1,6 +1,6 @@
 # CTng: Certificate and Revocation Transparency
 
-This is a Proof of Concept/Prototype code for CTng. Each entity can be found in their corresponding folder, and additional details can be found in separate documentation.
+This is a Proof of Concept/Prototype code for CTng. Each entity can be found in their corresponding folder.
 
 ## Software Requirements
 
